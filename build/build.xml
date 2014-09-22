@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!-- 
+Ejercicio: Valors Base de Datos
+Autores: Felipe Otalora y Sebastian Florez
+-->
+
+<project name="ValorAndes" default="deploy" basedir="../">
+	<!--
+	*******************************************************
+		Generales
+	*******************************************************
+	-->
+	
+	<!-- Classpath para compilación: incluye todos los jar del directorio lib -->
+	
+	<path id="classpath">
+	   <fileset dir="./WebContent/WEB-INF/lib/">
+	      <include name="*.jar"/>
+	   </fileset>
+	</path>
+
+	<!-- Inicialización de las propiedades:  -->
+	
+	<target name="init" description="Inicializa las propiedades">
+		<!-- Cambie esta línea según el punto en el que esté instalado JBboss -->
+		<property environment="env"/>
+		<property name="server.home" value="${env.JBOSS_HOME}"/>
+		<property name="server.path" value="standalone/deployments" />
+		
+		<!-- Definición de propiedades -->
+		<property name="source" value="./src" />
+		<property name="classes" value="./classes" />
+		<property name="data" value="./data" />
+		<property name="dist" value="./dist" />
+		<property name="war" value="${ant.project.name}.war" />
+		<property name="lib" value="./WebContent/WEB-INF/lib/" />
+		<property name="jsps" value="./WebContent" />
+		<property name="web.xml" value="./WebContent/WEB-INF/web.xml" />
+		
+		<!-- Borra y crea los directorios nuevamente -->
+		<delete dir="${dist}" />
+		<mkdir dir="${dist}" />
+		<delete dir="${classes}" />
+		<mkdir dir="${classes}" />
+	</target>
+
+	<!--
+	*******************************************************
+		Construcción del programa
+	*******************************************************
+	-->
+
+	<!-- Compilación -->
+	<target name="compile" description="Compilación" depends="init">
+		<javac srcdir="${source}" destdir="${classes}" debug = "true" includeantruntime="false">
+			<classpath refid="classpath" />
+			<compilerarg value="-Xlint:unchecked"/>
+		</javac>
+	</target>
+
+	<!-- Creación del WAR -->
+	<target name="build" depends="compile" description="Crea el WAR de la aplicación">	
+			<war destfile="${dist}/${war}" webxml="${web.xml}">
+				<fileset dir="${data}" />
+				<fileset dir="${jsps}" />
+				<lib dir="${lib}"/>
+				<classes dir="${classes}"/>
+			</war>
+		</target>
+
+	<!-- Hace el deploy de la aplicación en el servidor WEB-->
+	<target name="deploy" depends="build, undeploy" description="Realiza deploy de la aplicación sobre JBoss">
+			<copy todir="${server.home}/${server.path}">
+				<fileset file="${dist}/${war}" />
+			</copy>
+		</target>
+	
+	<!-- Undeploy de la aplicación -->
+	<target name="undeploy" depends="init" description="Borra todos los archivos instalados en JBoss">
+		<delete file="${server.home}/${server.path}/${war}" />
+	</target>
+
+</project>
