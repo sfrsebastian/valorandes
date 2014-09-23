@@ -35,7 +35,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="home.jsp">ValorAndes</a>
+                <a class="navbar-brand" href="./home.jsp">ValorAndes</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -264,7 +264,7 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a class="active" href="/home.jsp"><i class="fa fa-dashboard fa-fw"></i> Principal</a>
+                            <a class="active" href="./home.jsp"><i class="fa fa-dashboard fa-fw"></i> Principal</a>
                         </li>
                         <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Operaciones<span class="fa arrow"></span></a>
@@ -282,11 +282,11 @@
                             <a href="estadisticas.jsp"><i class="fa fa-table fa-fw"></i> Estadisticas</a>
                         </li>
 
-                        <!--<c:if test="${sessionScope.tipo == 'EMPRESA'}">-->
+                        <c:if test="${sessionScope.tipo == 'Empresa' || sessionScope.tipo == 'Inversionista'}">
                         <li>
                             <a href="valores.jsp"><i class="fa fa-edit fa-fw"></i> Valores</a>
                         </li>
-                        <!--</c:if>-->
+                        </c:if>
 
                         <li>
                             <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow"></span></a>

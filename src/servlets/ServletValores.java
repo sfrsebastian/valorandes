@@ -5,6 +5,8 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Calendar;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,13 +48,13 @@ public class ServletValores extends HttpServlet {
 		String nombre = request.getParameter("nombre");
 		if(nombre.isEmpty()){
 			error = true;
-			causa = "El nombre no puede ser vacío";
+			causa = "El nombre no puede ser vacio";
 		}
 
 		String descripcion = request.getParameter("descripcion");
 		if(descripcion.isEmpty() && !error){
 			error = true;
-			causa = "La descripción no puede ser vacia";
+			causa = "La descripcion no puede ser vacia";
 		}
 		int cantidad = -1;
 		try{
@@ -82,12 +84,12 @@ public class ServletValores extends HttpServlet {
 
 		if(sqlFechaExpiracion!= null && sqlFechaExpiracion.compareTo(sqlFechaLanzamiento)<0 && !error){
 			error = true;
-			causa = "La fecha de expiración debe ser una fecha futura";
+			causa = "La fecha de expiracion debe ser una fecha futura";
 		}
 
 		String tipo = request.getParameter("tipo");
 
-		//TODO solicitar id de usuario activo(idoferente)
+		int idOferente = (Integer) request.getSession().getAttribute("id");
 
 		if(tipo.equals("BONO")){
 			String tipo_bono = request.getParameter("tipo_bono");
@@ -98,16 +100,16 @@ public class ServletValores extends HttpServlet {
 			catch(Exception e){
 				if(!error){
 					error = true;
-					causa = "El interés no puede ser vacío";
+					causa = "El interes no puede ser vacio";
 				}
 			}
 			if(interes<0 && !error){
 				error = true;
-				causa = "El interés debe ser mayor o igual a cero";
+				causa = "El interes debe ser mayor o igual a cero";
 			}
 			int tipoInteres = request.getParameter("tipo_interes").equals("fijo")?2:1;
 			if(!error){
-				Bono bono = new Bono(0,nombre,descripcion,cantidad,sqlFechaLanzamiento,sqlFechaExpiracion,1,interes,tipoInteres,tipo_bono);
+				Bono bono = new Bono(0,nombre,descripcion,cantidad,sqlFechaLanzamiento,sqlFechaExpiracion,idOferente,interes,tipoInteres,tipo_bono);
 				ValorAndesDB.getInstance().registrarBono(bono);
 			}
 		}
@@ -119,7 +121,7 @@ public class ServletValores extends HttpServlet {
 			catch(Exception e){
 				if(!error){
 					error = true;
-					causa = "El precio previsto no puede ser vacío";
+					causa = "El precio previsto no puede ser vacio";
 				}
 			}
 			if(precioAccion<0 && !error){
@@ -133,12 +135,12 @@ public class ServletValores extends HttpServlet {
 			catch(Exception e){
 				if(!error){
 					error = true;
-					causa = "El rendimiento no puede ser vacío";
+					causa = "El rendimiento no puede ser vacio";
 				}
 			}
 			int tipoAccion = Integer.parseInt(request.getParameter("tipo_accion"));
 			if(!error){
-				Accion accion = new Accion(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, 1, tipoAccion, precioAccion, rendimientoAccion);
+				Accion accion = new Accion(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, idOferente, tipoAccion, precioAccion, rendimientoAccion);
 				ValorAndesDB.getInstance().registrarAccion(accion);
 			}
 		}
@@ -146,17 +148,24 @@ public class ServletValores extends HttpServlet {
 			String numeroCertificado = request.getParameter("certificado_numero");
 			if(numeroCertificado.isEmpty() && !error){
 				error = true;
-				causa = "El número de certificado no puede ser vacío";
+				causa = "El numero de certificado no puede ser vacio";
 			}
 			int tipoCertificado = Integer.parseInt(request.getParameter("tipo_certificado"));
 			if(!error){
-				Certificado certificado = new Certificado(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, 1, tipoCertificado, numeroCertificado);
+				Certificado certificado = new Certificado(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, idOferente, tipoCertificado, numeroCertificado);
 				ValorAndesDB.getInstance().registrarCertificado(certificado);
 			}
 		}
 		
-		if(error)
-			response.sendRedirect("./valores.jsp?error=SI&causa="+causa);
+		if(error){
+			request.setAttribute("causa", causa);
+			String url="/valores.jsp?error=SI"; 
+			ServletContext sc = getServletContext();
+			RequestDispatcher rd = sc.getRequestDispatcher(url);
+		    rd.forward(request, response);
+		}else{
+			response.sendRedirect("./valores.jsp?error=NO");
+		}
 	}
 
 }

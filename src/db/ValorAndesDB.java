@@ -11,6 +11,9 @@ import java.sql.Statement;
 import model.Accion;
 import model.Bono;
 import model.Certificado;
+import model.Corredor;
+import model.Empresa;
+import model.Inversionista;
 import model.Usuario;
 import model.Valor;
 
@@ -127,14 +130,36 @@ public class ValorAndesDB {
 	//-----------------------------------------------------------------
 
 	/**
-	 * Autentica los credenciales del usuario dado el usuari y palabra clave
+	 * Autentica los credenciales del usuario dado el usuario y palabra clave
 	 * @param usuario String El usuario ingresado
-	 * @param constrasena String La contrasena ingresada
+	 * @param contrasena String La contrasena ingresada
 	 * @return TRUE si se encontro en BD, FALSE en caso contrario
 	 */
-	public boolean autenticarUsuario(String usuario, String constrasena){
-		//TODO escribir la consulta SQL
-		return true;
+	public Object[] autenticarUsuario(String usuario, String contrasena){
+		try{
+			startConnection();
+			String sql = "SELECT u.id,t.nombre FROM usuarios u INNER JOIN TIPOS_USUARIO t ON u.tipo = t.id WHERE usuario = ? AND password = ?";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setString(1, usuario);
+			ps.setString(2, contrasena);
+			
+			ResultSet set = ps.executeQuery();
+			
+			if(set.next()){
+				Object[] hola = {set.getInt("ID"), set.getString("nombre")};
+				closeConnection();
+				return hola;
+			}else{
+				closeConnection();
+				return null;
+			}
+		}
+		catch(Exception e){
+			System.out.println("Error autenticando usuario: " + usuario);
+		}
+		
+		
+		return null;
 	}
 
 	/**
@@ -344,6 +369,38 @@ public class ValorAndesDB {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Asocia el corredor a la empresa determinada
+	 * @param empresa La empresa a la que se quiere asociar al corredor
+	 * @param corredor El corredor que se quiere asociar a la empresa
+	 */
+	public void asociarCorredorEmpresa(Empresa empresa, Corredor corredor){
+		
+	}
+	
+	/**
+	 * Asocia un corredor a un inversionista determinado <br>
+	 * pre: El inversionista y el corredor deben existir
+	 * @param inversionista El inversionista que se quiere asociar
+	 * @param corredor El corredor que se quiere asociar
+	 */
+	public void asociarInversionistaCorredor(Inversionista inversionista, Corredor corredor){
+		try{
+			startConnection();
+			String sql = "DELETE FROM VALORES WHERE ID = ?";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			
+			
+			
+			ps.executeUpdate();
+			conexion.commit();
+			closeConnection();
+		}
+		catch(Exception e){
+			System.out.println("Error asociando corredor e inversionista");
+		}
 	}
 	
 	/**

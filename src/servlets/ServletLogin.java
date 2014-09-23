@@ -56,14 +56,17 @@ public class ServletLogin extends HttpServlet {
 
 			boolean error = false;
 
-			if(usuario != null && pass != null && !usuario.equals("") && !pass.equals("")){
-				if(conexionDAO.autenticarUsuario(usuario, pass)){
-					HttpSession session = request.getSession();
-					session.setAttribute("usuario", usuario);
-					session.setAttribute("tipo", "EMPRESA");
-					response.sendRedirect("./home.jsp");
-				}else
-					error = true;
+			if(!usuario.equals("") && !pass.equals("")){
+					Object[] valores = ValorAndesDB.getInstance().autenticarUsuario(usuario, pass);
+					if(valores != null){
+						HttpSession session = request.getSession();
+						session.setAttribute("usuario", usuario);
+						session.setAttribute("id", valores[0]);
+						session.setAttribute("tipo", valores[1]);
+						response.sendRedirect("./home.jsp");
+					}
+					else
+						error = true;
 			}else
 				error = true;
 

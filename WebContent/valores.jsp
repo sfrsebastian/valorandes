@@ -70,7 +70,7 @@
 				user="ISIS2304141420" password="yatai48ea6" />
 
 			<sql:query dataSource="${snapshot}" var="result">
-                        select * from valores where ID_oferente = 1
+                        select * from valores where ID_oferente = '${sessionScope.id}'
                     </sql:query>
 
 			<h1 class="page-header">Valores</h1>
@@ -111,7 +111,7 @@
 			<c:if test="${param.error == 'SI'}">
 				<div class="alert alert-danger">
 					<a href="#" class="close" data-dismiss="alert">&times;</a>
-					"${param.causa}"
+					<c:out value="${causa}"/>
 				</div>
 			</c:if>
 
