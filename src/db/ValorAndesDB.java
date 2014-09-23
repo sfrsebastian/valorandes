@@ -8,7 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import model.Bono;
 import model.Usuario;
+import model.Valor;
 
 //import Model.Bebedor;
 
@@ -104,6 +106,12 @@ public class ValorAndesDB {
 		}
 	} 
 
+	/**
+	 * Ejecuta la sentencia pasada por parametro
+	 * @param query
+	 * @return
+	 * @throws SQLException
+	 */
 	public ResultSet makeQuery(String query) throws SQLException{
 		startConnection();
 		Statement statement = conexion.createStatement();
@@ -194,28 +202,25 @@ public class ValorAndesDB {
 	 * @param nIdOferente
 	 * @return true si se agrego correctamente, false de lo contrario.
 	 */
-	private boolean registrarValor(int nId,String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion,int nTipo, 
-			int nIdOferente){
-
+	private boolean registrarValor(Valor valor){
 		try{
 			startConnection();
 			String sql = "INSERT INTO VALORES (ID, NOMBRE, DESCRIPCION, CANTIDAD_DISPONIBLE, FECHA_LANZAMIENTO, FECHA_EXPIRACION, TIPO, ID_OFERENTE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
-			ps.setInt(1, nId);
-			ps.setString(2,nNombre);
-			ps.setString(3, nDescripcion);
-			ps.setInt(4,nCantidad);
-			ps.setDate(5,nFechaLanzamiento);
-			ps.setDate(6, nFechaExpiracion);
-			ps.setInt(7, nTipo);
-			ps.setInt(8,nIdOferente);
+			ps.setInt(1, valor.getId());
+			ps.setString(2,valor.getNombre());
+			ps.setString(3, valor.getDescripcion());
+			ps.setInt(4,valor.getCantidad());
+			ps.setDate(5,valor.getFechaLanzamiento());
+			ps.setDate(6, valor.getFechaExpiracion());
+			ps.setInt(7, valor.getTipo());
+			ps.setInt(8,valor.getIdOferente());
 			ps.executeUpdate();
 			conexion.commit();
 			return true;
 		}
 		catch(SQLException e){
-			System.out.println("Error SQL registrando valor con nombre: " + nNombre);
-			e.printStackTrace();
+			System.out.println("Error SQL registrando valor con nombre: " + valor.getNombre());
 			return false;
 		}
 		finally{
@@ -225,43 +230,32 @@ public class ValorAndesDB {
 
 	/**
 	 * Agrega en tabla de bonos un nuevo bono con valores dados.
-	 * @param nNombre
-	 * @param nDescripcion
-	 * @param nCantidad
-	 * @param nFechaLanzamiento
-	 * @param nFechaExpiracion
-	 * @param nIdOferente
-	 * @param nTipo
-	 * @param nInteres
-	 * @param nTipoInteres
-	 * @param nTipoBono
+	 * Si ocurre error registrando bono se elimina el cambio del valor que se agrego.
+	 * @param bono El bono a agregar.
 	 * @return true si se agrego correctamente, false de lo contrario.
-	 * @throws SQLException
 	 */
-	public boolean registrarBono(String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, double nInteres, int nTipoInteres, String nTipoBono){
-
-		if(oferenteValido(nIdOferente)){
+	public boolean registrarBono(Bono bono){
+		if(oferenteValido(bono.getIdOferente())){
 			//Agrega un nuevo valor
 			int id = proximoIdValores();
-			if(registrarValor(id,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,darIdTipoUsuario("Bono"),nIdOferente)){
+			bono.setId(id);
+			if(registrarValor(bono)){
 				//Agrega un nuevo Bono
 				try{
 					startConnection();
 					String sql = "INSERT INTO BONOS (ID, INTERES, TIPO_INTERES, TIPO) VALUES (?, ?, ?, ?)";
 					PreparedStatement ps = conexion.prepareStatement(sql);
 					ps.setInt(1, id);
-					ps.setDouble(2, nInteres);
-					ps.setInt(3,nTipoInteres);
-					ps.setString(4, nTipoBono);
+					ps.setDouble(2, bono.getInteres());
+					ps.setInt(3, bono.getTipoInteres());
+					ps.setString(4, bono.getTipoBono());
 					ps.executeQuery();
 					conexion.commit();
 					return true;
 				}
 				catch(SQLException e){
 					//Elimina valor agregado en valores por error agregando bono
-					System.out.println("Error agregando nuevo Bono con nombre: " + nNombre +". \n Eliminando Valor...");
-					e.printStackTrace();
+					System.out.println("Error agregando nuevo Bono con nombre: " + bono.getNombre() +". \n Eliminando Valor...");
 					eliminarValorPorId(id);
 					System.out.println("Valor eliminado");
 				}
@@ -273,6 +267,10 @@ public class ValorAndesDB {
 		return false;
 	}
 
+	/**
+	 * Elimina el valor con Id dado.
+	 * @param id
+	 */
 	private void eliminarValorPorId(int id){
 		try{
 			startConnection();
@@ -286,27 +284,12 @@ public class ValorAndesDB {
 		catch(Exception e){
 			System.out.println("Error eliminando en tabla valores ID: "+ id);
 		}
-
 	}
 
-	private int darIdTipoUsuario(String tipo){
-		try {
-			startConnection();
-			String sql = "SELECT ID FROM TIPOS_VALOR WHERE NOMBRE = ?";
-			PreparedStatement ps = conexion.prepareStatement(sql);
-			ps.setString(1, tipo);
-			ResultSet set = ps.executeQuery();
-			set.next();
-			return set.getInt("ID");
-		} catch (SQLException e) {
-			System.out.println("Error consultando tipo usuario");
-		}
-		finally{
-			closeConnection();
-		}
-		return 0;
-	}
-
+	/**
+	 * Retorna el id del proximo valor.
+	 * @return max(id) + 1
+	 */
 	private int proximoIdValores(){
 		try{
 			startConnection();
@@ -326,6 +309,11 @@ public class ValorAndesDB {
 		return 1;
 	}
 
+	/**
+	 * Indica si el oferente con id dado es empresa o inversionista.
+	 * @param id
+	 * @return true si se valida correctamente, false de lo contrario.
+	 */
 	private boolean oferenteValido(int id){
 		try {
 			startConnection();
