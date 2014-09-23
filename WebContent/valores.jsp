@@ -25,6 +25,8 @@
                $("#form-valores").append($(input));
             $("#form-valores").submit();
         });
+
+        $('#tabla-valores').DataTable();
     });
 
     function cambiarVariable(nueva){
@@ -43,31 +45,40 @@
                      user="ISIS2304141420"  password="yatai48ea6"/>
 
                     <sql:query dataSource="${snapshot}" var="result">
-                        select dueno.cantidad as cantidad, val.nombre as nombre, dueno.valor_unitario_compra as valor
-                        from (select * 
-                            from DUENO_VALOR WHERE ID_DUENO= 201) dueno INNER JOIN VALORES val ON dueno.ID_VALOR=val.ID
+                        select * from valores where ID_oferente = 1
                     </sql:query>
 
                     <h1 class="page-header">Valores</h1>
-                    <h3>Valores Registrados</h3>
-                    <table class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>First Name</th>
-                          <th>Last Name</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <c:forEach var="row" items="${result.rows}">
-                            <tr>
-                                <td><c:out value="${row.cantidad}"/></td>
-                                <td><c:out value="${row.nombre}"/></td>
-                                <td><c:out value="${row.valor}"/></td>
-                            </tr>
-                        </c:forEach>
-                      </tbody>
-                    </table>
+                    <!-- <h3>Valores Registrados</h3> -->
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <button class="btn btn-info btn-lg btn-block" id="valores">Agregar Valor</button>
+                        </div>
+                        <div class="panel-body">    
+                          <table class="table table-striped" id="tabla-valores">
+                            <thead>
+                              <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Cantidad disponible</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <c:forEach var="row" items="${result.rows}">
+                                  <tr>
+                                      <td><c:out value="${row.id}"/></td>
+                                      <td><c:out value="${row.nombre}"/></td>
+                                      <td><c:out value="${row.cantidad_disponible}"/></td>
+                                  </tr>
+                              </c:forEach>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="panel-footer">
+                           Footer 
+                        </div>
+                    </div>
 
                     <c:if test="${param.error == 'NO'}">
                         <div class="alert alert-success">Se ha ingresado un nuevo valor con los datos suministrados.</div>
@@ -77,7 +88,6 @@
                     </c:if>
 
                     <!--AQUI LA OTRA PARTE-->
-                    <button class="btn btn-info btn-lg btn-block" id="valores">Agregar Valor</button>
 
                 </div>
                 <!-- /.col-lg-12 -->
@@ -121,7 +131,7 @@
                         <div class="panel-heading">
                           <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onClick="cambiarVariable('BONO')">
-                                Bonos
+                                Bono
                             </a>
                           </h4>
                         </div>
@@ -162,26 +172,65 @@
                         <div class="panel-heading">
                           <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onClick="cambiarVariable('ACCION')">
-                                Acciones
+                                Accion
                             </a>
                           </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse">
                           <div class="panel-body">
 
+                            <h5>Tipo de Accion</h5>
+
+                            <sql:query dataSource="${snapshot}" var="result">
+                        select distinct nombre, ID from TIPOS_ACCION
+                            </sql:query>
+                           <c:forEach var="row" items="${result.rows}">
+                              <div class="radio">
+                                  <label>
+                                    <input type="radio" name="tipo_accion" id="optionsRadios2" value="${row.id}">
+                                    <c:out value="${row.nombre}"/>
+                                </label>
+                              </div>
+                          </c:forEach>
+
+                          <div class="form-group">
+                              <label for="accion_precio">Precio Accion Esperado</label>
+                              <input type="text" class="form-control" id="accion_precio" placeholder="Precio Accion" name="accion_precio">
                           </div>
+                          <div class="form-group">
+                              <label for="accion_rendimiento">Rendimiento Accion</label>
+                              <input type="text" class="form-control" id="accion_rendimiento" placeholder="Rendimiento Accion" name="accion_rendimiento">
+                          </div>
+                          
                         </div>
                       </div>
+                    </div>
                       <div class="panel panel-default">
                         <div class="panel-heading">
                           <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" onClick="cambiarVariable('CERTIFICADO')">
-                                Certificados
+                                Certificado
                             </a>
                           </h4>
                         </div>
                         <div id="collapseThree" class="panel-collapse collapse">
                           <div class="panel-body">
+                            <div class="form-group">
+                              <label for="certificado_numero">Numero de Certificados</label>
+                              <input type="text" class="form-control" id="certificado_numero" placeholder="Numero de Certificados" name="certificado_numero">
+                            </div>
+
+                            <sql:query dataSource="${snapshot}" var="result">
+                              select distinct nombre, ID from TIPOS_CERTIFICADO
+                            </sql:query>
+                           <c:forEach var="row" items="${result.rows}">
+                              <div class="radio">
+                                  <label>
+                                    <input type="radio" name="tipo_certificado" id="optionsRadios2" value="${row.id}">
+                                    <c:out value="${row.nombre}"/>
+                                </label>
+                              </div>
+                          </c:forEach>
 
                           </div>
                         </div>
