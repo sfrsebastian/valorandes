@@ -36,46 +36,37 @@ public class ServletValores extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//Atributos VALOR
 		String nombre = request.getParameter("nombre");
 		String descripcion = request.getParameter("descripcion");
-		String fechaExpiracion = request.getParameter("fecha_expiracion");
-		String tipo = request.getParameter("tipo");
 		String cantidad = request.getParameter("cantidad");
 		
-		boolean error = false;
+		java.util.Date fechaLanzamiento = new java.util.Date();
+		Date sqlFechaLanzamiento = new Date(fechaLanzamiento.getTime());
 		
+		String fechaExpiracion = request.getParameter("fecha_expiracion");
+		String[] fechas = fechaExpiracion.split(":");
+		Calendar c = Calendar.getInstance();
+		c.set((Integer.parseInt(fechas[0])), Integer.parseInt(fechas[1]), Integer.parseInt(fechas[2]));
+		Date sqlFechaExpiracion = new Date(c.getTimeInMillis());
+		
+		String tipo = request.getParameter("tipo");
+		
+		//TODO solicitar id de usuario activo(idoferente)
+		
+		//Atributos BONO
+		String tipo_bono = request.getParameter("tipo_bono");
+		String interes = request.getParameter("interes");
+		String tipoInteres = request.getParameter("tipo_interes");
+		int tipoInteress = tipoInteres.equals("fijo")?1:2;
+		
+		boolean error = false;
 		if(nombre != null && descripcion != null && cantidad != null){
 			if(!nombre.equals("") && !descripcion.equals("") && !cantidad.equals("")){
 				if(tipo.equals("BONO")){
-					
 					//TODO hacer validaciones
-					
-					String tipo_bono = "";
-					if(request.getParameter("tipo_bono").equals("privado")){
-						tipo_bono = "privado";
-					}else
-						tipo_bono = "publico";
-					String interes = request.getParameter("interes");
-					String tipoInteres = request.getParameter("tipo_interes");
-					
-					int tipoInteress = 0;
-					
-					if(tipoInteres.equals("fijo"))
-						tipoInteress = 1;
-					else
-						tipoInteress = 2;
-					
-					java.util.Date fechaLanzamiento = new java.util.Date();
-					Date sqlFechaLanzamiento = new Date(fechaLanzamiento.getTime());
-					String[] fechas = fechaExpiracion.split(":");
-					Calendar c = Calendar.getInstance();
-					c.set((Integer.parseInt(fechas[0])), Integer.parseInt(fechas[1]), Integer.parseInt(fechas[2]));
-					Date sqlFechaExpiracion = new Date(c.getTimeInMillis());
-					
 					ValorAndesDB.getInstance().registrarBono(nombre, descripcion, Integer.parseInt(cantidad), sqlFechaLanzamiento, sqlFechaExpiracion, 1, Double.parseDouble(interes), tipoInteress, tipo_bono);
-
 				}
-				
 				response.sendRedirect("./valores.jsp?error=NO");
 				
 			}else
