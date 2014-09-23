@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import model.Accion;
 import model.Bono;
 import model.Usuario;
 import model.Valor;
@@ -254,7 +255,7 @@ public class ValorAndesDB {
 					return true;
 				}
 				catch(SQLException e){
-					//Elimina valor agregado en valores por error agregando bono
+					//Elimina valor agregado en valores por error al agregar accion
 					System.out.println("Error agregando nuevo Bono con nombre: " + bono.getNombre() +". \n Eliminando Valor...");
 					eliminarValorPorId(id);
 					System.out.println("Valor eliminado");
@@ -267,6 +268,45 @@ public class ValorAndesDB {
 		return false;
 	}
 
+	/**
+	 * Agrega en tabla de acciones una nueva accion con valores dados.
+	 * Si ocurre error registrando accion se elimina el cambio del valor que se agrego.
+	 * @param accion La accion a agregar.
+	 * @return true si se agrego correctamente, false de lo contrario.
+	 */
+	public boolean registrarAccion(Accion accion){
+		if(oferenteValido(accion.getIdOferente())){
+			//Agrega un nuevo valor
+			int id = proximoIdValores();
+			accion.setId(id);
+			if(registrarValor(accion)){
+				//Agrega una nueva accion
+				try{
+					startConnection();
+					String sql = "INSERT INTO ACCIONES (ID, TIPO, PRECIO_ESPERADO_ANIO_ACTUAL, RENDIMIENTO) VALUES (?, ?, ?, ?);";
+					PreparedStatement ps = conexion.prepareStatement(sql);
+					ps.setInt(1, id);
+					ps.setInt(2, accion.getTipoAccion());
+					ps.setDouble(3, accion.getPrecioEsperadoAnioActual());
+					ps.setDouble(4, accion.getRendimiento());
+					ps.executeQuery();
+					conexion.commit();
+					return true;
+				}
+				catch(SQLException e){
+					//Elimina valor agregado en valores por error al agregar accion
+					System.out.println("Error agregando nueva Accion con nombre: " + accion.getNombre() +". \n Eliminando Valor...");
+					eliminarValorPorId(id);
+					System.out.println("Valor eliminado");
+				}
+				finally{
+					closeConnection();
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Elimina el valor con Id dado.
 	 * @param id
