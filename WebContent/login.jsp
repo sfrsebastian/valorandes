@@ -104,6 +104,7 @@
                 </div>
           </div>
           <div class="modal-footer">
+            <input type="hidden" value="REGISTRAR_EMPRESA" name="tipo">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             <button type="button" type="submit" class="btn btn-primary">Registrarse</button>
             </form>

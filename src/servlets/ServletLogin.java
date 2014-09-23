@@ -48,6 +48,10 @@ public class ServletLogin extends HttpServlet {
 	
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		
+		String tipo = request.getParameter("tipo");
+		
+		
 		String usuario = request.getParameter("usuario");
 		String pass = request.getParameter("password");
 		
