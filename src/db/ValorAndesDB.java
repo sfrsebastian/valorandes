@@ -10,6 +10,7 @@ import java.sql.Statement;
 
 import model.Accion;
 import model.Bono;
+import model.Certificado;
 import model.Usuario;
 import model.Valor;
 
@@ -283,7 +284,7 @@ public class ValorAndesDB {
 				//Agrega una nueva accion
 				try{
 					startConnection();
-					String sql = "INSERT INTO ACCIONES (ID, TIPO, PRECIO_ESPERADO_ANIO_ACTUAL, RENDIMIENTO) VALUES (?, ?, ?, ?);";
+					String sql = "INSERT INTO ACCIONES (ID, TIPO, PRECIO_ESPERADO_ANIO_ACTUAL, RENDIMIENTO) VALUES (?, ?, ?, ?)";
 					PreparedStatement ps = conexion.prepareStatement(sql);
 					ps.setInt(1, id);
 					ps.setInt(2, accion.getTipoAccion());
@@ -296,6 +297,44 @@ public class ValorAndesDB {
 				catch(SQLException e){
 					//Elimina valor agregado en valores por error al agregar accion
 					System.out.println("Error agregando nueva Accion con nombre: " + accion.getNombre() +". \n Eliminando Valor...");
+					eliminarValorPorId(id);
+					System.out.println("Valor eliminado");
+				}
+				finally{
+					closeConnection();
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Agrega en tabla de certificados un nuevo certificado con valores dados.
+	 * Si ocurre error registrando certificado se elimina el cambio del valor que se agrego.
+	 * @param certificado El certificado a agregar.
+	 * @return true si se agrego correctamente, false de lo contrario.
+	 */
+	public boolean registrarCertificado(Certificado certificado){
+		if(oferenteValido(certificado.getIdOferente())){
+			//Agrega un nuevo valor
+			int id = proximoIdValores();
+			certificado.setId(id);
+			if(registrarValor(certificado)){
+				//Agrega un nuevo certificado
+				try{
+					startConnection();
+					String sql = "INSERT INTO CERTIFICADOS (ID, TIPO, NUMERO) VALUES (?, ?, ?)";
+					PreparedStatement ps = conexion.prepareStatement(sql);
+					ps.setInt(1, id);
+					ps.setInt(2, certificado.getTipoCertificado());
+					ps.setString(3, certificado.getNumero());
+					ps.executeQuery();
+					conexion.commit();
+					return true;
+				}
+				catch(SQLException e){
+					//Elimina valor agregado en valores por error al agregar accion
+					System.out.println("Error agregando Certificado con nombre: " + certificado.getNombre() +". \n Eliminando Valor...");
 					eliminarValorPorId(id);
 					System.out.println("Valor eliminado");
 				}
