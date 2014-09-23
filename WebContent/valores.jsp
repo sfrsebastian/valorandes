@@ -8,6 +8,31 @@
 <%! String pageTitle = "ValorAndes - Valores"; %>
 <%@ include file="inc/headerHome.jsp" %>
 
+<script type="text/javascript">
+    var seleccionado = "BONO";
+
+    $(document).ready(function(){
+        $("#valores").click(function(){
+            $("#modal-valores").modal();
+        });      
+
+
+        $("#submit-valores").click(function (){
+            console.log(seleccionado);
+            var input = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "tipo").val(seleccionado);
+               $("#form-valores").append($(input));
+            $("#form-valores").submit();
+        });
+    });
+
+    function cambiarVariable(nueva){
+        seleccionado = nueva;
+        console.log("cambiando variable a " + nueva);
+    }
+</script>
+
         <!-- Page Content -->
         <div id="page-wrapper">
             <div class="row">
@@ -31,7 +56,6 @@
                           <th>#</th>
                           <th>First Name</th>
                           <th>Last Name</th>
-                          <!--<th>Username</th>-->
                         </tr>
                       </thead>
                       <tbody>
@@ -40,13 +64,20 @@
                                 <td><c:out value="${row.cantidad}"/></td>
                                 <td><c:out value="${row.nombre}"/></td>
                                 <td><c:out value="${row.valor}"/></td>
-                                <!--<td><c:out value="${row}"/></td>-->
                             </tr>
                         </c:forEach>
                       </tbody>
                     </table>
 
+                    <c:if test="${param.error == 'NO'}">
+                        <div class="alert alert-success">Se ha ingresado un nuevo valor con los datos suministrados.</div>
+                    </c:if>
+                    <c:if test="${param.error == 'SI'}">
+                        <div class="alert alert-danger">Ha ingresado los datos de manera incorrecta.</div>
+                    </c:if>
+
                     <!--AQUI LA OTRA PARTE-->
+                    <button class="btn btn-info btn-lg btn-block" id="valores">Agregar Valor</button>
 
                 </div>
                 <!-- /.col-lg-12 -->
@@ -57,6 +88,115 @@
 
     </div>
     <!-- /#wrapper -->
+
+    <div class="modal fade" id="modal-valores" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+            <h4 class="modal-title" id="myModalLabel"><span class="glyphicon glyphicon-briefcase"></span> Ingresar Valor</h4>
+          </div>
+          <div class="modal-body">
+            <form action="./valores.html" method="POST" role="form" id="form-valores">
+                <div class="form-group">
+                    <label for="nombre_valor">Nombre del valor</label>
+                    <input type="text" class="form-control" id="nombre_valor" placeholder="Ingrese nombre del valor" name="nombre">
+                </div>
+                <div class="form-group">
+                    <label for="valor_cantidad">Cantidad</label>
+                    <input type="text" class="form-control" id="valor_cantidad" placeholder="Ingrese la cantidad" name="cantidad">
+                </div>
+                <div class="form-group">
+                    <label for="password_Empresa">Descripcion </label>
+                    <textarea class="form-control" rows="3" name="descripcion"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="cantidad_valor">Fecha expiracion</label>
+                    <input type="text" class="form-control" id="cantidad_valor" placeholder="AAAA:MM:DD" name="fecha_expiracion">
+                </div>
+                    <p>Seleccione el tipo de valor que desea ingresar. Es posible que se requiera informacion adicional</p>
+
+                    <div class="panel-group" id="accordion">
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" onClick="cambiarVariable('BONO')">
+                                Bonos
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                          <div class="panel-body">
+                            <div class="radio">
+                              <label>
+                                <input type="radio" name="tipo_bono" id="optionsRadios1" value="Privado" checked>
+                                Bono Privado
+                              </label>
+                            </div>
+                            <div class="radio">
+                              <label>
+                                <input type="radio" name="tipo_bono" id="optionsRadios2" value="Publico">
+                                Bono Publico
+                              </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="valor_interes">Interes</label>
+                                <input type="text" class="form-control" id="valor_interes" placeholder="Interes" name="interes">
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="tipo_interes" id="optionsRadios1" value="fijo" checked>
+                                    Interes Fijo
+                                  </label>
+                                </div>
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="tipo_interes" id="optionsRadios2" value="variable">
+                                    Interes Variable
+                                </label>
+                            </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" onClick="cambiarVariable('ACCION')">
+                                Acciones
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse">
+                          <div class="panel-body">
+
+                          </div>
+                        </div>
+                      </div>
+                      <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" onClick="cambiarVariable('CERTIFICADO')">
+                                Certificados
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse">
+                          <div class="panel-body">
+
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" id="submit-valores">Agregar Valor</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>

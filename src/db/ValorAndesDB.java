@@ -59,6 +59,12 @@ public class ValorAndesDB {
 	 * Constructor de la clase valorAndes
 	 */
 	private ValorAndesDB(){
+		try {
+			Class.forName("oracle.jdbc.OracleDriver");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		urlConexion = DIRECCION;
 		usuario = "ISIS2304141420";
 		clave = "yatai48ea6";
@@ -66,6 +72,12 @@ public class ValorAndesDB {
 	
 	public static ValorAndesDB getInstance(){
 		instancia = new ValorAndesDB();
+		try {
+			instancia.establecerConexion();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return instancia;
 	}
 	
@@ -222,11 +234,11 @@ public class ValorAndesDB {
      * @param nInteres
      * @param nTipoInteres
      * @param nTipoBono
-     * @return true si se agregó correctamente, false de lo contrario.
+     * @return true si se agrego correctamente, false de lo contrario.
      * @throws SQLException
      */
     public boolean registrarBono(String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-    							int nIdOferente, String nTipo, double nInteres, int nTipoInteres, String nTipoBono){
+    							int nIdOferente, double nInteres, int nTipoInteres, String nTipoBono){
     	
     	if(oferenteValido(nIdOferente)){
     		//Agrega un nuevo valor
@@ -294,6 +306,7 @@ public class ValorAndesDB {
 			String sql = "SELECT NOMBRE FROM (SELECT TIPO FROM USUARIOS WHERE ID = ? ) us INNER JOIN TIPOS_USUARIO ti ON us.TIPO = ti.ID;";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			ps.setInt(1, id);
+			System.out.println(ps.toString());
 			ResultSet set = ps.executeQuery(sql);
 			set.next();
 			return set.getString("NOMBRE").equals(Usuario.EMPRESA)||set.getString("NOMBRE").equals(Usuario.INVERSIONISTA)?true:false;
