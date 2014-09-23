@@ -5,22 +5,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Valor {
-
 	private int id;
 	private String nombre;
 	private String descripcion;
 	private int cantidad;
 	private Date fechaLanzamiento;
 	private Date fechaExpiracion;
+	private int tipo;
 	private int idOferente;
 
-	public Valor(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, int nIdOferente){
+	public Valor(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, int nTipo, int nIdOferente){
 		id = nId;
 		nombre = nNombre;
 		descripcion = nDescripcion;
 		cantidad = nCantidad;
 		fechaLanzamiento = nFechaLanzamiento;
 		fechaExpiracion = nFechaExpiracion;
+		tipo = nTipo;
 		idOferente = nIdOferente;
 	}
 	
@@ -31,6 +32,7 @@ public abstract class Valor {
 		cantidad = set.getInt("CANTIDAD_DISPONIBLE");
 		fechaLanzamiento = set.getDate("FECHA_LANZAMIENTO");
 		fechaExpiracion = set.getDate("FECHA_EXPIRACION");
+		tipo = set.getInt("TIPO");
 		idOferente = set.getInt("ID_OFERENTE");
 	}
 	
@@ -58,7 +60,11 @@ public abstract class Valor {
 	public Date getFechaExpiracion() {
 		return fechaExpiracion;
 	}
-
+	
+	public int getTipo(){
+		return tipo;
+	}
+	
 	public int getIdOferente() {
 		return idOferente;
 	}
@@ -88,6 +94,10 @@ public abstract class Valor {
 		this.fechaExpiracion = fechaExpiracion;
 	}
 
+	public void setTipo(int tipo){
+		this.tipo = tipo;
+	}
+	
 	public void setIdOferente(int idOferente) {
 		this.idOferente = idOferente;
 	}
