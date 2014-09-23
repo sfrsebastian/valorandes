@@ -8,9 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import model.Bono;
 import model.Usuario;
-import model.Valor;
 
 //import Model.Bebedor;
 
@@ -57,27 +55,22 @@ public class ValorAndesDB {
 	
 	/**
 	 * Constructor de la clase valorAndes
+	 * @throws ClassNotFoundException 
 	 */
 	private ValorAndesDB(){
 		try {
 			Class.forName("oracle.jdbc.OracleDriver");
+			urlConexion = DIRECCION;
+			usuario = "ISIS2304141420";
+			clave = "yatai48ea6";
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error cargando driver de oracle");
 		}
-		urlConexion = DIRECCION;
-		usuario = "ISIS2304141420";
-		clave = "yatai48ea6";
+		
 	}
 	
 	public static ValorAndesDB getInstance(){
 		instancia = new ValorAndesDB();
-		try {
-			instancia.establecerConexion();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return instancia;
 	}
 	
@@ -89,13 +82,12 @@ public class ValorAndesDB {
 	 * @param clave clave de acceso a la base de datos
 	 * @throws SQLException si ocurre un error generando la conexion con la base de datos.
 	 */
-    private void establecerConexion() throws SQLException{
-    	try{
+    private void startConnection(){
+    	try {
 			conexion = DriverManager.getConnection(urlConexion,usuario,clave);
-        }
-        catch( SQLException exception ){
-            throw new SQLException( "ERROR: ConsultaDAO obteniendo una conexion." );
-        }
+		} catch (SQLException e) {
+			System.out.println("Error estableciendo conexion con DB");
+		}
     }
     
     /**
@@ -103,17 +95,19 @@ public class ValorAndesDB {
      * @param con objeto de conexion a la base de datos
      * @throws SistemaCinesException Si se presentan errores de conexion
      */
-    public void closeConnection(Connection connection) throws SQLException {        
-		connection.close();
-		connection = null;
+    public void closeConnection(){        
+		try {
+			conexion.close();
+		} catch (SQLException e) {
+			System.out.println("Error cerrando conexion con DB");
+		}
     } 
     
     public ResultSet makeQuery(String query) throws SQLException{
-    	if(conexion==null)
-    		establecerConexion();
-    	
+    	startConnection();
     	Statement statement = conexion.createStatement();
 		ResultSet set = statement.executeQuery(query);
+		closeConnection();
 		return set;		
     }
     
@@ -199,10 +193,11 @@ public class ValorAndesDB {
      * @param nIdOferente
      * @return true si se agrego correctamente, false de lo contrario.
      */
-    public boolean registrarValor(int nId,String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion,int nTipo, 
+    private boolean registrarValor(int nId,String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion,int nTipo, 
 			int nIdOferente){
     	
     	try{
+    		startConnection();
     		String sql = "INSERT INTO VALORES (ID, NOMBRE, DESCRIPCION, CANTIDAD_DISPONIBLE, FECHA_LANZAMIENTO, FECHA_EXPIRACION, TIPO, ID_OFERENTE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     		PreparedStatement ps = conexion.prepareStatement(sql);
     		ps.setInt(1, nId);
@@ -212,13 +207,16 @@ public class ValorAndesDB {
     		ps.setDate(5,nFechaLanzamiento);
     		ps.setDate(6, nFechaExpiracion);
     		ps.setInt(7, nTipo);
-    		ps.setInt(8,nIdOferente);	
-    		System.out.println(ps.toString());
+    		ps.setInt(8,nIdOferente);
     		ps.executeUpdate();
     		return true;
     	}
     	catch(SQLException e){
+    		System.out.println("Error SQL registrando valor con nombre: " + nNombre);
     		return false;
+    	}
+    	finally{
+			closeConnection();
     	}
     }
     
@@ -242,67 +240,90 @@ public class ValorAndesDB {
     	
     	if(oferenteValido(nIdOferente)){
     		//Agrega un nuevo valor
-    		int id;
-    		try{
-    			id= proximoId("VALORES");
-    			registrarValor(id,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,darIdTipoUsuario("Bono"),nIdOferente);
-    		}
-    		catch(SQLException e){
-    			return false;
-    		}
+    		int id = proximoId("VALORES");
+    		registrarValor(id,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,darIdTipoUsuario("Bono"),nIdOferente);
+    			
     		//Agrega un nuevo Bono
     		try{
+    			startConnection();
     			String sql = "INSERT INTO BONOS (ID, INTERES, TIPO_INTERES, TIPO) VALUES (?, ?, ?, ?)";
         		PreparedStatement ps = conexion.prepareStatement(sql);
         		ps.setInt(1, id);
         		ps.setDouble(2, nInteres);
         		ps.setInt(3,nTipoInteres);
         		ps.setString(4, nTipoBono);
+        		return true;
     		}
     		catch(SQLException e){
     			//Elimina valor agregado en valores por error agregando bono
+    			System.out.println("Error agregando nuevo Bono con nombre: " + nNombre +". \n Eliminando Valor...");
     			eliminarPorId("VALORES",id);
+    			System.out.println("Valor eliminado");
     			return false;
     		}
-    		return true;
+    		finally{
+				closeConnection();
+    		}
     	}
     	return false;
     }
     
     private void eliminarPorId(String tabla, int id){
     	try{
+    		startConnection();
     		String sql = "DELETE FROM ? WHERE ID = ?";
     		PreparedStatement ps = conexion.prepareStatement(sql);
     		ps.setString(1, tabla);
     		ps.setInt(2,id);
     		ps.executeUpdate();
+    		closeConnection();
     	}
     	catch(Exception e){
-    		
+    		System.out.println("Error eliminando en tabla: " + tabla + "ID: "+ id);
     	}
 		
 	}
 
-	private int darIdTipoUsuario(String tipo) throws SQLException {
-		String sql = "SELECT ID FROM TIPOS_USUARIO WHERE NOMBRE = ?";
-		PreparedStatement ps = conexion.prepareStatement(sql);
-		ps.setString(1, tipo);
-		ResultSet set = ps.executeQuery(sql);
-		set.next();
-		return set.getInt("ID");
+	private int darIdTipoUsuario(String tipo){
+		try {
+			startConnection();
+			String sql = "SELECT ID FROM TIPOS_USUARIO WHERE NOMBRE = ?";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setString(1, tipo);
+			ResultSet set = ps.executeQuery(sql);
+			set.next();
+			return set.getInt("ID");
+		} catch (SQLException e) {
+			System.out.println("Error consultando tipo usuario");
+		}
+		finally{
+			closeConnection();
+		}
+		return 0;
 	}
 
-	private int proximoId(String tabla) throws SQLException{
-		String sql = "SELECT MAX(id) AS ID FROM ?";
-		PreparedStatement ps = conexion.prepareStatement(sql);
-		ps.setString(1, tabla);
-		ResultSet set = ps.executeQuery(sql);
-		set.next();
-		return set.getInt("ID") + 1;
+	private int proximoId(String tabla){
+		try{
+			startConnection();
+			String sql = "SELECT MAX(id) AS ID FROM ?";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setString(1, tabla);
+			ResultSet set = ps.executeQuery(sql);
+			set.next();
+			return set.getInt("ID") + 1;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando proximo id en tabla: " + tabla);
+		}
+		finally{
+			closeConnection();
+		}
+		return 1;
     }
     
     private boolean oferenteValido(int id){
 		try {
+			startConnection();
 			String sql = "SELECT NOMBRE FROM (SELECT TIPO FROM USUARIOS WHERE ID = ? ) us INNER JOIN TIPOS_USUARIO ti ON us.TIPO = ti.ID;";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			ps.setInt(1, id);
@@ -312,7 +333,11 @@ public class ValorAndesDB {
 			return set.getString("NOMBRE").equals(Usuario.EMPRESA)||set.getString("NOMBRE").equals(Usuario.INVERSIONISTA)?true:false;
 		} 
 		catch (Exception e) {
+			System.out.println("Error consultando oferente valido con id: " + id);
 			return false;
+		}
+		finally{
+			closeConnection();
 		}
     }
 }
