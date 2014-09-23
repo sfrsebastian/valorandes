@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Usuario {
-
+	public final static String EMPRESA = "Empresa";
+	public final static String CORREDOR = "Corredor";
+	public final static String INVERSIONISTA = "Inversionista";
+	
 	private int id;
 	private String nombre;
 	private String usuario;

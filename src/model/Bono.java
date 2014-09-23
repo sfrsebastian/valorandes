@@ -7,18 +7,21 @@ import java.sql.SQLException;
 import db.ValorAndesDB;
 
 public class Bono extends Valor {
-
+	public static final String TIPO_PUBLICO = "Publico";
+	public static final String TIPO_PRIVADO = "Privado";
 	private String tipo;
 	private double interes;
 	private String tipoInteres;
+	private String tipoBono;
 
 	public Bono(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, String nTipo, double nInteres, int nTipoInteres) throws SQLException{
+			int nIdOferente, String nTipo, double nInteres, int nTipoInteres, String nTipoBono) throws SQLException{
 		
 		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,nIdOferente);
 		tipo = nTipo;
 		interes = nInteres;
 		tipoInteres = consultarTipoInteres(nTipoInteres);
+		tipoBono = nTipoBono;
 	}
 	
 	public Bono (ResultSet set) throws SQLException{
@@ -26,6 +29,7 @@ public class Bono extends Valor {
 		tipo = set.getString("TIPO");
 		interes = set.getDouble("INTERES");
 		tipoInteres = consultarTipoInteres(set.getInt("TIPO_INTERES"));
+		tipoBono = set.getString("TIPO");
 	}
 
 	private static ResultSet consultarValores(int id) throws SQLException {
@@ -53,6 +57,10 @@ public class Bono extends Valor {
 		return tipoInteres;
 	}
 	
+	public String getTipoBono(){
+		return tipoBono;
+	}
+	
 	//SETTERS
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
@@ -64,5 +72,9 @@ public class Bono extends Valor {
 
 	public void setTipoInteres(String tipoInteres) {
 		this.tipoInteres = tipoInteres;
+	}
+	
+	public void setTipoBono(String tipoBono){
+		this.tipoBono = tipoBono;
 	}
 }
