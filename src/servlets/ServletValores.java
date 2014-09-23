@@ -40,67 +40,123 @@ public class ServletValores extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//Atributos VALOR
+		boolean error = false;
+		String causa = "";
+
 		String nombre = request.getParameter("nombre");
+		if(nombre.isEmpty()){
+			error = true;
+			causa = "El nombre no puede ser vacío";
+		}
+
 		String descripcion = request.getParameter("descripcion");
-		int cantidad = Integer.parseInt(request.getParameter("cantidad"));
+		if(descripcion.isEmpty() && !error){
+			error = true;
+			causa = "La descripción no puede ser vacia";
+		}
+		int cantidad = -1;
+		try{
+			cantidad = Integer.parseInt(request.getParameter("cantidad"));
+		}
+		catch(Exception e){
+			if(!error){
+				error = true;
+				causa = "La cantidad no puede ser vacia";
+			}
+		}
+		if(cantidad<=0 && !error){
+			error = true;
+			causa = "La cantidad debe ser mayor a cero";
+		}
 
 		java.util.Date fechaLanzamiento = new java.util.Date();
 		Date sqlFechaLanzamiento = new Date(fechaLanzamiento.getTime());
-
 		String fechaExpiracion = request.getParameter("fecha_expiracion");
-		String[] fechas = fechaExpiracion.split(":");
-		Calendar c = Calendar.getInstance();
-		c.set((Integer.parseInt(fechas[0])), Integer.parseInt(fechas[1]), Integer.parseInt(fechas[2]));
-		Date sqlFechaExpiracion = new Date(c.getTimeInMillis());
+		Date sqlFechaExpiracion = null;
+		if(!fechaExpiracion.isEmpty()){
+			String[] fechas = fechaExpiracion.split(":");
+			Calendar c = Calendar.getInstance();
+			c.set((Integer.parseInt(fechas[0])), Integer.parseInt(fechas[1]), Integer.parseInt(fechas[2]));
+			sqlFechaExpiracion = new Date(c.getTimeInMillis());
+		}
+
+		if(sqlFechaExpiracion!= null && sqlFechaExpiracion.compareTo(sqlFechaLanzamiento)<0 && !error){
+			error = true;
+			causa = "La fecha de expiración debe ser una fecha futura";
+		}
 
 		String tipo = request.getParameter("tipo");
 
 		//TODO solicitar id de usuario activo(idoferente)
 
-		//Atributos BONO
-		
-		boolean error = false;
-		if(!nombre.equals("") && !descripcion.equals("") && cantidad > 0){
-			if(tipo.equals("BONO")){
-				//Atributos Bono
-				String tipo_bono = request.getParameter("tipo_bono");
-				double interes = Double.parseDouble(request.getParameter("interes"));
-				int tipoInteres = request.getParameter("tipo_interes").equals("fijo")?2:1;
-				Bono bono = new Bono(0,nombre,descripcion,cantidad,sqlFechaLanzamiento,sqlFechaExpiracion,1,interes,tipoInteres,tipo_bono);
-				//TODO hacer validaciones
-				ValorAndesDB.getInstance().registrarBono(bono);
-			}else if(tipo.equals("ACCION")){
-				double precioAccion = Double.parseDouble(request.getParameter("accion_precio"));
-				double rendimientoAccion = Double.parseDouble(request.getParameter("accion_rendimiento"));
-				int tipoAccion = Integer.parseInt(request.getParameter("tipo_accion"));
-				//TODO cambiar el ID del oferente por el de la sesion
-				try {
-					Accion accion = new Accion(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, 1, tipoAccion, precioAccion, rendimientoAccion);
-					ValorAndesDB.getInstance().registrarAccion(accion);
-				} catch (SQLException e) {
-					response.sendRedirect("./valores.jsp?error=SI");
-					e.printStackTrace();
-				}
-			}else if(tipo.equals("CERTIFICADO")){
-				String numeroCertificado = request.getParameter("certificado_numero");
-				int tipoCertificado = Integer.parseInt(request.getParameter("tipo_certificado"));
-				
-				try {
-					Certificado certificado = new Certificado(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, 1, tipoCertificado, numeroCertificado);
-					ValorAndesDB.getInstance().registrarCertificado(certificado);
-				} catch (SQLException e) {
-					response.sendRedirect("./valores.jsp?error=SI");
-					e.printStackTrace();
+		if(tipo.equals("BONO")){
+			String tipo_bono = request.getParameter("tipo_bono");
+			double interes = -1;
+			try{
+				interes = Double.parseDouble(request.getParameter("interes"));
+			}
+			catch(Exception e){
+				if(!error){
+					error = true;
+					causa = "El interés no puede ser vacío";
 				}
 			}
-			response.sendRedirect("./valores.jsp?error=NO");
-
-		}else
-			error = true;
-
+			if(interes<0 && !error){
+				error = true;
+				causa = "El interés debe ser mayor o igual a cero";
+			}
+			int tipoInteres = request.getParameter("tipo_interes").equals("fijo")?2:1;
+			if(!error){
+				Bono bono = new Bono(0,nombre,descripcion,cantidad,sqlFechaLanzamiento,sqlFechaExpiracion,1,interes,tipoInteres,tipo_bono);
+				ValorAndesDB.getInstance().registrarBono(bono);
+			}
+		}
+		else if(tipo.equals("ACCION")){
+			double precioAccion = -1;
+			try{
+				precioAccion=Double.parseDouble(request.getParameter("accion_precio"));
+			}		
+			catch(Exception e){
+				if(!error){
+					error = true;
+					causa = "El precio previsto no puede ser vacío";
+				}
+			}
+			if(precioAccion<0 && !error){
+				error = true;
+				causa = "El precio esperado debe ser mayor o igual a cero";
+			}
+			double rendimientoAccion = -1;
+			try{
+				rendimientoAccion=Double.parseDouble(request.getParameter("accion_rendimiento"));
+			}		
+			catch(Exception e){
+				if(!error){
+					error = true;
+					causa = "El rendimiento no puede ser vacío";
+				}
+			}
+			int tipoAccion = Integer.parseInt(request.getParameter("tipo_accion"));
+			if(!error){
+				Accion accion = new Accion(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, 1, tipoAccion, precioAccion, rendimientoAccion);
+				ValorAndesDB.getInstance().registrarAccion(accion);
+			}
+		}
+		else if(tipo.equals("CERTIFICADO")){
+			String numeroCertificado = request.getParameter("certificado_numero");
+			if(numeroCertificado.isEmpty() && !error){
+				error = true;
+				causa = "El número de certificado no puede ser vacío";
+			}
+			int tipoCertificado = Integer.parseInt(request.getParameter("tipo_certificado"));
+			if(!error){
+				Certificado certificado = new Certificado(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, 1, tipoCertificado, numeroCertificado);
+				ValorAndesDB.getInstance().registrarCertificado(certificado);
+			}
+		}
+		
 		if(error)
-			response.sendRedirect("./valores.jsp?error=SI");
+			response.sendRedirect("./valores.jsp?error=SI&causa="+causa);
 	}
 
 }

@@ -15,7 +15,7 @@ public class Certificado extends Valor {
 	private String numero;
 
 	public Certificado(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, int nTipo, String nNumero) throws SQLException{
+			int nIdOferente, int nTipo, String nNumero){
 		
 		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,TIPO,nIdOferente);
 		tipo = nTipo;

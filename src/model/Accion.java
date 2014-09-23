@@ -16,7 +16,7 @@ public class Accion extends Valor {
 	private double rendimiento;
 	
 	public Accion(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, int nTipo, double nPrecioEsperado, double nRendimiento) throws SQLException{
+			int nIdOferente, int nTipo, double nPrecioEsperado, double nRendimiento){
 		
 		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,TIPO,nIdOferente);
 		tipo = nTipo;
