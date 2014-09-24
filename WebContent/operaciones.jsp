@@ -247,9 +247,9 @@
                     </c:forEach>
                 </select>
                 <div class="form-group">
-                    <label for="cant-compra">Cantidad de Compra</label> <input
-                            type="text" class="form-control" id="cant-compra" placeholder="Ingrese cantidad de la compra" name="cantidad_compra">
-                    </div>
+                    <label for="cant-compra">Cantidad de Compra</label> 
+                    <input type="text" class="form-control" id="cant-compra" placeholder="Ingrese cantidad de la compra" name="cantidad_compra">
+                </div>
                     <input type="hidden" name="tipo" value="Compra">
                 </form>
             </div>

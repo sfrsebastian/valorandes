@@ -43,6 +43,13 @@ public class ServletOperaciones extends HttpServlet {
 	
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		int idAsociacion = Integer.parseInt(request.getParameter("id_asociacion"));
+		int idValor = Integer.parseInt(request.getParameter("id_valor"));
+		String tipo = request.getParameter("tipo");
+		int cantCompra = Integer.parseInt(request.getParameter("cantidad-compra"));
+		//TODO asignar en jstl un parametro adicional para cantidad disponible del valor
+		//TODO validacion cantidad mayor a cero
+		ValorAndesDB.getInstance().autorizarAccion(idAsociacion,idValor,tipo,cantCompra);
 		response.sendRedirect("./operaciones.jsp");
 		//TODO realizar autorizacion ya sea compra/venta
 	}
