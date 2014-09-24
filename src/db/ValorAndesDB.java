@@ -121,6 +121,8 @@ public class ValorAndesDB {
 		startConnection();
 		Statement statement = conexion.createStatement();
 		ResultSet set = statement.executeQuery(query);
+		set.close();
+		statement.close();
 		closeConnection();
 		return set;		
 	}
@@ -147,6 +149,8 @@ public class ValorAndesDB {
 			
 			if(set.next()){
 				Object[] hola = {set.getInt("ID"), set.getString("nombre")};
+				set.close();
+				ps.close();
 				return hola;
 			}else{	
 				return null;
@@ -243,6 +247,7 @@ public class ValorAndesDB {
 			ps.setInt(8,valor.getIdOferente());
 			ps.executeUpdate();
 			conexion.commit();
+			ps.close();
 			return true;
 		}
 		catch(SQLException e){
@@ -277,6 +282,7 @@ public class ValorAndesDB {
 					ps.setString(4, bono.getTipoBono());
 					ps.executeQuery();
 					conexion.commit();
+					ps.close();
 					return true;
 				}
 				catch(SQLException e){
@@ -316,6 +322,7 @@ public class ValorAndesDB {
 					ps.setDouble(4, accion.getRendimiento());
 					ps.executeQuery();
 					conexion.commit();
+					ps.close();
 					return true;
 				}
 				catch(SQLException e){
@@ -354,6 +361,7 @@ public class ValorAndesDB {
 					ps.setString(3, certificado.getNumero());
 					ps.executeQuery();
 					conexion.commit();
+					ps.close();
 					return true;
 				}
 				catch(SQLException e){
@@ -395,6 +403,7 @@ public class ValorAndesDB {
 			
 			ps.executeUpdate();
 			conexion.commit();
+			ps.close();
 			closeConnection();
 		}
 		catch(Exception e){
@@ -414,6 +423,7 @@ public class ValorAndesDB {
 			ps.setInt(1,id);
 			ps.executeUpdate();
 			conexion.commit();
+			ps.close();
 			closeConnection();
 		}
 		catch(Exception e){
@@ -432,6 +442,8 @@ public class ValorAndesDB {
 			Statement statement = conexion.createStatement();
 			ResultSet set = statement.executeQuery(sql);
 			set.next();
+			set.close();
+			statement.close();
 			return set.getInt("ID") + 1;
 		}
 		catch(SQLException e){
@@ -457,7 +469,10 @@ public class ValorAndesDB {
 			ps.setInt(1, id);
 			ResultSet set = ps.executeQuery();
 			set.next();
-			return set.getString("NOMBRE").equals(Usuario.EMPRESA)||set.getString("NOMBRE").equals(Usuario.INVERSIONISTA)?true:false;
+			boolean respuesta = set.getString("NOMBRE").equals(Usuario.EMPRESA)||set.getString("NOMBRE").equals(Usuario.INVERSIONISTA)?true:false;
+			set.close();
+			ps.close();
+			return respuesta;
 		} 
 		catch (Exception e) {
 			System.out.println("Error consultando oferente valido con id: " + id);
