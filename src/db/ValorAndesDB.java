@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
 
 import model.Accion;
 import model.Bono;
@@ -534,5 +535,252 @@ public class ValorAndesDB {
 		finally{
 			closeConnection();
 		}
+	}
+
+	public void realizarPut(int idValor, int cantidad, int idAsociacion) {
+		try {
+			startConnection();
+			String sql = "INSERT INTO PUTS (ID, ID_VALOR, CANTIDAD, FECHA, ID_ASOCIACION, TIPO_MERCADO) VALUES (?, ?, ?, ?, ?, ?)";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			Calendar c = Calendar.getInstance();
+			int id = proximoPut();
+			String tipoMercado = darMercado(idAsociacion);
+			ps.setInt(1, id);
+			ps.setInt(2,idValor);
+			ps.setInt(3,cantidad);
+			ps.setDate(4,new Date(c.getTimeInMillis()));
+			ps.setInt(5, idAsociacion);
+			ps.setString(6, tipoMercado);
+			ps.executeUpdate();
+			conexion.commit();
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+		}
+		finally{
+			closeConnection();
+		}
+	}
+
+	private String darMercado(int idAsociacion) {
+		try {
+			String query = "select asociaciones.id,nombre from ASOCIACIONES INNER JOIN (select usuarios.id,tipo.nombre from usuarios INNER JOIN tipos_usuario tipo ON usuarios.tipo = tipo.id)tabla ON ASOCIACIONES.ID_USUARIO = tabla.id where asociaciones.id=?";
+			PreparedStatement ps = conexion.prepareStatement(query);
+			ps.setInt(1,idAsociacion);
+			ResultSet set = ps.executeQuery();
+			set.next();
+			String respuesta = set.getString("NOMBRE").equals("Empresa")?"Primario":"Secundario";
+			set.close();
+			return respuesta;
+		} 
+		catch (SQLException e) {
+			System.out.println("Error consultando mercado");
+		}
+		finally{
+			closeConnection();
+		}
+		return "Primario";
+	}
+
+	private int proximoPut() {
+		try{
+			startConnection();
+			String sql = "SELECT MAX(ID) AS ID FROM PUTS";
+			Statement statement = conexion.createStatement();
+			ResultSet set = statement.executeQuery(sql);
+			set.next();
+			set.close();
+			statement.close();
+			return set.getInt("ID") + 1;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando proximo id en tabla puts");
+			e.printStackTrace();
+		}
+		finally{
+			closeConnection();
+		}
+		return 1;
+	}
+
+	public void realizarCall(int idValor, int cantidad, int idAsociacion) {
+		try {
+			startConnection();
+			String sql = "INSERT INTO CALLS (ID, CANTIDAD, FECHA, ID_PUT, ID_ASOCIACION) VALUES (?, ?, ?, ?, ?)";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			Calendar c = Calendar.getInstance();
+			int id = proximoCall();
+			int idPut = darIdPut(idValor);
+			ps.setInt(1, id);
+			ps.setInt(2,cantidad);
+			ps.setDate(3,new Date(c.getTimeInMillis()));
+			ps.setInt(4, idPut);
+			ps.setInt(5, idAsociacion);
+			ps.executeUpdate();
+			conexion.commit();
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+		}
+		finally{
+			closeConnection();
+		}
+	}
+
+	private int darIdPut(int idValor) {
+		try{
+			startConnection();
+			String sql = "select * FROM PUTS where ID_Valor = ?";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setInt(1,idValor);
+			ResultSet set = ps.executeQuery();
+			set.next();
+			int respuesta = set.getInt("ID");
+			set.close();
+			return respuesta;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando id puts");
+		}
+		finally{
+			closeConnection();
+		}
+		return 1;
+	}
+
+	private int proximoCall() {
+		try{
+			startConnection();
+			String sql = "SELECT MAX(ID) AS ID FROM CALLS";
+			Statement statement = conexion.createStatement();
+			ResultSet set = statement.executeQuery(sql);
+			set.next();
+			set.close();
+			statement.close();
+			return set.getInt("ID") + 1;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando proximo id en tabla calls");
+			e.printStackTrace();
+		}
+		finally{
+			closeConnection();
+		}
+		return 1;
+	}
+
+	public void realizarTransaccion(int idUsuario, int cantidad, String tipoMercado, int asociacionPut, int asociacionCall, int idValor) {
+		//Disminuir cantidad de dueno
+		try{
+			Calendar c = Calendar.getInstance();
+			startConnection();
+			String sql = "SELECT ID_DUENO,CANTIDAD FROM DUENO_VALOR WHERE ID_DUENO = (SELECT ID_USUARIO FROM ASOCIACIONES WHERE ID = ?)";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setInt(1,asociacionPut);		
+			ResultSet set = ps.executeQuery();
+			set.next();
+			int idDueno = set.getInt("ID_DUENO");
+			int cantidadDueno = set.getInt("CANTIDAD");
+			set.close();
+			ps.close();
+
+			String sql2 = "SELECT CANTIDAD FROM DUENO_VALOR WHERE ID_DUENO = (SELECT ID_USUARIO FROM ASOCIACIONES WHERE ID = ?)";
+			PreparedStatement ps2 = conexion.prepareStatement(sql2);
+			ps2.setInt(1,asociacionCall);		
+			ResultSet set2 = ps.executeQuery();
+			int cantidadComprador = 0;
+			try{
+				set2.next();
+				cantidadComprador = set2.getInt("CANTIDAD");
+				ps2.close();
+				set2.close();
+			}
+			catch(SQLException e){
+				
+			}
+			String query3 = "UPDATE DUENO_VALOR SET CANTIDAD="+ (cantidadDueno-cantidad) +" WHERE ID_USUARIO="+ idDueno+"AND ID_VALOR="+idValor;
+			PreparedStatement ps3 = conexion.prepareStatement(query3);
+			ps3.executeQuery();
+			ps3.close();
+			if(cantidadComprador==0){
+				double precioCompra = darPrecioMasReciente(idValor);
+				String create = "INSERT INTO DUENO_VALOR (ID_VALOR, CANTIDAD, VALOR_UNITARIO_COMPRA, FECHA_COMPRA, ID_DUENO) VALUES (?,?,?,?,?)";
+				PreparedStatement state = conexion.prepareStatement(create);
+				state.setInt(1, idValor);
+				state.setInt(2, cantidad);
+				state.setDouble(3,precioCompra);
+				state.setDate(4, new Date(c.getTimeInMillis()));
+				state.setInt(5, idUsuario);	
+			}
+			else{
+				String query4 = "UPDATE DUENO_VALOR SET CANTIDAD="+ (cantidadComprador+cantidad) +" WHERE ID_USUARIO="+ idUsuario+"AND ID_VALOR="+idValor;
+				PreparedStatement ps4 = conexion.prepareStatement(query4);
+				ps4.executeQuery();
+				ps4.close();
+			}
+			//crear transaccion
+			String query5 = "INSERT INTO TRANSACCIONES (ID, FECHA, CANTIDAD, TIPO_MERCADO, ID_ASOCIACION_COMPRA, ID_ASOCIACION_VENTA, ID_VALOR) VALUES (?, ?, ?, ?, ?, ?, ?)";
+			PreparedStatement ps5 = conexion.prepareStatement(query5);
+			ps5.setInt(1,darProximoIdTransaccion());
+			ps5.setDate(2, new Date(c.getTimeInMillis()));
+			ps5.setInt(3,cantidad);
+			ps5.setString(4, tipoMercado);
+			ps5.setInt(5,asociacionCall);
+			ps5.setInt(6,asociacionPut);
+			ps5.setInt(7,idValor);
+			ps5.executeQuery();
+			ps5.close();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			System.out.println("Error con transaccion");
+			e.printStackTrace();
+		}
+		finally{
+			closeConnection();
+		}
+	}
+
+	private int darProximoIdTransaccion() {
+		try{
+			startConnection();
+			String sql = "SELECT MAX(ID) AS ID FROM TRANSACCIONES";
+			Statement statement = conexion.createStatement();
+			ResultSet set = statement.executeQuery(sql);
+			set.next();
+			set.close();
+			statement.close();
+			return set.getInt("ID") + 1;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando proximo id en tabla transacciones");
+			e.printStackTrace();
+		}
+		finally{
+			closeConnection();
+		}
+		return 1;
+	}
+
+	private double darPrecioMasReciente(int idValor) {
+		try{
+			startConnection();
+			String create = "select PRECIO_UNITARIO FROM PRECIOS_VALOR WHERE ID_Valor = ? AND fecha = (select max(fecha)from PRECIOS_VALOR where id_valor = ?)";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1,idValor);
+			state.setInt(2, idValor);
+			ResultSet set = state.executeQuery();
+			set.next();
+			double respuesta = set.getDouble("PRECIO_UNITARIO");
+			set.close();
+			return respuesta;
+		}
+		catch(SQLException e){
+			System.out.println("Error buscando precio reciente de valor con id: " + idValor);
+		}
+		finally{
+			closeConnection();
+		}
+		return 0;
 	}
 }

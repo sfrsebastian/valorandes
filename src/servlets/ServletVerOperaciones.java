@@ -40,13 +40,42 @@ public class ServletVerOperaciones extends HttpServlet {
 	
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
-		String param = request.getParameter("id_valor");
-		String[] valores = param.split("-");
-		int idAsociacion = Integer.parseInt(valores[0]);
-		int idValor = Integer.parseInt(valores[1]);
-		String tipo = valores[2];
-		ValorAndesDB.getInstance().eliminarAutorizacion(idAsociacion,idValor,tipo);
+		String tipo = request.getParameter("tipo");
+		if(tipo.equals("cancelar")){
+			String param = request.getParameter("id_valor");
+			String[] valores = param.split("-");
+			int idAsociacion = Integer.parseInt(valores[0]);
+			int idValor = Integer.parseInt(valores[1]);
+			String tipoAu = valores[2];
+			ValorAndesDB.getInstance().eliminarAutorizacion(idAsociacion,idValor,tipoAu);
+		}
+		else if(tipo.equals("putCall")){
+			String param = request.getParameter("valores");
+			String[] valores = param.split("-");
+			String accion = valores[3];
+			int idValor = Integer.parseInt(valores[0]);
+			int cantidad = Integer.parseInt(valores[1]);
+			int idAsociacion = Integer.parseInt(valores[2]);
+			if(accion.equals("put"))
+				ValorAndesDB.getInstance().realizarPut(idValor,cantidad,idAsociacion);
+			else if(accion.equals("call"))
+				ValorAndesDB.getInstance().realizarCall(idValor,cantidad,idAsociacion);	
+		}
+		else if(tipo.equals("transaccion")){
+			String param = request.getParameter("valores");
+			String[] valores = param.split("-");
+			int cantidad = Integer.parseInt(valores[0]);
+			String tipoMercado = valores[1];
+			int asociacionPut = Integer.parseInt(valores[2]);
+			int asociacionCall = Integer.parseInt(valores[3]);
+			int idValor = Integer.parseInt(valores[4]);
+			int idUsuario = Integer.parseInt(request.getParameter("id"));
+			ValorAndesDB.getInstance().realizarTransaccion(idUsuario,cantidad,tipoMercado,asociacionPut,asociacionCall,idValor);	
+		}
+		
 		response.sendRedirect("./verOperaciones.jsp");
+		
+		
 		//TODO realizar autorizacion ya sea compra/venta
 		
 		

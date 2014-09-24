@@ -18,13 +18,13 @@
         });
 
         $(".PUT").click(function (){
-            var params = this.value;
+            var params = this.value + "-put";
             var input = $("<input>").attr("type", "hidden").attr("name", "valores").val(params);
             $("#form-asociados").append($(input));
             $("#form-asociados").submit(); 
         });
         $(".CALL").click(function (){
-            var params = this.value;
+            var params = this.value + "-call";
             var input = $("<input>").attr("type", "hidden").attr("name", "valores").val(params);
             $("#form-asociados").append($(input));
             $("#form-asociados").submit();
@@ -118,8 +118,7 @@ SELECT ID_ASOCIACION as ASOCIACION,ID_VALOR as ID,CANTIDAD,ID_CORREDOR,TIPO AS T
                             </table>
                         </div>
                     </div>
-
-    <form role="form" action="./verOperaciones.html" method="POST" id="form-cancelar"></form>
+    <form role="form" action="./verOperaciones.html" method="POST" id="form-cancelar"><input type="hidden" value="cancelar" name="tipo"></form>
                     <!--FIN-->
 </c:if>
 <c:if test="${sessionScope.tipo == 'Corredor'}">
@@ -180,8 +179,7 @@ WHERE ID_CORREDOR = '${sessionScope.id}'
                             </table>
                         </div>
                     </div>
-
-                    <form role="form" action="./verOperaciones.html" method="POST" id="form-asociados"></form>
+                    <form role="form" action="./verOperaciones.html" method="POST" id="form-asociados"><input type="hidden" value="putCall" name="tipo"></form>
 
                     <!-- TABLA DE CALLS EXTERNOS -->
                         <sql:setDataSource var="snapshot" driver="oracle.jdbc.OracleDriver"
@@ -229,7 +227,7 @@ ON RELFINAL.ID_USUARIO = USU.id ORDER BY PUT_ID
                         </div>
                     </div>
 
-                    <form role="form" action="./verOperaciones.html" method="POST" id="form-calls"></form>
+                    <form role="form" action="./verOperaciones.html" method="POST" id="form-calls"><input type="hidden" value="transaccion" name="tipo"></form>
                     
 </c:if>
 
