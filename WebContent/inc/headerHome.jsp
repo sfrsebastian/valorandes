@@ -7,6 +7,7 @@
 
 <html>
 <head>
+    <title><% out.println(pageTitle); %></title>
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">

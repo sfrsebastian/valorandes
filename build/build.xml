@@ -24,7 +24,7 @@ Autores: Felipe Otalora y Sebastian Florez
 	<target name="init" description="Inicializa las propiedades">
 		<!-- Cambie esta línea según el punto en el que esté instalado JBboss -->
 		<property environment="env"/>
-		<property name="server.home" value="${env.JBOSS_HOME}"/>
+		<property name="server.home" value="/Users/FelipeOtalora/Downloads/jboss-as-7.1.1.Final"/>
 		<property name="server.path" value="standalone/deployments" />
 		
 		<!-- Definición de propiedades -->
@@ -78,6 +78,7 @@ Autores: Felipe Otalora y Sebastian Florez
 	<!-- Undeploy de la aplicación -->
 	<target name="undeploy" depends="init" description="Borra todos los archivos instalados en JBoss">
 		<delete file="${server.home}/${server.path}/${war}" />
+		<delete dir="/Users/FelipeOtalora/Downloads/jboss-as-7.1.1.Final/standalone/deployments/ValorAndes.war" />
 	</target>
 
 </project>

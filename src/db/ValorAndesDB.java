@@ -147,17 +147,16 @@ public class ValorAndesDB {
 			
 			if(set.next()){
 				Object[] hola = {set.getInt("ID"), set.getString("nombre")};
-				closeConnection();
 				return hola;
-			}else{
-				closeConnection();
+			}else{	
 				return null;
 			}
 		}
 		catch(Exception e){
 			System.out.println("Error autenticando usuario: " + usuario);
+		}finally{
+			closeConnection();
 		}
-		
 		
 		return null;
 	}

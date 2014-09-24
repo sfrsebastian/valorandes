@@ -13,6 +13,14 @@
     <servlet-name>Valores</servlet-name>
     <servlet-class>servlets.ServletValores</servlet-class>
   </servlet>
+     <servlet>
+    <servlet-name>Operaciones</servlet-name>
+    <servlet-class>servlets.ServletOperaciones</servlet-class>
+  </servlet>
+       <servlet>
+    <servlet-name>VerOperaciones</servlet-name>
+    <servlet-class>servlets.ServletVerOperaciones</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Home</servlet-name>
     <url-pattern>/index.html</url-pattern>
@@ -24,5 +32,13 @@
    <servlet-mapping>
     <servlet-name>Valores</servlet-name>
     <url-pattern>/valores.html</url-pattern>
+  </servlet-mapping>
+     <servlet-mapping>
+    <servlet-name>Operaciones</servlet-name>
+    <url-pattern>/operaciones.html</url-pattern>
+  </servlet-mapping>
+       <servlet-mapping>
+    <servlet-name>VerOperaciones</servlet-name>
+    <url-pattern>/verOperaciones.html</url-pattern>
   </servlet-mapping>
 </web-app>
