@@ -127,6 +127,20 @@ public class ValorAndesDB {
 		return set;		
 	}
 
+	/**
+	 * Ejecuta la sentencia pasada por parametro
+	 * @param query
+	 * @return
+	 * @throws SQLException
+	 */
+	public void makeUpdate(String query) throws SQLException{
+		startConnection();
+		PreparedStatement ps = conexion.prepareStatement(query);
+		ps.executeQuery();
+		conexion.commit();	
+		ps.close();
+		closeConnection();
+	}
 	//-----------------------------------------------------------------
 	// Procedimientos
 	//-----------------------------------------------------------------
@@ -496,6 +510,26 @@ public class ValorAndesDB {
 			ps.close();
 		} catch (SQLException e) {
 			System.out.println("Error eliminando autorizados idAu: " + idAsociacion + " idValor: " + idValor + " tipo: " + tipo );
+		}
+		finally{
+			closeConnection();
+		}
+	}
+
+	public void autorizarAccion(int idAsociacion, int idValor, String tipo,int cantCompra) {
+		try {
+			startConnection();
+			String sql = "INSERT INTO AUTORIZADOS(ID_ASOCIACION, ID_VALOR, TIPO, CANTIDAD) VALUES(?,?,?,?)";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setInt(1, idAsociacion);
+			ps.setInt(2,idValor);
+			ps.setString(3,tipo);
+			ps.setInt(4,cantCompra);
+			ps.executeUpdate();
+			conexion.commit();
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println("Error agregando autorizados idAu: " + idAsociacion + " idValor: " + idValor + " tipo: " + tipo );
 		}
 		finally{
 			closeConnection();
