@@ -65,7 +65,7 @@
                  "sProcessing":     "Procesando...",
                   "sLengthMenu":     "Mostrar _MENU_ registros",
                   "sZeroRecords":    "No se encontraron resultados",
-                  "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                  "sEmptyTable":     "Ningun dato disponible en esta tabla",
                   "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                   "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                   "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -91,7 +91,7 @@
                  "sProcessing":     "Procesando...",
                   "sLengthMenu":     "Mostrar _MENU_ registros",
                   "sZeroRecords":    "No se encontraron resultados",
-                  "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                  "sEmptyTable":     "Ningun dato disponible en esta tabla",
                   "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                   "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                   "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
@@ -126,9 +126,22 @@
                     		<button class="btn btn-success btn-lg btn-block" id="comprar"><span class="glyphicon glyphicon-tag"></span> Comprar</button>
                     	</div>
                     	<div class="col-lg-6">
-                    		<button class="btn btn-blue btn-lg btn-block" id="vender"><span class="glyphicon glyphicon-euro"></span> Vender</button>
+                    		<button class="btn btn-info btn-lg btn-block" id="vender"><span class="glyphicon glyphicon-euro"></span> Vender</button>
                     	</div>
                     </div>
+
+                    <c:if test="${param.error == 'NO'}">
+                        <div class="alert alert-success" style="margin-top:10px;">
+                            <a href="#" class="close" data-dismiss="alert">&times;</a>
+                            Se ha realizado la operacion deseada
+                        </div>
+                    </c:if>
+                    <c:if test="${param.error == 'SI'}">
+                        <div class="alert alert-danger" style="margin-top:10px;">
+                            <a href="#" class="close" data-dismiss="alert">&times;</a>
+                            <c:out value="${causa}"/>
+                        </div>
+                    </c:if>
 
                     <div id="tabla_vender" class="col-lg-12" style="margin-top:30px;">
                         
@@ -158,7 +171,7 @@
                                         <tr>
                                             <td><c:out value="${row.nombre}" /></td>
                                             <td><c:out value="${row.cantidad_disponible}" /></td>
-                                            <td><button class="sell btn btn-warning" value="${row.id}">Vender</button></td>
+                                            <td><button class="sell btn btn-warning" value="${row.cantidad_disponible}-${row.id}">Vender</button></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
@@ -174,11 +187,11 @@
                             user="ISIS2304141420" password="yatai48ea6" />
 
                         <sql:query dataSource="${snapshot}" var="result">
-                        from (select asopu.*, vals.nombre
+                        select * from (select asopu.*, vals.nombre
 						from (select pu.ID_VALOR, pu.CANTIDAD, pu.TIPO_MERCADO, aso.ID_USUARIO from PUTS pu INNER JOIN ASOCIACIONES aso ON aso.ID = pu.ID_ASOCIACION)asopu
      					 INNER JOIN VALORES vals ON asopu.ID_VALOR=vals.ID)fin INNER JOIN (select usuarios.id,usuarios.nombre as nombre_ofertante,apellido from USUARIOS LEFT OUTER JOIN INVERSIONISTAS ON usuarios.id = inversionistas.id where usuarios.tipo = 1 OR usuarios.tipo = 3 order by usuarios.id)usu 
      					 ON fin.id_usuario = usu.id
-						where ID !='${sessionScope.id}';
+						where ID !='${sessionScope.id}'
                        </sql:query>
 
                     <div class="panel panel-green">
@@ -201,9 +214,9 @@
                                         <tr>
                                             <td><c:out value="${row.nombre}" /></td>
                                             <td><c:out value="${row.cantidad}" /></td>
-                                            <td><c:out value="${row.nombre_ofertante}"/></td>
+                                            <td><c:out value="${row.nombre_ofertante}"/> <c:if test="${row.apellido != null}"><c:out value="${row.apellido}"/></c:if></td>
                                             <td><c:out value="${row.tipo_mercado}"/></td>
-                                            <td><button class="buy btn btn-success" value="${row.id_valor}">Comprar</button></td>
+                                            <td><button class="buy btn btn-success" value="${row.cantidad}-${row.id_valor}">Comprar</button></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
@@ -248,7 +261,7 @@
                 </select>
                 <div class="form-group">
                     <label for="cant-compra">Cantidad de Compra</label> 
-                    <input type="text" class="form-control" id="cant-compra" placeholder="Ingrese cantidad de la compra" name="cantidad_compra">
+                    <input type="text" class="form-control" id="cant-compra" placeholder="Ingrese cantidad de la compra" name="cantidad">
                 </div>
                     <input type="hidden" name="tipo" value="Compra">
                 </form>
@@ -289,7 +302,7 @@
                 </select>
                 <div class="form-group">
                     <label for="cant-compra">Cantidad de Venta</label> <input
-                            type="text" class="form-control" id="cant-compra" placeholder="Ingrese cantidad de la compra" name="cantidad_venta">
+                            type="text" class="form-control" id="cant-compra" placeholder="Ingrese cantidad de la compra" name="cantidad">
                     </div>
                     <input type="hidden" name="tipo" value="Venta">
                 </form>

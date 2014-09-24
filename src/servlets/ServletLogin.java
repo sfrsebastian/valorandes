@@ -63,6 +63,7 @@ public class ServletLogin extends HttpServlet {
 						session.setAttribute("usuario", usuario);
 						session.setAttribute("id", valores[0]);
 						session.setAttribute("tipo", valores[1]);
+						System.out.println("Usuario autenticado con tipo "+ valores[1] + " con id: " + valores[0]);
 						response.sendRedirect("./home.jsp");
 					}
 					else

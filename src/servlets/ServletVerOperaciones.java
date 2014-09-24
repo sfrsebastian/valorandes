@@ -48,6 +48,8 @@ public class ServletVerOperaciones extends HttpServlet {
 		ValorAndesDB.getInstance().eliminarAutorizacion(idAsociacion,idValor,tipo);
 		response.sendRedirect("./verOperaciones.jsp");
 		//TODO realizar autorizacion ya sea compra/venta
+		
+		
 	}
 
 }
