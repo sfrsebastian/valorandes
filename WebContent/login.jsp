@@ -40,6 +40,7 @@
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
                                 <input type="submit" href="home.jsp" class="btn btn-lg btn-success btn-block" value="Ingresar">
+                                <input type="hidden" value="INGRESAR_USUARIO" name="tipo">
                             </fieldset>
                         </form>
                     </div>
@@ -90,17 +91,44 @@
           <div class="modal-body">
             <form action="/login.html" action="POST" role="form">
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                    <label for="nombre_Empresa">Nombre de la Empresa</label>
+                    <input type="text" class="form-control" id="nombre_Empresa" placeholder="Ingrese nombre empresa" name="nombre">
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    <label for="password_Empresa">Palabra clave</label>
+                    <input type="password" class="form-control" id="password_Empresa" placeholder="Palabra clave" name="password">
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputFile">File input</label>
-                    <input type="file" id="exampleInputFile">
-                    <p class="help-block">Example block-level help text here.</p>
+                    <label for="usuario_empresa">Usuario</label>
+                    <input type="text" class="form-control" id="usuario_empresa" placeholder="Usuario" name="usuario">
+                </div>
+                <div class="form-group">
+                    <label for="correo_empresa">Correo</label>
+                    <input type="text" class="form-control" id="correo_empresa" placeholder="Correo" name="correo">
+                </div>
+                <div class="form-group">
+                    <label for="telefono_empresa">Telefono</label>
+                    <input type="text" class="form-control" id="telefono_empresa" placeholder="Usuario" name="telefono">
+                </div>
+                <div class="form-group">
+                    <label for="pais_empresa">Pais</label>
+                    <input type="text" class="form-control" id="pais_empresa" placeholder="Pais" name="pais">
+                </div>
+                <div class="form-group">
+                    <label for="depto_empresa">Departamento</label>
+                    <input type="text" class="form-control" id="depto_empresa" placeholder="Departamento" name="depto">
+                </div>
+                <div class="form-group">
+                    <label for="ciudad_empresa">Ciudad</label>
+                    <input type="text" class="form-control" id="ciudad_empresa" placeholder="Ciudad" name="ciudad">
+                </div>
+                <div class="form-group">
+                    <label for="direccion_empresa">Direccion</label>
+                    <input type="text" class="form-control" id="direccion_empresa" placeholder="Direccion" name="direccion">
+                </div>
+                <div class="form-group">
+                    <label for="codigo_empresa">Codigo Postal</label>
+                    <input type="text" class="form-control" id="codigo_empresa" placeholder="Codigo postal" name="codigo">
                 </div>
           </div>
           <div class="modal-footer">

@@ -7,6 +7,7 @@
 
 <html>
 <head>
+    <title><% out.println(pageTitle); %></title>
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -20,6 +21,9 @@
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 	<script src="http://cdn.oesmith.co.uk/morris-0.5.1.min.js"></script>
     <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+    <!-- Estilo data-Tables -->
+    <link href="css/plugins/dataTables.bootstrap.css" rel="stylesheet">
+    <script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>
 </head>
 <body>
     <div id="wrapper">
@@ -32,7 +36,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="home.jsp">ValorAndes</a>
+                <a class="navbar-brand" href="./home.jsp">ValorAndes</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -261,7 +265,7 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a class="active" href="/home.jsp"><i class="fa fa-dashboard fa-fw"></i> Principal</a>
+                            <a class="active" href="./home.jsp"><i class="fa fa-dashboard fa-fw"></i> Principal</a>
                         </li>
                         <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Operaciones<span class="fa arrow"></span></a>
@@ -279,11 +283,11 @@
                             <a href="estadisticas.jsp"><i class="fa fa-table fa-fw"></i> Estadisticas</a>
                         </li>
 
-                        <!--<c:if test="${sessionScope.tipo == 'EMPRESA'}">-->
+                        <c:if test="${sessionScope.tipo == 'Empresa' || sessionScope.tipo == 'Inversionista'}">
                         <li>
                             <a href="valores.jsp"><i class="fa fa-edit fa-fw"></i> Valores</a>
                         </li>
-                        <!--</c:if>-->
+                        </c:if>
 
                         <li>
                             <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow"></span></a>

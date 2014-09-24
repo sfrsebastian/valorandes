@@ -7,22 +7,25 @@ import java.sql.SQLException;
 import db.ValorAndesDB;
 
 public class Certificado extends Valor {
-
-	private String tipo;
+	public static final int TIPO = 3;
+	public static final int CHEQUE= 1;
+	public static final int LETRA_CAMBIO = 2;
+	public static final int PAGARE = 3;
+	private int tipo;
 	private String numero;
 
 	public Certificado(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, int nTipo, String nNumero) throws SQLException{
+			int nIdOferente, int nTipo, String nNumero){
 		
-		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,nIdOferente);
-		tipo = consultarTipoCertificado(nTipo);
+		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,TIPO,nIdOferente);
+		tipo = nTipo;
 		numero = nNumero;
 	}
 
 	public Certificado (ResultSet set) throws SQLException{
 		
 		super(consultarValores(set.getInt("ID")));
-		tipo = consultarTipoCertificado(set.getInt("TIPO"));
+		tipo = set.getInt("TIPO");
 		numero = set.getString("NUMERO");
 	}
 	
@@ -39,7 +42,7 @@ public class Certificado extends Valor {
 	}
 	
 	//GETTERS
-	public String getTipo() {
+	public int getTipoCertificado() {
 		return tipo;
 	}
 
@@ -48,7 +51,7 @@ public class Certificado extends Valor {
 	}
 
 	//SETTERS
-	public void setTipo(String tipo) {
+	public void setTipoCertificado(int tipo) {
 		this.tipo = tipo;
 	}
 

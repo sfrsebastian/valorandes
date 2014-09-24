@@ -7,25 +7,30 @@ import java.sql.SQLException;
 import db.ValorAndesDB;
 
 public class Bono extends Valor {
-
-	private String tipo;
+	public static final int TIPO = 1;
+	public static final String TIPO_PUBLICO = "Publico";
+	public static final String TIPO_PRIVADO = "Privado";
+	public static final int INTERES_VARIABLE = 1;
+	public static final int INTERES_FIJO = 2;
+	
 	private double interes;
-	private String tipoInteres;
+	private int tipoInteres;
+	private String tipoBono;
 
 	public Bono(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, String nTipo, double nInteres, int nTipoInteres) throws SQLException{
+			int nIdOferente, double nInteres, int nTipoInteres, String nTipoBono){
 		
-		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,nIdOferente);
-		tipo = nTipo;
+		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,TIPO,nIdOferente);
 		interes = nInteres;
-		tipoInteres = consultarTipoInteres(nTipoInteres);
+		tipoInteres = nTipoInteres;
+		tipoBono = nTipoBono;
 	}
 	
 	public Bono (ResultSet set) throws SQLException{
 		super(consultarValores(set.getInt("ID")));
-		tipo = set.getString("TIPO");
 		interes = set.getDouble("INTERES");
-		tipoInteres = consultarTipoInteres(set.getInt("TIPO_INTERES"));
+		tipoInteres = set.getInt("TIPO_INTERES");
+		tipoBono = set.getString("TIPO");
 	}
 
 	private static ResultSet consultarValores(int id) throws SQLException {
@@ -33,36 +38,30 @@ public class Bono extends Valor {
 		set.next();
 		return set;
 	}
-
-	private String consultarTipoInteres(int id) throws SQLException {
-		 ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT NOMBRE FROM TIPOS_INTERES WHERE ID="+id);
-		 set.next();
-		 return set.getString("NOMBRE");
-	}
 	
 	//GETTERS
-	public String getTipo() {
-		return tipo;
-	}
-
 	public double getInteres() {
 		return interes;
 	}
 
-	public String getTipoInteres() {
+	public int getTipoInteres() {
 		return tipoInteres;
 	}
 	
-	//SETTERS
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
+	public String getTipoBono(){
+		return tipoBono;
 	}
-
+	
+	//SETTERS
 	public void setInteres(double interes) {
 		this.interes = interes;
 	}
 
-	public void setTipoInteres(String tipoInteres) {
+	public void setTipoInteres(int tipoInteres) {
 		this.tipoInteres = tipoInteres;
+	}
+	
+	public void setTipoBono(String tipoBono){
+		this.tipoBono = tipoBono;
 	}
 }

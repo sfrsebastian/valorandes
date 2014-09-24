@@ -7,22 +7,26 @@ import java.sql.SQLException;
 import db.ValorAndesDB;
 
 public class Accion extends Valor {
-	private String tipo;
+	public static final int TIPO = 2;
+	public static final int ACCION_ORDINARIA = 1;
+	public static final int ACCION_PREFERENTE = 2;
+	public static final int ACCION_SAVING = 3;
+	private int tipo;
 	private double precioEsperadoAnioActual;
 	private double rendimiento;
 	
 	public Accion(int nId, String nNombre, String nDescripcion, int nCantidad, Date nFechaLanzamiento, Date nFechaExpiracion, 
-			int nIdOferente, int nTipo, double nPrecioEsperado, int nRendimiento) throws SQLException{
+			int nIdOferente, int nTipo, double nPrecioEsperado, double nRendimiento){
 		
-		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,nIdOferente);
-		tipo = consultarTipoAccion(nTipo);
+		super(nId,nNombre,nDescripcion,nCantidad,nFechaLanzamiento,nFechaExpiracion,TIPO,nIdOferente);
+		tipo = nTipo;
 		precioEsperadoAnioActual = nPrecioEsperado;
 		rendimiento = nRendimiento;
 	}
 	
 	public Accion (ResultSet set) throws SQLException{
 		super(consultarValores(set.getInt("ID")));
-		tipo = consultarTipoAccion(set.getInt("TIPO"));
+		tipo = set.getInt("TIPO");
 		precioEsperadoAnioActual = set.getDouble("PRECIO_ESPERADO_ANIO_ACTUAL");
 		rendimiento = set.getDouble("RENDIMIENTO");
 	}
@@ -40,7 +44,7 @@ public class Accion extends Valor {
 	}
 	
 	//GETTERS
-	public String getTipo() {
+	public int getTipoAccion() {
 		return tipo;
 	}
 
@@ -53,7 +57,7 @@ public class Accion extends Valor {
 	}
 	
 	//SETTERS
-	public void setTipo(String tipo) {
+	public void setTipoAccion(int tipo) {
 		this.tipo = tipo;
 	}
 

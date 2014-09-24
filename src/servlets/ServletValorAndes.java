@@ -37,7 +37,7 @@ public class ServletValorAndes extends HttpServlet {
 	public void init( ) throws ServletException
     {
 		System.out.println("Init called");
-        conexionDAO = ValorAndesDB.getInstance();
+        //conexionDAO = ValorAndesDB.getInstance();
     }
 	
 	//--------------------------------------------

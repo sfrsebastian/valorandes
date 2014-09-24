@@ -1,30 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns="http://java.sun.com/xml/ns/javaee" 
-xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
-id="WebApp_ID" version="3.0">
-
-   <description>Servlet Calculadora Web</description>
-
-   <!-- SERVLETS -->
-
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <description>Servlet Valor Andes</description>
+  <servlet>
+    <servlet-name>Home</servlet-name>
+    <servlet-class>servlets.ServletValorAndes</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Login</servlet-name>
+    <servlet-class>servlets.ServletLogin</servlet-class>
+  </servlet>
    <servlet>
-      <servlet-name>Home</servlet-name>
-      <servlet-class>servlets.ServletValorAndes</servlet-class>
-   </servlet>
-   <servlet>
-      <servlet-name>Login</servlet-name>
-      <servlet-class>servlets.ServletLogin</servlet-class>
-   </servlet>
-   <!-- MAPPING -->
-   
+    <servlet-name>Valores</servlet-name>
+    <servlet-class>servlets.ServletValores</servlet-class>
+  </servlet>
+     <servlet>
+    <servlet-name>Operaciones</servlet-name>
+    <servlet-class>servlets.ServletOperaciones</servlet-class>
+  </servlet>
+       <servlet>
+    <servlet-name>VerOperaciones</servlet-name>
+    <servlet-class>servlets.ServletVerOperaciones</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Home</servlet-name>
+    <url-pattern>/index.html</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Login</servlet-name>
+    <url-pattern>/login.html</url-pattern>
+  </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>Home</servlet-name>
-      <url-pattern>/index.html</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>Login</servlet-name>
-      <url-pattern>/login.html</url-pattern>
-   </servlet-mapping>
-   
+    <servlet-name>Valores</servlet-name>
+    <url-pattern>/valores.html</url-pattern>
+  </servlet-mapping>
+     <servlet-mapping>
+    <servlet-name>Operaciones</servlet-name>
+    <url-pattern>/operaciones.html</url-pattern>
+  </servlet-mapping>
+       <servlet-mapping>
+    <servlet-name>VerOperaciones</servlet-name>
+    <url-pattern>/verOperaciones.html</url-pattern>
+  </servlet-mapping>
 </web-app>

@@ -48,33 +48,64 @@ public class ServletLogin extends HttpServlet {
 	
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
-		
 		String tipo = request.getParameter("tipo");
-		
-		
-		String usuario = request.getParameter("usuario");
-		String pass = request.getParameter("password");
-		
-		boolean error = false;
-		
-		if(usuario != null && pass != null && !usuario.equals("") && !pass.equals("")){
-			if(conexionDAO.autenticarUsuario(usuario, pass)){
-				HttpSession session = request.getSession();
-				session.setAttribute("usuario", usuario);
-				session.setAttribute("tipo", "EMPRESA");
-				response.sendRedirect("./home.jsp");
+		if(tipo.equals("INGRESAR_USUARIO")){
+
+			String usuario = request.getParameter("usuario");
+			String pass = request.getParameter("password");
+
+			boolean error = false;
+
+			if(!usuario.equals("") && !pass.equals("")){
+					Object[] valores = ValorAndesDB.getInstance().autenticarUsuario(usuario, pass);
+					if(valores != null){
+						HttpSession session = request.getSession();
+						session.setAttribute("usuario", usuario);
+						session.setAttribute("id", valores[0]);
+						session.setAttribute("tipo", valores[1]);
+						response.sendRedirect("./home.jsp");
+					}
+					else
+						error = true;
 			}else
 				error = true;
-		}else
-			error = true;
 
-		if(error){
-			String url="/login.jsp?error=si"; //relative url for display jsp page
-		    ServletContext sc = getServletContext();
-		    RequestDispatcher rd = sc.getRequestDispatcher(url);
-		    rd.forward(request, response);
+			if(error){
+				String url="/login.jsp?error=si"; //relative url for display jsp page
+				ServletContext sc = getServletContext();
+				RequestDispatcher rd = sc.getRequestDispatcher(url);
+				rd.forward(request, response);
+			}
+		}else if (tipo.equals("REGISTRAR_EMPRESA")){
+			//fecha automatica
+				String nombre = request.getParameter("nombre");
+				String clave = request.getParameter("password");
+				String usuario = request.getParameter("usuario");
+				String correo = request.getParameter("correo");
+				String telefono = request.getParameter("telefono");
+				String pais = request.getParameter("pais");
+				String depto = request.getParameter("depto");
+				String ciudad = request.getParameter("ciudad");
+				String direccion = request.getParameter("direccion");
+				String codigo = request.getParameter("codigo");
+				
+				if(nombre != null && clave != null & usuario != null && correo != null && telefono != null
+						&& pais != null && depto != null && ciudad != null && direccion != null && codigo != null){
+					if(!nombre.equals("") ){
+						
+						
+						
+						HttpSession session = request.getSession();
+						session.setAttribute("usuario", usuario);
+						session.setAttribute("tipo", "EMPRESA");
+						response.sendRedirect("./home.jsp");
+					}
+				}
+				
+				
+				
 		}
-		
+
 	}
 	
 }
