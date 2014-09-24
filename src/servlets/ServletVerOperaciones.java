@@ -40,6 +40,12 @@ public class ServletVerOperaciones extends HttpServlet {
 	
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		String param = request.getParameter("id_valor");
+		String[] valores = param.split("-");
+		int idAsociacion = Integer.parseInt(valores[0]);
+		int idValor = Integer.parseInt(valores[1]);
+		String tipo = valores[2];
+		ValorAndesDB.getInstance().eliminarAutorizacion(idAsociacion,idValor,tipo);
 		response.sendRedirect("./verOperaciones.jsp");
 		//TODO realizar autorizacion ya sea compra/venta
 	}

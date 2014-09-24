@@ -482,4 +482,23 @@ public class ValorAndesDB {
 			closeConnection();
 		}
 	}
+
+	public void eliminarAutorizacion(int idAsociacion, int idValor, String tipo) {
+		try {
+			startConnection();
+			String sql = "DELETE FROM AUTORIZADOS WHERE ID_ASOCIACION = ? AND ID_VALOR = ? AND TIPO = ?";
+			PreparedStatement ps = conexion.prepareStatement(sql);
+			ps.setInt(1, idAsociacion);
+			ps.setInt(2,idValor);
+			ps.setString(3,tipo);
+			ps.executeUpdate();
+			conexion.commit();
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println("Error eliminando autorizados idAu: " + idAsociacion + " idValor: " + idValor + " tipo: " + tipo );
+		}
+		finally{
+			closeConnection();
+		}
+	}
 }
