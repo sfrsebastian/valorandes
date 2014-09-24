@@ -174,10 +174,12 @@
                             user="ISIS2304141420" password="yatai48ea6" />
 
                         <sql:query dataSource="${snapshot}" var="result">
-                        select val.*,us.NOMBRE as nombre_ofertante
-                        from (select vals.id,vals.NOMBRE,pu.CANTIDAD,pu.TIPO_MERCADO,vals.ID_OFERENTE
-                        from PUTS pu INNER JOIN VALORES vals ON pu.ID_VALOR = vals.ID WHERE vals.ID_OFERENTE != '${sessionScope.id}')val INNER JOIN USUARIOS us ON val.ID_OFERENTE = us.ID
-                        </sql:query>
+                        from (select asopu.*, vals.nombre
+						from (select pu.ID_VALOR, pu.CANTIDAD, pu.TIPO_MERCADO, aso.ID_USUARIO from PUTS pu INNER JOIN ASOCIACIONES aso ON aso.ID = pu.ID_ASOCIACION)asopu
+     					 INNER JOIN VALORES vals ON asopu.ID_VALOR=vals.ID)fin INNER JOIN (select usuarios.id,usuarios.nombre as nombre_ofertante,apellido from USUARIOS LEFT OUTER JOIN INVERSIONISTAS ON usuarios.id = inversionistas.id where usuarios.tipo = 1 OR usuarios.tipo = 3 order by usuarios.id)usu 
+     					 ON fin.id_usuario = usu.id
+						where ID !='${sessionScope.id}';
+                       </sql:query>
 
                     <div class="panel panel-green">
                         <div class="panel-heading">
@@ -201,7 +203,7 @@
                                             <td><c:out value="${row.cantidad}" /></td>
                                             <td><c:out value="${row.nombre_ofertante}"/></td>
                                             <td><c:out value="${row.tipo_mercado}"/></td>
-                                            <td><button class="buy btn btn-success" value="${row.id}">Comprar</button></td>
+                                            <td><button class="buy btn btn-success" value="${row.id_valor}">Comprar</button></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
@@ -217,8 +219,6 @@
             <!-- /.row -->
         </div>
         <!-- /#page-wrapper -->
-
-    </div>
     <!-- /#wrapper -->
 
 <!-- MODAL COMPRAR -->
