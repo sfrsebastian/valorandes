@@ -32,13 +32,10 @@ public class Certificado extends Valor {
 	private static ResultSet consultarValores(int id) throws SQLException {
 		ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT * FROM VALORES WHERE ID="+id);
 		set.next();
+		set.next();
+		set.close();
+		ValorAndesDB.getInstance().closeConnection();
 		return set;
-	}
-
-	private String consultarTipoCertificado(int id) throws SQLException {
-		ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT NOMBRE FROM TIPOS_CERTIFICADO WHERE ID="+id);
-		 set.next();
-		 return set.getString("NOMBRE");
 	}
 	
 	//GETTERS

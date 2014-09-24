@@ -34,13 +34,9 @@ public class Accion extends Valor {
 	private static ResultSet consultarValores(int id) throws SQLException {
 		ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT * FROM VALORES WHERE ID="+id);
 		set.next();
+		set.close();
+		ValorAndesDB.getInstance().closeConnection();
 		return set;
-	}
-
-	private String consultarTipoAccion(int id) throws SQLException {
-		 ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT NOMBRE FROM TIPOS_ACCION WHERE ID="+id);
-		 set.next();
-		 return set.getString("NOMBRE");
 	}
 	
 	//GETTERS

@@ -38,6 +38,9 @@ public class Corredor extends Usuario {
 	private static ResultSet consultarUsuarios(int id) throws SQLException{
 		ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT * FROM USUARIOS WHERE ID="+id);
 		set.next();
+		set.next();
+		set.close();
+		ValorAndesDB.getInstance().closeConnection();
 		return set;
 	}
 	

@@ -8,7 +8,7 @@ import db.ValorAndesDB;
 
 public class Empresa extends Usuario {
 
-	private String tipo;
+	private int tipo;
 	private String nombreRepresentante;
 	private String cedulaRepresentante;
 
@@ -16,14 +16,14 @@ public class Empresa extends Usuario {
 			String nPais, String nDepartamento, String nCiudad, String nDireccion, String nCodigoPostal, int nTipo, String nNombreRep, String nCedulaRep) throws SQLException{
 		
 		super(nId,nNombre, nUsuario, nPassword, nFechaIncripcion, nCorreo, nTelefono, nPais, nDepartamento, nCiudad, nDireccion, nCodigoPostal);
-		tipo = consultarTipo(nTipo);
+		tipo = nTipo;
 		nombreRepresentante = nNombreRep;
 		cedulaRepresentante = nCedulaRep;
 	}
 	
 	public Empresa(ResultSet set) throws SQLException{
 		super(consultarUsuarios(set.getInt("ID")));
-		tipo = consultarTipo(set.getInt("TIPO"));
+		tipo = set.getInt("TIPO");
 		nombreRepresentante = set.getString("NOMBRE_REPRESENTANTE");
 		cedulaRepresentante = set.getString("CEDULA_REPRESENTANTE");		
 	}
@@ -31,17 +31,13 @@ public class Empresa extends Usuario {
 	private static ResultSet consultarUsuarios(int id) throws SQLException{
 		ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT * FROM USUARIOS WHERE ID="+id);
 		set.next();
+		set.close();
+		ValorAndesDB.getInstance().closeConnection();
 		return set;
 	}
 	
-	private String consultarTipo(int id) throws SQLException {
-		ResultSet set = ValorAndesDB.getInstance().makeQuery("SELECT NOMBRE FROM TIPOS_EMPRESA WHERE ID="+id);
-		set.next();
-		return set.getString("NOMBRE");
-	}
-	
 	//GETTERS
-	public String getTipo() {
+	public int getTipo() {
 		return tipo;
 	}
 
@@ -54,7 +50,7 @@ public class Empresa extends Usuario {
 	}
 	
 	//SETTERS
-	public void setTipo(String tipo) {
+	public void setTipo(int tipo) {
 		this.tipo = tipo;
 	}
 
