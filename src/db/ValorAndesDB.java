@@ -138,12 +138,19 @@ public class ValorAndesDB {
 	 * @throws SQLException
 	 */
 	public void makeUpdate(String query) throws SQLException{
-		startConnection();
-		PreparedStatement ps = conexion.prepareStatement(query);
-		ps.executeQuery();
-		conexion.commit();	
-		ps.close();
-		closeConnection();
+		try{
+			startConnection();
+			PreparedStatement ps = conexion.prepareStatement(query);
+			ps.executeQuery();
+			conexion.commit();	
+			ps.close();
+		}
+		catch(SQLException e){
+			throw e;
+		}
+		finally{
+			closeConnection();
+		}
 	}
 	//-----------------------------------------------------------------
 	// Procedimientos
@@ -787,7 +794,7 @@ public class ValorAndesDB {
 				set2.close();
 			}
 			catch(SQLException e){
-				
+				System.out.println("El usuario no tiene el valor, creando entrada de propiedad...");
 			}
 			String query3 = "UPDATE DUENO_VALOR SET CANTIDAD = CANTIDAD - "+ cantidad +" WHERE ID_DUENO ="+ idDueno+"AND ID_VALOR="+idValor;
 			PreparedStatement ps3 = conexion.prepareStatement(query3);
