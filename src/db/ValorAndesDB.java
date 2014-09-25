@@ -794,6 +794,7 @@ public class ValorAndesDB {
 				set2.close();
 			}
 			catch(SQLException e){
+				cantidadComprador = 0;
 				System.out.println("El usuario no tiene el valor, creando entrada de propiedad...");
 			}
 			String query3 = "UPDATE DUENO_VALOR SET CANTIDAD = CANTIDAD - "+ cantidad +" WHERE ID_DUENO ="+ idDueno+"AND ID_VALOR="+idValor;
@@ -801,6 +802,7 @@ public class ValorAndesDB {
 			ps3.executeQuery();
 			ps3.close();
 			if(cantidadComprador==0){
+				System.out.println("Entrando al insert");
 				double precioCompra = darPrecioMasReciente(idValor);
 				String create = "INSERT INTO DUENO_VALOR (ID_VALOR, CANTIDAD, VALOR_UNITARIO_COMPRA, FECHA_COMPRA, ID_DUENO) VALUES (?,?,?,?,?)";
 				PreparedStatement state = conexion.prepareStatement(create);

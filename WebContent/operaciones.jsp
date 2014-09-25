@@ -170,8 +170,8 @@
                                     <c:forEach var="row" items="${result.rows}">
                                         <tr>
                                             <td><c:out value="${row.nombre}" /></td>
-                                            <td><c:out value="${row.cantidad_disponible}" /></td>
-                                            <td><button class="sell btn btn-warning" value="${row.cantidad_disponible}-${row.id}">Vender</button></td>
+                                            <td><c:out value="${row.cantidad}" /></td>
+                                            <td><button class="sell btn btn-warning" value="${row.cantidad}-${row.id}">Vender</button></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
