@@ -774,21 +774,21 @@ public class ValorAndesDB {
 			set.close();
 			ps.close();
 
-			String sql2 = "SELECT CANTIDAD FROM DUENO_VALOR WHERE ID_DUENO = ? AND ID_VALOR = ?";
-			PreparedStatement ps2 = conexion.prepareStatement(sql2);
-			ps2.setInt(1,idComprador);		
-			ps2.setInt(2, idValor);
-			ResultSet set2 = ps2.executeQuery();
 			int cantidadComprador = 0;
 			try{
+				String sql2 = "SELECT CANTIDAD FROM DUENO_VALOR WHERE ID_DUENO = ? AND ID_VALOR = ?";
+				PreparedStatement ps2 = conexion.prepareStatement(sql2);
+				ps2.setInt(1,idComprador);		
+				ps2.setInt(2, idValor);
+				ResultSet set2 = ps2.executeQuery();
 				set2.next();
 				cantidadComprador = set2.getInt("CANTIDAD");
+				ps2.close();
+				set2.close();
 			}
 			catch(SQLException e){
 				
 			}
-			ps2.close();
-			set2.close();
 			String query3 = "UPDATE DUENO_VALOR SET CANTIDAD = CANTIDAD - "+ cantidad +" WHERE ID_DUENO ="+ idDueno+"AND ID_VALOR="+idValor;
 			PreparedStatement ps3 = conexion.prepareStatement(query3);
 			ps3.executeQuery();
@@ -806,7 +806,7 @@ public class ValorAndesDB {
 				state.close();
 			}
 			else{
-				String query4 = "UPDATE DUENO_VALOR SET CANTIDAD="+ (cantidadComprador+cantidad) +" WHERE ID_DUENO="+ idUsuario+"AND ID_VALOR="+idValor;
+				String query4 = "UPDATE DUENO_VALOR SET CANTIDAD=CANTIDAD+"+ cantidad +" WHERE ID_DUENO="+ idUsuario+"AND ID_VALOR="+idValor;
 				PreparedStatement ps4 = conexion.prepareStatement(query4);
 				ps4.executeQuery();
 				ps4.close();
