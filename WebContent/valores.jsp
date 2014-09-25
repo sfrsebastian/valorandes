@@ -70,8 +70,8 @@
 				user="ISIS2304141420" password="yatai48ea6" />
 
 			<sql:query dataSource="${snapshot}" var="result">
-                        select * from valores where ID_oferente = '${sessionScope.id}'
-                    </sql:query>
+                        select * from dueno_valor INNER JOIN VALORES on VALORES.ID = dueno_valor.ID_VALOR where dueno_valor.ID_DUENO = '${sessionScope.id}'
+            </sql:query>
 
 			<h1 class="page-header">Valores</h1>
 			<!-- <h3>Valores Registrados</h3> -->
@@ -95,7 +95,7 @@
 								<tr>
 									<td><c:out value="${row.id}" /></td>
 									<td><c:out value="${row.nombre}" /></td>
-									<td><c:out value="${row.cantidad_disponible}" /></td>
+									<td><c:out value="${row.cantidad}" /></td>
 								</tr>
 							</c:forEach>
 						</tbody>
@@ -152,6 +152,11 @@
 						<label for="valor_cantidad">Cantidad</label> <input type="text"
 							class="form-control" id="valor_cantidad"
 							placeholder="Ingrese la cantidad" name="cantidad">
+					</div>
+					<div class="form-group">
+						<label for="valor_precio">Precio</label> <input type="text"
+							class="form-control" id="valor_precio"
+							placeholder="Ingrese el precio" name="precio">
 					</div>
 					<div class="form-group">
 						<label for="password_Empresa">Descripcion </label>

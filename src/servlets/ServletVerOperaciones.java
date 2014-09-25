@@ -3,9 +3,11 @@ package servlets;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import db.ValorAndesDB;
 
@@ -69,8 +71,12 @@ public class ServletVerOperaciones extends HttpServlet {
 			int asociacionPut = Integer.parseInt(valores[2]);
 			int asociacionCall = Integer.parseInt(valores[3]);
 			int idValor = Integer.parseInt(valores[4]);
-			int idUsuario = Integer.parseInt(request.getParameter("id"));
-			ValorAndesDB.getInstance().realizarTransaccion(idUsuario,cantidad,tipoMercado,asociacionPut,asociacionCall,idValor);	
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer)session.getAttribute("id");
+			int callId = Integer.parseInt(valores[5]);
+			int putId = Integer.parseInt(valores[6]);
+			int compradorId= Integer.parseInt(valores[7]);
+			ValorAndesDB.getInstance().realizarTransaccion(idUsuario,cantidad,tipoMercado,asociacionPut,asociacionCall,idValor,callId,putId,compradorId);	
 		}
 		
 		response.sendRedirect("./verOperaciones.jsp");

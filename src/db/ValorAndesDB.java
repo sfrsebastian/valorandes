@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
+
 import model.Accion;
 import model.Bono;
 import model.Certificado;
@@ -107,6 +109,7 @@ public class ValorAndesDB {
 	public void closeConnection(){        
 		try {
 			conexion.close();
+			conexion = null;
 		} catch (SQLException e) {
 			System.out.println("Error cerrando conexion con DB");
 		}
@@ -248,8 +251,12 @@ public class ValorAndesDB {
 	 * @return true si se agrego correctamente, false de lo contrario.
 	 */
 	private boolean registrarValor(Valor valor){
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "INSERT INTO VALORES (ID, NOMBRE, DESCRIPCION, CANTIDAD_DISPONIBLE, FECHA_LANZAMIENTO, FECHA_EXPIRACION, TIPO, ID_OFERENTE) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			ps.setInt(1, valor.getId());
@@ -261,8 +268,8 @@ public class ValorAndesDB {
 			ps.setInt(7, valor.getTipo());
 			ps.setInt(8,valor.getIdOferente());
 			ps.executeUpdate();
-			conexion.commit();
 			ps.close();
+			
 			return true;
 		}
 		catch(SQLException e){
@@ -270,7 +277,8 @@ public class ValorAndesDB {
 			return false;
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 	}
 
@@ -280,7 +288,7 @@ public class ValorAndesDB {
 	 * @param bono El bono a agregar.
 	 * @return true si se agrego correctamente, false de lo contrario.
 	 */
-	public boolean registrarBono(Bono bono){
+	public boolean registrarBono(Bono bono, double precio){
 		if(oferenteValido(bono.getIdOferente())){
 			//Agrega un nuevo valor
 			int id = proximoIdValores();
@@ -296,15 +304,33 @@ public class ValorAndesDB {
 					ps.setInt(3, bono.getTipoInteres());
 					ps.setString(4, bono.getTipoBono());
 					ps.executeQuery();
+					
+					String sqlDuen = "INSERT INTO DUENO_VALOR VALUES (? , ? , ? , ? , ?)";
+					PreparedStatement ps1 = conexion.prepareStatement(sqlDuen);
+					ps1.setInt(1, id);
+					ps1.setInt(2, bono.getCantidad());
+					ps1.setDouble(3, precio);
+					Calendar c = Calendar.getInstance();
+					ps1.setDate(4,new Date(c.getTimeInMillis()));
+					ps1.setInt(5, bono.getIdOferente());
+					
+					ps1.executeUpdate();
+					String sqlPrecio = "INSERT INTO PRECIOS_VALOR VALUES (? , ? , ?) ";
+					PreparedStatement ps2 = conexion.prepareStatement(sqlPrecio);
+					ps2.setInt(1, id);
+					ps2.setDouble(2, precio);
+					ps2.setDate(3, new Date(c.getTimeInMillis()));
+					ps2.executeUpdate();
+					
 					conexion.commit();
 					ps.close();
+					ps1.close();
+					ps2.close();
 					return true;
 				}
 				catch(SQLException e){
 					//Elimina valor agregado en valores por error al agregar accion
 					System.out.println("Error agregando nuevo Bono con nombre: " + bono.getNombre() +". \n Eliminando Valor...");
-					eliminarValorPorId(id);
-					System.out.println("Valor eliminado");
 				}
 				finally{
 					closeConnection();
@@ -320,7 +346,7 @@ public class ValorAndesDB {
 	 * @param accion La accion a agregar.
 	 * @return true si se agrego correctamente, false de lo contrario.
 	 */
-	public boolean registrarAccion(Accion accion){
+	public boolean registrarAccion(Accion accion, double precio){
 		if(oferenteValido(accion.getIdOferente())){
 			//Agrega un nuevo valor
 			int id = proximoIdValores();
@@ -336,15 +362,33 @@ public class ValorAndesDB {
 					ps.setDouble(3, accion.getPrecioEsperadoAnioActual());
 					ps.setDouble(4, accion.getRendimiento());
 					ps.executeQuery();
+					
+					String sqlDuen = "INSERT INTO DUENO_VALOR VALUES (? , ? , ? , ? , ?)";
+					PreparedStatement ps1 = conexion.prepareStatement(sqlDuen);
+					ps1.setInt(1, id);
+					ps1.setInt(2, accion.getCantidad());
+					ps1.setDouble(3, precio);
+					Calendar c = Calendar.getInstance();
+					ps1.setDate(4,new Date(c.getTimeInMillis()));
+					ps1.setInt(5, accion.getIdOferente());
+					
+					ps1.executeUpdate();
+					String sqlPrecio = "INSERT INTO PRECIOS_VALOR VALUES (? , ? , ?) ";
+					PreparedStatement ps2 = conexion.prepareStatement(sqlPrecio);
+					ps2.setInt(1, id);
+					ps2.setDouble(2, precio);
+					ps2.setDate(3, new Date(c.getTimeInMillis()));
+					ps2.executeUpdate();
+					
 					conexion.commit();
 					ps.close();
+					ps1.close();
+					ps2.close();
 					return true;
 				}
 				catch(SQLException e){
 					//Elimina valor agregado en valores por error al agregar accion
 					System.out.println("Error agregando nueva Accion con nombre: " + accion.getNombre() +". \n Eliminando Valor...");
-					eliminarValorPorId(id);
-					System.out.println("Valor eliminado");
 				}
 				finally{
 					closeConnection();
@@ -360,7 +404,7 @@ public class ValorAndesDB {
 	 * @param certificado El certificado a agregar.
 	 * @return true si se agrego correctamente, false de lo contrario.
 	 */
-	public boolean registrarCertificado(Certificado certificado){
+	public boolean registrarCertificado(Certificado certificado, double precio){
 		if(oferenteValido(certificado.getIdOferente())){
 			//Agrega un nuevo valor
 			int id = proximoIdValores();
@@ -375,15 +419,33 @@ public class ValorAndesDB {
 					ps.setInt(2, certificado.getTipoCertificado());
 					ps.setString(3, certificado.getNumero());
 					ps.executeQuery();
+					
+					String sqlDuen = "INSERT INTO DUENO_VALOR VALUES (? , ? , ? , ? , ?)";
+					PreparedStatement ps1 = conexion.prepareStatement(sqlDuen);
+					ps1.setInt(1, id);
+					ps1.setInt(2, certificado.getCantidad());
+					ps1.setDouble(3, precio);
+					Calendar c = Calendar.getInstance();
+					ps1.setDate(4,new Date(c.getTimeInMillis()));
+					ps1.setInt(5, certificado.getIdOferente());
+					
+					ps1.executeUpdate();
+					String sqlPrecio = "INSERT INTO PRECIOS_VALOR VALUES (? , ? , ?) ";
+					PreparedStatement ps2 = conexion.prepareStatement(sqlPrecio);
+					ps2.setInt(1, id);
+					ps2.setDouble(2, precio);
+					ps2.setDate(3, new Date(c.getTimeInMillis()));
+					ps2.executeUpdate();
+					
 					conexion.commit();
 					ps.close();
+					ps1.close();
+					ps2.close();
 					return true;
 				}
 				catch(SQLException e){
 					//Elimina valor agregado en valores por error al agregar accion
 					System.out.println("Error agregando Certificado con nombre: " + certificado.getNombre() +". \n Eliminando Valor...");
-					eliminarValorPorId(id);
-					System.out.println("Valor eliminado");
 				}
 				finally{
 					closeConnection();
@@ -427,46 +489,32 @@ public class ValorAndesDB {
 	}
 	
 	/**
-	 * Elimina el valor con Id dado.
-	 * @param id
-	 */
-	private void eliminarValorPorId(int id){
-		try{
-			startConnection();
-			String sql = "DELETE FROM VALORES WHERE ID = ?";
-			PreparedStatement ps = conexion.prepareStatement(sql);
-			ps.setInt(1,id);
-			ps.executeUpdate();
-			conexion.commit();
-			ps.close();
-			closeConnection();
-		}
-		catch(Exception e){
-			System.out.println("Error eliminando en tabla valores ID: "+ id);
-		}
-	}
-
-	/**
 	 * Retorna el id del proximo valor.
 	 * @return max(id) + 1
 	 */
 	private int proximoIdValores(){
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "SELECT MAX(ID) AS ID FROM VALORES";
 			Statement statement = conexion.createStatement();
 			ResultSet set = statement.executeQuery(sql);
 			set.next();
+			int respuesta = set.getInt("ID") + 1;
 			set.close();
 			statement.close();
-			return set.getInt("ID") + 1;
+			return respuesta;
 		}
 		catch(SQLException e){
 			System.out.println("Error consultando proximo id en tabla valores");
 			e.printStackTrace();
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return 1;
 	}
@@ -540,10 +588,12 @@ public class ValorAndesDB {
 	public void realizarPut(int idValor, int cantidad, int idAsociacion) {
 		try {
 			startConnection();
+			int id = proximoPut();
+			
 			String sql = "INSERT INTO PUTS (ID, ID_VALOR, CANTIDAD, FECHA, ID_ASOCIACION, TIPO_MERCADO) VALUES (?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
-			int id = proximoPut();
+
 			String tipoMercado = darMercado(idAsociacion);
 			ps.setInt(1, id);
 			ps.setInt(2,idValor);
@@ -552,7 +602,17 @@ public class ValorAndesDB {
 			ps.setInt(5, idAsociacion);
 			ps.setString(6, tipoMercado);
 			ps.executeUpdate();
+			
+			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
+			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
+			ps1.setString(1, "Venta");
+			ps1.setInt(2, idValor);
+			ps1.setInt(3, idAsociacion);
+			ps1.executeUpdate();
+			
 			conexion.commit();
+			
+			ps1.close();
 			ps.close();
 		} catch (SQLException e) {
 			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
@@ -563,7 +623,12 @@ public class ValorAndesDB {
 	}
 
 	private String darMercado(int idAsociacion) {
+		boolean creada = false;
 		try {
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String query = "select asociaciones.id,nombre from ASOCIACIONES INNER JOIN (select usuarios.id,tipo.nombre from usuarios INNER JOIN tipos_usuario tipo ON usuarios.tipo = tipo.id)tabla ON ASOCIACIONES.ID_USUARIO = tabla.id where asociaciones.id=?";
 			PreparedStatement ps = conexion.prepareStatement(query);
 			ps.setInt(1,idAsociacion);
@@ -577,28 +642,35 @@ public class ValorAndesDB {
 			System.out.println("Error consultando mercado");
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return "Primario";
 	}
 
 	private int proximoPut() {
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "SELECT MAX(ID) AS ID FROM PUTS";
 			Statement statement = conexion.createStatement();
-			ResultSet set = statement.executeQuery(sql);
+			ResultSet set = statement.executeQuery(sql); 
 			set.next();
+			int respuesta = set.getInt("ID") + 1;
 			set.close();
 			statement.close();
-			return set.getInt("ID") + 1;
+			return respuesta;
 		}
 		catch(SQLException e){
 			System.out.println("Error consultando proximo id en tabla puts");
 			e.printStackTrace();
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return 1;
 	}
@@ -617,8 +689,17 @@ public class ValorAndesDB {
 			ps.setInt(4, idPut);
 			ps.setInt(5, idAsociacion);
 			ps.executeUpdate();
+			
+			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
+			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
+			ps1.setString(1, "Compra");
+			ps1.setInt(2, idValor);
+			ps1.setInt(3, idAsociacion);
+			ps1.executeUpdate();
+			
 			conexion.commit();
 			ps.close();
+			ps1.close();
 		} catch (SQLException e) {
 			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
 		}
@@ -628,8 +709,12 @@ public class ValorAndesDB {
 	}
 
 	private int darIdPut(int idValor) {
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "select * FROM PUTS where ID_Valor = ?";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			ps.setInt(1,idValor);
@@ -643,33 +728,39 @@ public class ValorAndesDB {
 			System.out.println("Error consultando id puts");
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return 1;
 	}
 
 	private int proximoCall() {
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "SELECT MAX(ID) AS ID FROM CALLS";
 			Statement statement = conexion.createStatement();
 			ResultSet set = statement.executeQuery(sql);
 			set.next();
+			int respuesta = set.getInt("ID") + 1;
 			set.close();
 			statement.close();
-			return set.getInt("ID") + 1;
+			return respuesta;
 		}
 		catch(SQLException e){
 			System.out.println("Error consultando proximo id en tabla calls");
-			e.printStackTrace();
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return 1;
 	}
 
-	public void realizarTransaccion(int idUsuario, int cantidad, String tipoMercado, int asociacionPut, int asociacionCall, int idValor) {
+	public void realizarTransaccion(int idUsuario, int cantidad, String tipoMercado, int asociacionPut, int asociacionCall, int idValor, int callId, int putId, int idComprador) {
 		//Disminuir cantidad de dueno
 		try{
 			Calendar c = Calendar.getInstance();
@@ -680,25 +771,25 @@ public class ValorAndesDB {
 			ResultSet set = ps.executeQuery();
 			set.next();
 			int idDueno = set.getInt("ID_DUENO");
-			int cantidadDueno = set.getInt("CANTIDAD");
 			set.close();
 			ps.close();
 
-			String sql2 = "SELECT CANTIDAD FROM DUENO_VALOR WHERE ID_DUENO = (SELECT ID_USUARIO FROM ASOCIACIONES WHERE ID = ?)";
+			String sql2 = "SELECT CANTIDAD FROM DUENO_VALOR WHERE ID_DUENO = ? AND ID_VALOR = ?";
 			PreparedStatement ps2 = conexion.prepareStatement(sql2);
-			ps2.setInt(1,asociacionCall);		
-			ResultSet set2 = ps.executeQuery();
+			ps2.setInt(1,idComprador);		
+			ps2.setInt(2, idValor);
+			ResultSet set2 = ps2.executeQuery();
 			int cantidadComprador = 0;
 			try{
 				set2.next();
 				cantidadComprador = set2.getInt("CANTIDAD");
-				ps2.close();
-				set2.close();
 			}
 			catch(SQLException e){
 				
 			}
-			String query3 = "UPDATE DUENO_VALOR SET CANTIDAD="+ (cantidadDueno-cantidad) +" WHERE ID_USUARIO="+ idDueno+"AND ID_VALOR="+idValor;
+			ps2.close();
+			set2.close();
+			String query3 = "UPDATE DUENO_VALOR SET CANTIDAD = CANTIDAD - "+ cantidad +" WHERE ID_DUENO ="+ idDueno+"AND ID_VALOR="+idValor;
 			PreparedStatement ps3 = conexion.prepareStatement(query3);
 			ps3.executeQuery();
 			ps3.close();
@@ -711,9 +802,11 @@ public class ValorAndesDB {
 				state.setDouble(3,precioCompra);
 				state.setDate(4, new Date(c.getTimeInMillis()));
 				state.setInt(5, idUsuario);	
+				state.executeQuery();
+				state.close();
 			}
 			else{
-				String query4 = "UPDATE DUENO_VALOR SET CANTIDAD="+ (cantidadComprador+cantidad) +" WHERE ID_USUARIO="+ idUsuario+"AND ID_VALOR="+idValor;
+				String query4 = "UPDATE DUENO_VALOR SET CANTIDAD="+ (cantidadComprador+cantidad) +" WHERE ID_DUENO="+ idUsuario+"AND ID_VALOR="+idValor;
 				PreparedStatement ps4 = conexion.prepareStatement(query4);
 				ps4.executeQuery();
 				ps4.close();
@@ -730,6 +823,18 @@ public class ValorAndesDB {
 			ps5.setInt(7,idValor);
 			ps5.executeQuery();
 			ps5.close();
+			
+			String sqlElimCall = "DELETE FROM CALLS WHERE ID = ?";
+			PreparedStatement psEl = conexion.prepareStatement(sqlElimCall);
+			psEl.setInt(1,callId);
+			psEl.executeUpdate();
+			psEl.close();
+			
+			String quer = "UPDATE PUTS SET CANTIDAD = CANTIDAD - "+ (cantidad) +" WHERE ID=" + putId;
+			PreparedStatement ps1000 = conexion.prepareStatement(quer);
+			ps1000.executeQuery();
+			ps1000.close();
+			
 			conexion.commit();
 		}
 		catch(SQLException e){
@@ -742,29 +847,39 @@ public class ValorAndesDB {
 	}
 
 	private int darProximoIdTransaccion() {
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "SELECT MAX(ID) AS ID FROM TRANSACCIONES";
 			Statement statement = conexion.createStatement();
 			ResultSet set = statement.executeQuery(sql);
 			set.next();
+			int respuesta = set.getInt("ID") + 1;
 			set.close();
 			statement.close();
-			return set.getInt("ID") + 1;
+			return respuesta;
 		}
 		catch(SQLException e){
 			System.out.println("Error consultando proximo id en tabla transacciones");
 			e.printStackTrace();
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return 1;
 	}
 
 	private double darPrecioMasReciente(int idValor) {
+		boolean creada = false;
 		try{
-			startConnection();
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String create = "select PRECIO_UNITARIO FROM PRECIOS_VALOR WHERE ID_Valor = ? AND fecha = (select max(fecha)from PRECIOS_VALOR where id_valor = ?)";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1,idValor);
@@ -779,7 +894,8 @@ public class ValorAndesDB {
 			System.out.println("Error buscando precio reciente de valor con id: " + idValor);
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 		return 0;
 	}

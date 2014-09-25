@@ -24,10 +24,10 @@
 
         $("#comprar").click(function(){
             $("#tabla_vender").hide();
-            $("#tabla_comprar").show();
+            $("#tabla_comprar").show("slow");
         });
         $("#vender").click(function(){
-            $("#tabla_vender").show();
+            $("#tabla_vender").show("slow");
             $("#tabla_comprar").hide();
         });
 
@@ -150,7 +150,7 @@
                             user="ISIS2304141420" password="yatai48ea6" />
 
                         <sql:query dataSource="${snapshot}" var="result">
-                            select * from valores where ID_oferente = '${sessionScope.id}'
+                            select * from dueno_valor INNER JOIN VALORES on VALORES.ID = dueno_valor.ID_VALOR where dueno_valor.ID_DUENO = '${sessionScope.id}'
                         </sql:query>
             
                     <div class="panel panel-info">

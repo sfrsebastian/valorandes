@@ -88,6 +88,7 @@ public class ServletValores extends HttpServlet {
 		}
 
 		String tipo = request.getParameter("tipo");
+		double precio = Double.parseDouble(request.getParameter("precio"));
 
 		int idOferente = (Integer) request.getSession().getAttribute("id");
 
@@ -110,7 +111,7 @@ public class ServletValores extends HttpServlet {
 			int tipoInteres = request.getParameter("tipo_interes").equals("fijo")?2:1;
 			if(!error){
 				Bono bono = new Bono(0,nombre,descripcion,cantidad,sqlFechaLanzamiento,sqlFechaExpiracion,idOferente,interes,tipoInteres,tipo_bono);
-				ValorAndesDB.getInstance().registrarBono(bono);
+				ValorAndesDB.getInstance().registrarBono(bono,precio);
 			}
 		}
 		else if(tipo.equals("ACCION")){
@@ -141,7 +142,7 @@ public class ServletValores extends HttpServlet {
 			int tipoAccion = Integer.parseInt(request.getParameter("tipo_accion"));
 			if(!error){
 				Accion accion = new Accion(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, idOferente, tipoAccion, precioAccion, rendimientoAccion);
-				ValorAndesDB.getInstance().registrarAccion(accion);
+				ValorAndesDB.getInstance().registrarAccion(accion,precio);
 			}
 		}
 		else if(tipo.equals("CERTIFICADO")){
@@ -153,7 +154,7 @@ public class ServletValores extends HttpServlet {
 			int tipoCertificado = Integer.parseInt(request.getParameter("tipo_certificado"));
 			if(!error){
 				Certificado certificado = new Certificado(0, nombre, descripcion, cantidad, sqlFechaLanzamiento, sqlFechaExpiracion, idOferente, tipoCertificado, numeroCertificado);
-				ValorAndesDB.getInstance().registrarCertificado(certificado);
+				ValorAndesDB.getInstance().registrarCertificado(certificado,precio);
 			}
 		}
 		

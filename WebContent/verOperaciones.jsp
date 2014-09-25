@@ -63,6 +63,31 @@
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"                        }
              }
         });
+        $('#tabla-aceptar').DataTable({
+             "language": {
+                 "sProcessing":     "Procesando...",
+                  "sLengthMenu":     "Mostrar _MENU_ registros",
+                  "sZeroRecords":    "No se encontraron resultados",
+                  "sEmptyTable":     "Ningun dato disponible en esta tabla",
+                  "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                  "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                  "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                  "sInfoPostFix":    "",
+                  "sSearch":         "Buscar:",
+                  "sUrl":            "",
+                  "sInfoThousands":  ",",
+                  "sLoadingRecords": "Cargando...",
+                  "oPaginate": {
+                      "sFirst":    "Primero",
+                      "sLast":     "Último",
+                      "sNext":     "Siguiente",
+                      "sPrevious": "Anterior"
+                  },
+               "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"                        }
+             }
+        });
     });
 </script>
 
@@ -190,21 +215,20 @@ WHERE ID_CORREDOR = '${sessionScope.id}'
 SELECT * FROM (
 SELECT REL.*,VALORES.NOMBRE FROM(
 SELECT * FROM (
-SELECT PUTS.ID as PUT_ID,CALLS.CANTIDAD,TIPO_MERCADO,PUTS.ID_ASOCIACION AS ASOCIACION_PUT,CALLS.ID_ASOCIACION AS ASOCIACION_CALL, CALLS.FECHA AS FECHA_CALL, PUTS.ID_VALOR
-FROM PUTS INNER JOIN CALLS ON PUTS.ID = CALLS.ID
-) PUTCALLS INNER JOIN ASOCIACIONES ON PUTCALLS.ASOCIACION_CALL = ASOCIACIONES.ID WHERE ASOCIACIONES.ID_CORREDOR = '${sessionScope.id}'
+SELECT PUTS.ID as PUT_ID,CALLS.ID as CALL_ID,CALLS.CANTIDAD,TIPO_MERCADO,PUTS.ID_ASOCIACION AS ASOCIACION_PUT,CALLS.ID_ASOCIACION AS ASOCIACION_CALL, CALLS.FECHA AS FECHA_CALL, PUTS.ID_VALOR
+FROM PUTS INNER JOIN CALLS ON PUTS.ID = CALLS.ID_PUT
+) PUTCALLS INNER JOIN ASOCIACIONES ON PUTCALLS.ASOCIACION_PUT = ASOCIACIONES.ID WHERE ASOCIACIONES.ID_CORREDOR = '${sessionScope.id}'
 )REL INNER JOIN VALORES ON REL.ID_VALOR = VALORES.ID 
 )RELFINAL INNER JOIN (select usuarios.id,usuarios.nombre as nombre_ofertante,apellido from USUARIOS LEFT OUTER JOIN INVERSIONISTAS ON usuarios.id = inversionistas.id order by usuarios.id) usu
 ON RELFINAL.ID_USUARIO = USU.id ORDER BY PUT_ID
-
                         </sql:query>
 
                     <div class="panel panel-yellow">
                         <div class="panel-heading">
-                            Operaciones que se pueden cancelar
+                            Transaccion a confirmar
                         </div>
                         <div class="panel-body">
-                            <table class="table table-striped" id="tabla-cancelar">
+                            <table class="table table-striped" id="tabla-aceptar">
                                 <thead>
                                     <tr>
                                         <th>Nombre Valor</th>
@@ -219,7 +243,7 @@ ON RELFINAL.ID_USUARIO = USU.id ORDER BY PUT_ID
                                             <td><c:out value="${row.NOMBRE}" /></td>
                                             <td><c:out value="${row.CANTIDAD}" /></td>
                                             <td><c:out value="${row.NOMBRE_OFERTANTE} ${row.APELLIDO}"/></td>
-                                            <td><button value="${row.CANTIDAD}-${row.TIPO_MERCADO}-${row.ASOCIACION_PUT}-${row.ASOCIACION_CALL}-${row.ID_VALOR}" class="aceptar btn btn-danger">ACEPTAR</button></td>
+                                            <td><button value="${row.CANTIDAD}-${row.TIPO_MERCADO}-${row.ASOCIACION_PUT}-${row.ASOCIACION_CALL}-${row.ID_VALOR}-${row.CALL_ID}-${row.PUT_ID}-${row.ID_USUARIO}" class="aceptar btn btn-danger">ACEPTAR</button></td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
