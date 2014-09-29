@@ -553,6 +553,12 @@ public class ValorAndesDB {
 		}
 	}
 
+	/**
+	 * Elimina la autorizacion con los parametros dados.
+	 * @param idAsociacion
+	 * @param idValor
+	 * @param tipo
+	 */
 	public void eliminarAutorizacion(int idAsociacion, int idValor, String tipo) {
 		try {
 			startConnection();
@@ -572,6 +578,13 @@ public class ValorAndesDB {
 		}
 	}
 
+	/**
+	 * Autoriza a la asociacion dada la negociacion del valor dado por parametro
+	 * @param idAsociacion
+	 * @param idValor
+	 * @param tipo
+	 * @param cantCompra
+	 */
 	public void autorizarAccion(int idAsociacion, int idValor, String tipo,int cantCompra) {
 		try {
 			startConnection();
@@ -592,6 +605,12 @@ public class ValorAndesDB {
 		}
 	}
 
+	/**
+	 * Realiza el put respectivo con la asociacion, valor y cantidad dados.
+	 * @param idValor
+	 * @param cantidad
+	 * @param idAsociacion
+	 */
 	public void realizarPut(int idValor, int cantidad, int idAsociacion) {
 		try {
 			startConnection();
@@ -629,6 +648,11 @@ public class ValorAndesDB {
 		}
 	}
 
+	/**
+	 * Retorna el tipo de mercado según la consulta realizada.
+	 * @param idAsociacion
+	 * @return Primario o Secundario segun el caso.
+	 */
 	private String darMercado(int idAsociacion) {
 		boolean creada = false;
 		try {
@@ -655,6 +679,10 @@ public class ValorAndesDB {
 		return "Primario";
 	}
 
+	/**
+	 * Retorna el id del proximo put de la tabla.
+	 * @return El id del proximo put.
+	 */
 	private int proximoPut() {
 		boolean creada = false;
 		try{
@@ -682,6 +710,12 @@ public class ValorAndesDB {
 		return 1;
 	}
 
+	/**
+	 * Realiza el call respectivo al put relacionado con los datos dados por parametro.
+	 * @param idValor
+	 * @param cantidad
+	 * @param idAsociacion
+	 */
 	public void realizarCall(int idValor, int cantidad, int idAsociacion) {
 		try {
 			startConnection();
@@ -715,6 +749,11 @@ public class ValorAndesDB {
 		}
 	}
 
+	/**
+	 * Retorna el id del put con valor dado.
+	 * @param idValor
+	 * @return
+	 */
 	private int darIdPut(int idValor) {
 		boolean creada = false;
 		try{
@@ -741,6 +780,10 @@ public class ValorAndesDB {
 		return 1;
 	}
 
+	/**
+	 * Retorna el id del proximo call de la tabla.
+	 * @return El id del proximo call
+	 */
 	private int proximoCall() {
 		boolean creada = false;
 		try{
@@ -767,6 +810,19 @@ public class ValorAndesDB {
 		return 1;
 	}
 
+	/**
+	 * Realiza la transaccion con los parámetros dados.<br>
+	 * Si encuentra una excepcion en alguno de los pasos no se realiza la transaccion
+	 * @param idUsuario
+	 * @param cantidad
+	 * @param tipoMercado
+	 * @param asociacionPut
+	 * @param asociacionCall
+	 * @param idValor
+	 * @param callId
+	 * @param putId
+	 * @param idComprador
+	 */
 	public void realizarTransaccion(int idUsuario, int cantidad, String tipoMercado, int asociacionPut, int asociacionCall, int idValor, int callId, int putId, int idComprador) {
 		//Disminuir cantidad de dueno
 		try{
@@ -855,6 +911,10 @@ public class ValorAndesDB {
 		}
 	}
 
+	/**
+	 * Retorna el próximo id de la tabla de transacciones.
+	 * @return
+	 */
 	private int darProximoIdTransaccion() {
 		boolean creada = false;
 		try{
@@ -882,6 +942,11 @@ public class ValorAndesDB {
 		return 1;
 	}
 
+	/**
+	 * Retorna el precio mas reciente del valor con id dado.
+	 * @param idValor
+	 * @return
+	 */
 	private double darPrecioMasReciente(int idValor) {
 		boolean creada = false;
 		try{
