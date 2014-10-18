@@ -605,7 +605,7 @@ public class ValorAndesDB {
 	 * @param tipo
 	 * @param cantCompra
 	 */
-	public void autorizarAccion(int idAsociacion, int idValor, String tipo,int cantCompra) {
+	public void autorizarAccion(int idAsociacion, int idValor, String tipo,int cantCompra)throws Exception {
 		try {
 			startConnection();
 			String sql = "INSERT INTO AUTORIZADOS(ID_ASOCIACION, ID_VALOR, TIPO, CANTIDAD) VALUES(?,?,?,?)";
@@ -619,6 +619,7 @@ public class ValorAndesDB {
 			ps.close();
 		} catch (SQLException e) {
 			System.out.println("Error agregando autorizados idAu: " + idAsociacion + " idValor: " + idValor + " tipo: " + tipo );
+			throw new Exception();
 		}
 		finally{
 			closeConnection();
@@ -631,7 +632,7 @@ public class ValorAndesDB {
 	 * @param cantidad
 	 * @param idAsociacion
 	 */
-	public void realizarPut(int idValor, int cantidad, int idAsociacion) {
+	public void realizarPut(int idValor, int cantidad, int idAsociacion){
 		try {
 			startConnection();
 			int id = proximoPut();
@@ -774,6 +775,7 @@ public class ValorAndesDB {
 	 * @param idValor
 	 * @return
 	 */
+	//TODO CAMBIAR ESTA CHAMBONADA
 	private int darIdPut(int idValor) {
 		boolean creada = false;
 		try{
@@ -1012,6 +1014,7 @@ public class ValorAndesDB {
 			set.next();
 			double respuesta = set.getDouble("PRECIO_UNITARIO");
 			set.close();
+			state.close();
 			return respuesta;
 		}
 		catch(SQLException e){
@@ -1037,6 +1040,7 @@ public class ValorAndesDB {
 			state.setInt(2, idCorredor);
 			state.setInt(3, idUsuario);
 			state.executeUpdate();
+			state.close();
 			conexion.commit();
 		}
 		catch(SQLException e){
@@ -1055,14 +1059,186 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
-			String create = "UPDATE PUTS SET HABILITADO='0' where id_asociacion=?";
+			String create = "UPDATE PUTS SET HABILITADO='0' WHERE id_asociacion=?";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idAsociacion);
 			state.executeUpdate();
+			state.close();
 			conexion.commit();
 		}
 		catch(SQLException e){
 			System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+	
+	public void habilitarCorredor(int idAsociacion){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String create = "UPDATE PUTS SET HABILITADO='1' WHERE id_asociacion=?";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1, idAsociacion);
+			state.executeUpdate();
+			state.close();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+	
+	public void agregarPortafolio(String nombre, int tipo, int idUsuario, String descripcion){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String create = "INSERT INTO PORTAFOLIOS (ID, NOMBRE, DESCRIPCION, TIPO, ID_USUARIO) VALUES (?, ?, ?, ?, ?)";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1, darProximioIdPortafolio());
+			state.setString(2,nombre);
+			state.setString(3, descripcion);
+			state.setInt(4, tipo);
+			state.setInt(5, idUsuario);
+			state.executeUpdate();
+			state.close();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			System.out.println("Error creando portafolio: " + nombre);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+	private int darProximioIdPortafolio() {
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String sql = "SELECT MAX(ID) AS ID FROM PORTAFOLIOS";
+			Statement statement = conexion.createStatement();
+			ResultSet set = statement.executeQuery(sql);
+			set.next();
+			int respuesta = set.getInt("ID") + 1;
+			set.close();
+			statement.close();
+			return respuesta;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando proximo id en tabla Portafolios");
+			e.printStackTrace();
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+		return 1;
+	}
+
+	public void agregarValorAPortafolio(int idValor, int cantidad, int idPortafolio){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String create = "INSERT INTO VALORPORTAFOLIO (ID_VALOR, CANTIDAD, ID_PORTAFOLIO) VALUES (?, ?, ?)";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1, idValor);
+			state.setInt(2,cantidad);
+			state.setInt(3, idPortafolio);
+			state.executeUpdate();
+			state.close();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			System.out.println("Error agregando valor a portafolio idValor: " + idValor);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+	
+	public void actualizarValorPortafolio(int idValor, int deltaCantidad, int idDueno, int idCorredor, int idPortafolio){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			int idAsociacion = darIdAsociacion(idDueno, idCorredor);
+			if(deltaCantidad<0 && idAsociacion>=0){
+				autorizarAccion(idAsociacion, idValor, "Venta", Math.abs(deltaCantidad));;
+				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
+				PreparedStatement state = conexion.prepareStatement(uPort);
+				state.setInt(1, deltaCantidad);
+				state.setInt(2, idValor);
+				state.setInt(3, idPortafolio);
+				state.executeUpdate();
+				state.close();
+			}
+			else if(deltaCantidad>0 && idAsociacion>=0){
+				autorizarAccion(idAsociacion, idValor, "Compra", Math.abs(deltaCantidad));;
+				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
+				PreparedStatement state = conexion.prepareStatement(uPort);
+				state.setInt(1, deltaCantidad);
+				state.setInt(2, idValor);
+				state.setInt(3, idPortafolio);
+				state.executeUpdate();
+				state.close();
+			}
+			else{
+				throw new Exception();
+			}
+			conexion.commit();
+		}
+		catch(Exception e){
+			System.out.println("Error agregando valor a portafolio idValor: " + idValor);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+
+	private int darIdAsociacion(int idUsuario, int idCorredor){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String query = "SELECT id FROM ASOCIACIONES WHERE id_usuario = ? AND id_corredor = ? AND activo = '1'";
+			PreparedStatement st = conexion.prepareStatement(query);
+			st.setInt(1, idUsuario);
+			st.setInt(2, idCorredor);
+			ResultSet set = st.executeQuery();
+			set.next();
+			int id = set.getInt("ID");
+			set.close();
+			st.close();
+			return id; 
+		}
+		catch(SQLException e){
+			System.out.println("Error encontrando asociacion idUsuario: " + idUsuario + " idCorredor" + idCorredor);
+			return -1;
 		}
 		finally{
 			if(creada)
@@ -1087,4 +1263,12 @@ public class ValorAndesDB {
 		
 		return finale;
 	}
+	
+	public HashMap<String,String> sendError (String message){
+		HashMap<String,String> ans = new HashMap<String,String>();
+		ans.put("error", message);
+		return ans;
+	}
+	
+	
 }
