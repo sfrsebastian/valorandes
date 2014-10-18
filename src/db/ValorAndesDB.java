@@ -943,6 +943,36 @@ public class ValorAndesDB {
 	}
 
 	/**
+	 * Retorna el próximo id de la tabla de transacciones.
+	 * @return
+	 */
+	private int darProximoIdAsociacion() {
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String sql = "SELECT MAX(ID) AS ID FROM ASOCIACIONES";
+			Statement statement = conexion.createStatement();
+			ResultSet set = statement.executeQuery(sql);
+			set.next();
+			int respuesta = set.getInt("ID") + 1;
+			set.close();
+			statement.close();
+			return respuesta;
+		}
+		catch(SQLException e){
+			System.out.println("Error consultando proximo id en tabla Asociaciones");
+			e.printStackTrace();
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+		return 1;
+	}
+	/**
 	 * Retorna el precio mas reciente del valor con id dado.
 	 * @param idValor
 	 * @return
@@ -972,5 +1002,51 @@ public class ValorAndesDB {
 				closeConnection();
 		}
 		return 0;
+	}
+	
+	public void agregarCorredorALista(int idCorredor,int idUsuario){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String create = "INSERT INTO ASOCIACIONES (ID, ID_CORREDOR, ID_USUARIO, ACTIVO) VALUES (?, ?, ?, '1')";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1,darProximoIdAsociacion());
+			state.setInt(2, idCorredor);
+			state.setInt(3, idUsuario);
+			state.executeUpdate();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			System.out.println("Error insertando corredor id: " + idCorredor + "con usuario id: " + idUsuario);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+	
+	public void desHabilitarCorredor(int idAsociacion){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String create = "UPDATE PUTS SET HABILITADO='0' where id_asociacion=?";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1, idAsociacion);
+			state.executeUpdate();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
 	}
 }
