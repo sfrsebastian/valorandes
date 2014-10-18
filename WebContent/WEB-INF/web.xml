@@ -21,6 +21,12 @@
     <servlet-name>VerOperaciones</servlet-name>
     <servlet-class>servlets.ServletVerOperaciones</servlet-class>
   </servlet>
+         <servlet>
+    <servlet-name>Admin</servlet-name>
+    <servlet-class>servlets.ServletAdmin</servlet-class>
+  </servlet>
+  
+  
   <servlet-mapping>
     <servlet-name>Home</servlet-name>
     <url-pattern>/index.html</url-pattern>
@@ -40,5 +46,9 @@
        <servlet-mapping>
     <servlet-name>VerOperaciones</servlet-name>
     <url-pattern>/verOperaciones.html</url-pattern>
+  </servlet-mapping>
+         <servlet-mapping>
+    <servlet-name>Admin</servlet-name>
+    <url-pattern>/admin.html</url-pattern>
   </servlet-mapping>
 </web-app>

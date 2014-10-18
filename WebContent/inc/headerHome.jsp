@@ -282,6 +282,12 @@
                         <li>
                             <a href="estadisticas.jsp"><i class="fa fa-table fa-fw"></i> Estadisticas</a>
                         </li>
+                        
+                        <c:if test="${sessionScope.tipo == 'ADMIN'}">
+                            <li>
+                            <a href="admin.jsp"><i class="fa fa-wrench fa-fw"></i> Administrador</a>
+                            </li>
+                        </c:if>
 
                         <c:if test="${sessionScope.tipo == 'Empresa' || sessionScope.tipo == 'Inversionista'}">
                         <li>

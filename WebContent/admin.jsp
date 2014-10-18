@@ -9,31 +9,14 @@
 <%@ include file="inc/headerHome.jsp" %>
 
 <script type="text/javascript">
-    $(document).ready(function(){
-        console.log("Hello");
-        $.plot($("#placeholder"), [ [[0, 0], [1, 1]] ], { yaxis: { max: 1 } });
-
-        new Morris.Line({
-          // ID of the element in which to draw the chart.
-          element: 'myfirstchart',
-          // Chart data records -- each entry in this array corresponds to a point on
-          // the chart.
-          data: [
-            { year: '2008', value: 20 },
-            { year: '2009', value: 10 },
-            { year: '2010', value: 5 },
-            { year: '2011', value: 5 },
-            { year: '2012', value: 20 }
-          ],
-          // The name of the data record attribute that contains x-values.
-          xkey: 'year',
-          // A list of names of data record attributes that contain y-values.
-          ykeys: ['value'],
-          // Labels for the ykeys -- will be displayed when you hover over the
-          // chart.
-          labels: ['Value']
-        });
-    });
+	$(document).ready(function (){
+		$("#get").click(function (){
+			$.post( "/ValorAndes/admin.html", function( data ) {
+				  $( "#tester" ).html( data );
+				  console.log(data);
+				});
+		});
+	});
 </script>
 
         <!-- Page Content -->
@@ -41,9 +24,9 @@
             <div class="row">
                 <div class="col-lg-12">
 
-                    <h1 class="page-header">Pagina Principal</h1>
-                    <div id="placeholder" style="width:600px;height:300px"></div>
-                    <div id="myfirstchart" style="height: 250px;"></div>
+                    <h1 class="page-header">ADMIN</h1>
+                    <button class="btn btn-info" id="get">CLICK ME</button>
+                    <div id="tester"></div>
 
                 </div>
                 <!-- /.col-lg-12 -->
@@ -77,4 +60,3 @@
 </body>
 
 </html>
-

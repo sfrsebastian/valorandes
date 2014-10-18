@@ -1,7 +1,6 @@
 package servlets;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -57,6 +56,16 @@ public class ServletLogin extends HttpServlet {
 			boolean error = false;
 
 			if(!usuario.equals("") && !pass.equals("")){
+					//TODO eliminar esta chanda
+					if (usuario.equals("admin") && pass.equals("admin")){
+						HttpSession session = request.getSession();
+						session.setAttribute("usuario", usuario);
+						session.setAttribute("id", 0);
+						session.setAttribute("tipo", "ADMIN");
+						System.out.println("ADMIN logged IN! ");
+						response.sendRedirect("./home.jsp");
+					}else{
+				
 					Object[] valores = ValorAndesDB.getInstance().autenticarUsuario(usuario, pass);
 					if(valores != null){
 						HttpSession session = request.getSession();
@@ -68,6 +77,7 @@ public class ServletLogin extends HttpServlet {
 					}
 					else
 						error = true;
+					}
 			}else
 				error = true;
 
