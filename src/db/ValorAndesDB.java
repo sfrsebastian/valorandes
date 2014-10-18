@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -123,11 +124,11 @@ public class ValorAndesDB {
 	 * @return
 	 * @throws SQLException
 	 */
-	public HashMap<String, HashMap<String, String>> makeQuery2(String query) throws SQLException{
+	public ArrayList<HashMap<String, String>> makeQuery2(String query) throws SQLException{
 		startConnection();
 		Statement statement = conexion.createStatement();
 		ResultSet set = statement.executeQuery(query);
-		HashMap resultado = darHola(set);
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
 		set.close();
 		statement.close();
 		closeConnection();
@@ -668,7 +669,7 @@ public class ValorAndesDB {
 	}
 
 	/**
-	 * Retorna el tipo de mercado según la consulta realizada.
+	 * Retorna el tipo de mercado segun la consulta realizada.
 	 * @param idAsociacion
 	 * @return Primario o Secundario segun el caso.
 	 */
@@ -830,7 +831,7 @@ public class ValorAndesDB {
 	}
 
 	/**
-	 * Realiza la transaccion con los parámetros dados.<br>
+	 * Realiza la transaccion con los parametros dados.<br>
 	 * Si encuentra una excepcion en alguno de los pasos no se realiza la transaccion
 	 * @param idUsuario
 	 * @param cantidad
@@ -931,7 +932,7 @@ public class ValorAndesDB {
 	}
 
 	/**
-	 * Retorna el próximo id de la tabla de transacciones.
+	 * Retorna el proximo id de la tabla de transacciones.
 	 * @return
 	 */
 	private int darProximoIdTransaccion() {
@@ -962,7 +963,7 @@ public class ValorAndesDB {
 	}
 
 	/**
-	 * Retorna el próximo id de la tabla de transacciones.
+	 * Retorna el proximo id de la tabla de transacciones.
 	 * @return
 	 */
 	private int darProximoIdAsociacion() {
@@ -1069,8 +1070,8 @@ public class ValorAndesDB {
 		}
 	}
 	
-	public HashMap<String, HashMap<String, String>> darHola(ResultSet resSet) throws SQLException{
-		HashMap<String, HashMap<String, String>> finale = new HashMap<String, HashMap<String, String>>();
+	public ArrayList<HashMap<String, String>> darHola(ResultSet resSet) throws SQLException{
+		ArrayList<HashMap<String, String>> finale = new ArrayList<HashMap<String,String>>();
 		int j = 0;
 		while(resSet.next()){
 			Object[] str = new Object[resSet.getMetaData().getColumnCount()];
@@ -1080,7 +1081,7 @@ public class ValorAndesDB {
 				String obj = resSet.getString(i);
 				temp.put(label, obj);
 			}
-			finale.put(j + "", temp);
+			finale.add(temp);
 			j++;
 		}
 		

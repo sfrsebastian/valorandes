@@ -10,12 +10,47 @@
 
 <script type="text/javascript">
 	$(document).ready(function (){
-		$("#get").click(function (){
-			$.post( "/ValorAndes/admin.html", function( data ) {
-				  $( "#tester" ).html( data );
-				  console.log(data);
-				});
-		});
+		$( "#tabla-rec1" ).dataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax": {
+                "url": "/ValorAndes/admin.html",
+                "type": "POST",
+                "data" : { "table_name" : "intermediarios" } 
+            },
+            columns: [
+                { data : 'NOMBRE' },
+                { data : 'CIUDAD' },
+            ]
+        });
+
+        $( "#tabla-rec2" ).dataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax": {
+                "url": "/ValorAndes/admin.html",
+                "type": "POST",
+                "data" : { "table_name" : "inversionistas" } 
+            },
+            columns: [
+                { data : 'NOMBRE' },
+                { data : 'CIUDAD' }
+            ]
+        });
+
+        $( "#tabla-rec3" ).dataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax": {
+                "url": "/ValorAndes/admin.html",
+                "type": "POST",
+                "data" : { "table_name" : "oferentes" } 
+            },
+            columns: [
+                { data : 'NOMBRE' },
+                { data : 'CIUDAD' }
+            ]
+        });
 	});
 </script>
 
@@ -24,9 +59,55 @@
             <div class="row">
                 <div class="col-lg-12">
 
-                    <h1 class="page-header">ADMIN</h1>
-                    <button class="btn btn-info" id="get">CLICK ME</button>
-                    <div id="tester"></div>
+                    <h1 class="page-header">Ventana de Administrador</h1>
+                    
+                    <div>
+                        <table class="table table-striped" id="tabla-rec1">
+                            <thead>
+                                <tr>
+                                    <th>Ciudad</th>
+                                    <th>Tipo Valor</th>
+<!--                                     <th>Esta siendo negociado</th>
+                                    <th>Fecha Expiracion</th>
+                                    <th>ID Oferente</th>
+                                    <th>ID Intermediario</th>
+                                    <th>ID Inversionista</th> -->
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                    <div>
+                        <table class="table table-striped" id="tabla-rec2">
+                            <thead>
+                                <tr>
+                                    <th>TABLA 2</th>
+                                    <th>Tipo TABLA 2 </th>
+<!--                                     <th>Esta siendo negociado</th>
+                                    <th>Fecha Expiracion</th>
+                                    <th>ID Oferente</th>
+                                    <th>ID Intermediario</th>
+                                    <th>ID Inversionista</th> -->
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                    <div>
+                        <table class="table table-striped" id="tabla-rec3">
+                            <thead>
+                                <tr>
+                                    <th>TABLA 3</th>
+                                    <th>Tipo TABLA 3</th>
+<!--                                     <th>Esta siendo negociado</th>
+                                    <th>Fecha Expiracion</th>
+                                    <th>ID Oferente</th>
+                                    <th>ID Intermediario</th>
+                                    <th>ID Inversionista</th> -->
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
 
                 </div>
                 <!-- /.col-lg-12 -->
