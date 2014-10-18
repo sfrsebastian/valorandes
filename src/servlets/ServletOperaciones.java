@@ -63,8 +63,13 @@ public class ServletOperaciones extends HttpServlet {
 			RequestDispatcher rd = sc.getRequestDispatcher(url);
 		    rd.forward(request, response);
 		}else{
-			ValorAndesDB.getInstance().autorizarAccion(idAsociacion,idValor,tipo,cantCompra);
-			response.sendRedirect("./operaciones.jsp?error=NO");
+			try{
+				ValorAndesDB.getInstance().autorizarAccion(idAsociacion,idValor,tipo,cantCompra);
+				response.sendRedirect("./operaciones.jsp?error=NO");
+			}
+			catch(Exception e){
+				response.sendRedirect("./operaciones.jsp?error=SI");
+			}
 		}
 		
 		//TODO realizar autorizacion ya sea compra/venta
