@@ -1,7 +1,11 @@
 package servlets;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -52,8 +56,13 @@ public class ServletAdmin extends HttpServlet {
 		response.setContentType("application/json");            
 		 
         // 5. Add article to List<Article>
-		ArrayList perros = new ArrayList<String>();
-		perros.add("Hola");
+		HashMap<String, HashMap<String, String>> perros = null;
+		try {
+			perros = conexionDAO.makeQuery2("SELECT * FROM USUARIOS");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
  
         // 6. Send List<Article> as JSON to client
         mapper.writeValue(response.getOutputStream(), perros);

@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
@@ -115,6 +117,23 @@ public class ValorAndesDB {
 		}
 	} 
 
+	/**
+	 * Ejecuta la sentencia pasada por parametro
+	 * @param query
+	 * @return
+	 * @throws SQLException
+	 */
+	public HashMap<String, HashMap<String, String>> makeQuery2(String query) throws SQLException{
+		startConnection();
+		Statement statement = conexion.createStatement();
+		ResultSet set = statement.executeQuery(query);
+		HashMap resultado = darHola(set);
+		set.close();
+		statement.close();
+		closeConnection();
+		return resultado;		
+	}
+	
 	/**
 	 * Ejecuta la sentencia pasada por parametro
 	 * @param query
@@ -1048,5 +1067,23 @@ public class ValorAndesDB {
 			if(creada)
 				closeConnection();
 		}
+	}
+	
+	public HashMap<String, HashMap<String, String>> darHola(ResultSet resSet) throws SQLException{
+		HashMap<String, HashMap<String, String>> finale = new HashMap<String, HashMap<String, String>>();
+		int j = 0;
+		while(resSet.next()){
+			Object[] str = new Object[resSet.getMetaData().getColumnCount()];
+			HashMap<String, String> temp = new HashMap<String, String>();
+			for (int i = 1; i <= str.length; i++) {
+				String label = resSet.getMetaData().getColumnLabel(i);
+				String obj = resSet.getString(i);
+				temp.put(label, obj);
+			}
+			finale.put(j + "", temp);
+			j++;
+		}
+		
+		return finale;
 	}
 }
