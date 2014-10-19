@@ -91,6 +91,20 @@
 		$("#asociar").click(function(){
 			$("#modal-asociar").modal();
 		});
+
+        $.post( "/ValorAndes/portafolio.html", { global: "cargarCorredores", value: "cargarCorredores" }).done(function( data ) {
+            $("#select-form-corredores").empty();
+            jQuery.each(data.data, function ( i , val){
+                //<option value="${row.asoci}"><c:out value="${row.nombre} ${row.apellido}"/></option>
+                // var option  = $("<option>").attr("value", val.ID_CORREDOR).attr("nombre","id_corredor_valor_opt").text(val.NOMBRE + " " + val.APELLIDO);
+                var nombreApellido = val.NOMBRE + " " + val.APELLIDO; 
+                $("#select-form-corredores").append($('<option>', { 
+                    value: val.ID_CORREDOR,
+                    text : nombreApellido
+                }));
+            })
+        });
+
 	});
 	$(window).load(function (){
 		$("#corredores").show();
@@ -143,23 +157,12 @@
 
                     <hr>
 
-                    <sql:setDataSource var="snapshot" driver="oracle.jdbc.OracleDriver"
-                            url="jdbc:oracle:thin:@prod.oracle.virtual.uniandes.edu.co:1531:prod"
-                            user="ISIS2304141420" password="yatai48ea6" />
-
-	                <sql:query dataSource="${snapshot}" var="result">
-	                    select nombre,apellido,asociaciones.id as asoci from corredores, asociaciones, usuarios WHERE corredores.id = asociaciones.ID_CORREDOR AND corredores.id = usuarios.ID AND asociaciones.ID_USUARIO = '${sessionScope.id}' ORDER BY NOMBRE
-	                </sql:query>
-
                     <h3>Reasignar operaciones inactivas a corredor</h3>
                     <form action="./corredores.html" method="POST" role="form">
-                    	<select class="form-control" name="id_asociacion">
-		                    <c:forEach var="row" items="${result.rows}">
-		                    <option value="${row.asoci}"><c:out value="${row.nombre} ${row.apellido}"/></option>
-		                    </c:forEach>
-		                </select>
-		                <input type="hidden" name="tipo" value="reasignarOperaciones">
-		                <button class="btn btn-info" type="submit" style="margin-top:15px;">Reasginar</button>
+                    	<select class="form-control" name="id_asociacion" id="select-form-corredores">
+                        </select>
+		                <input type="hidden" name="tipo-post" value="reasignarOperaciones">
+		                <button class="btn btn-info" type="submit" style="margin-top:15px;">Reasignar</button>
                     </form>
 
                 </div>

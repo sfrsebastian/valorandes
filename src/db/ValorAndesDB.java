@@ -606,8 +606,12 @@ public class ValorAndesDB {
 	 * @param cantCompra
 	 */
 	public void autorizarAccion(int idAsociacion, int idValor, String tipo,int cantCompra)throws Exception {
-		try {
-			startConnection();
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
 			String sql = "INSERT INTO AUTORIZADOS(ID_ASOCIACION, ID_VALOR, TIPO, CANTIDAD) VALUES(?,?,?,?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			ps.setInt(1, idAsociacion);
@@ -622,7 +626,8 @@ public class ValorAndesDB {
 			throw new Exception();
 		}
 		finally{
-			closeConnection();
+			if(creada)
+				closeConnection();
 		}
 	}
 
@@ -1073,7 +1078,7 @@ public class ValorAndesDB {
 				creada = true;
 			}
 			//Asegura lock asociacion
-			String lock = "SELECT * FROM ASOCIACIONES WHERE id_asociacion=? FOR UPDATE";
+			String lock = "SELECT * FROM ASOCIACIONES WHERE id=? FOR UPDATE";
 			PreparedStatement stat1 = conexion.prepareStatement(lock);
 			stat1.setInt(1, idAsociacion);
 			stat1.executeQuery();
@@ -1248,24 +1253,22 @@ public class ValorAndesDB {
 		}
 	}
 
-	public void actualizarValorPortafolio(int idValor, int deltaCantidad, int idDueno, int idCorredor, int idPortafolio){
+	public void actualizarValorPortafolio(int idValor, int deltaCantidad, int idDueno, int idAsociacion, int idPortafolio){
 		boolean creada = false;
 		try{
 			if(conexion == null){
 				startConnection();
 				creada = true;
 			}
-			int idAsociacion = darIdAsociacion(idDueno, idCorredor);
-
 			//Asegura lock de update
 			String lock = "SELECT * FROM VALORPORTAFOLIO WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ? FOR UPDATE";
 			PreparedStatement stat1 = conexion.prepareStatement(lock);
-			stat1.setInt(2, idValor);
-			stat1.setInt(3, idPortafolio);
+			stat1.setInt(1, idValor);
+			stat1.setInt(2, idPortafolio);
 			stat1.executeQuery();
 			stat1.close();
 
-			if(deltaCantidad<0 && idAsociacion>=0){
+			if(deltaCantidad<0 ){
 				autorizarAccion(idAsociacion, idValor, "Venta", Math.abs(deltaCantidad));
 				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
 				PreparedStatement state = conexion.prepareStatement(uPort);
@@ -1275,7 +1278,7 @@ public class ValorAndesDB {
 				state.executeUpdate();
 				state.close();
 			}
-			else if(deltaCantidad>0 && idAsociacion>=0){
+			else if(deltaCantidad>0){
 				autorizarAccion(idAsociacion, idValor, "Compra", Math.abs(deltaCantidad));				
 				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
 				PreparedStatement state = conexion.prepareStatement(uPort);
@@ -1513,12 +1516,14 @@ public class ValorAndesDB {
 			state.executeUpdate();
 			state.close();
 
-			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where puts_inactivos.ID_USUARIO = ?)";
+			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where calls_inactivos.ID_USUARIO = ?)";
 			PreparedStatement state1 = conexion.prepareStatement(ucall);
 			state1.setInt(1, idAsociacion);
 			state1.setInt(2, idUsuario);
 			state1.executeUpdate();
 			state1.close();
+			
+			conexion.commit();
 		}
 		catch(SQLException e){
 			try {

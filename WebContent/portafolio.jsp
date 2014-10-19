@@ -19,6 +19,7 @@
 
     var modificarValor_id = 0;
     var idPortafolio = 0;
+    var cantidad_vieja_val = 0;
 
 	$(document).ready(function (){
 
@@ -73,7 +74,10 @@
 
                                 $("#modal-modificar-valor").modal();
 							   	// var id_actual = this.value;
-                                modificarValor_id = this.value;
+                                var stringger = this.value;
+                                var res = stringger.split("-");
+                                modificarValor_id = res[0];
+                                cantidad_vieja_val = res[1];
 
                                 $.post( "/ValorAndes/portafolio.html", { global: "cargarCorredores", value: "cargarCorredores" }).done(function( data ) {
 
@@ -100,7 +104,7 @@
 						},
 			            "columnDefs": [ {
 				            "render": function ( data, type, row ) {
-			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + data + "\">Modificar</button>";
+			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + row.ID_VALOR + "-" + row.CANTIDAD_DISPONIBLE + "\">Modificar</button>";
 			                },
 			                "targets": -1
 				        },
@@ -200,12 +204,16 @@
 			var global = $("<input>").attr("type", "hidden").attr("value", "crearPortafolio").attr("name","global");
 			$(form).append($(jsonInput));
 			$(form).append($(global));
+            $(form).append($("#nombre_portafolio")); //nombre
+            $(form).append($("#textArea-Desc")); //descripcion
 			$((form)).submit();
 		});
 
         $("#btn-modificar-valor").click(function (){
             var input = $("<input>").attr("type", "hidden").attr("value", modificarValor_id).attr("name","modificarValor_id_final");
             var idPortafolioInput = $("<input>").attr("type", "hidden").attr("value", idPortafolio).attr("name","id_portafolio");
+            var cantidadViejaInput = $("<input>").attr("type", "hidden").attr("value", cantidad_vieja_val).attr("name","cantidadVieja");
+            $("#form-modificar-valor").append($(cantidadViejaInput));
             $("#form-modificar-valor").append($(input));
             $("#form-modificar-valor").append($(idPortafolioInput));
             $("#form-modificar-valor").submit();
@@ -302,14 +310,14 @@
             	<form action="./portafolio.html" method="POST" role="form" id="form-portafolio">
 
 					<div class="form-group">
-						<label for="nombre_valor">Nombre del Portafolio</label> <input
-							type="text" class="form-control" id="nombre_valor"
+						<label for="nombre_portafolio">Nombre del Portafolio</label> <input
+							type="text" class="form-control" id="nombre_portafolio"
 							placeholder="Nombre del portafolio" name="nombre">
 					</div>
 
 					<div class="form-group">
 						<label for="password_Empresa">Descripcion </label>
-						<textarea class="form-control" rows="3" name="descripcion"></textarea>
+						<textarea class="form-control" rows="3" name="descripcion" id="textArea-Desc"></textarea>
 					</div>
 
 					<h5>Tipo de Portafolio</h5>

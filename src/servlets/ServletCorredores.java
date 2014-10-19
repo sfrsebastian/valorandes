@@ -84,7 +84,9 @@ public class ServletCorredores extends HttpServlet {
 			}else if(tipo.equals("reasignarOperaciones")){
 				HttpSession session = request.getSession();
 				int idUsuario = (Integer) session.getAttribute("id");
-				int idAsociacion = Integer.parseInt(request.getParameter("id_asociacion"));
+				
+				int idCorredor = Integer.parseInt(request.getParameter("id_asociacion"));
+				int idAsociacion = conexionDAO.darIdAsociacion(idUsuario, idCorredor);
 				conexionDAO.reasignarOperaciones(idAsociacion, idUsuario);
 			}
 			

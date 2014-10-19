@@ -159,7 +159,9 @@ public class ServletPortafolio extends HttpServlet {
 		}else if (global.equals("crearPortafolio")){
 			HttpSession session = request.getSession();
 			int idUsuario = (Integer) session.getAttribute("id");
-			int idPortafolio = conexionDAO.agregarPortafolio("Nuevo Portafolio", 1, idUsuario, "El mejor portafolio de la historio");
+			String nombre = request.getParameter("nombre");
+			String descripcion = request.getParameter("descripcion");
+			int idPortafolio = conexionDAO.agregarPortafolio(nombre, 1, idUsuario, descripcion);
 			
 			String jsonReceived = request.getParameter("json");
 			JsonElement jelement = new JsonParser().parse(jsonReceived);
@@ -180,9 +182,13 @@ public class ServletPortafolio extends HttpServlet {
 			int idValor = Integer.parseInt(request.getParameter("modificarValor_id_final"));
 			int cantidad = Integer.parseInt(request.getParameter("cantidad_nueva"));
 			int idPortafolio = Integer.parseInt(request.getParameter("id_portafolio"));
-			conexionDAO.actualizarValorPortafolio(idValor, cantidad, idUsuario, idCorredor, idPortafolio);
+			int idAsociacion = conexionDAO.darIdAsociacion(idUsuario, idCorredor);
+			int cantidadVieja = Integer.parseInt(request.getParameter("cantidadVieja"));
 			
-			response.sendRedirect("/ValorAndes/portafolio.html?error=NO");
+			int delta = cantidad - cantidadVieja;
+			conexionDAO.actualizarValorPortafolio(idValor, delta, idUsuario, idAsociacion, idPortafolio);
+			
+			response.sendRedirect("/ValorAndes/portafolio.jsp?error=NO");
 			
 		}else if(global.equals("cargarCorredores")){
 			HttpSession session = request.getSession();
