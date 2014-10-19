@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import test.DataTableObject;
 
@@ -69,56 +70,83 @@ public class ServletCorredores extends HttpServlet {
 				identificador_usuario = Integer.parseInt(request.getParameter("id"));
 				int id_asociacion = conexionDAO.darIdAsociacion(identificador_usuario, identificador);
 				conexionDAO.desHabilitarCorredor(id_asociacion);
+				System.out.println("hola");
 			}else if (tipo.equals("asociar")){
 				int identificadorCorredor = Integer.parseInt(request.getParameter("id_valor"));
 				identificador_usuario = Integer.parseInt(request.getParameter("id"));
 				String tipo_usuario = request.getParameter("tipo");
-				
-				
+				int id_asociacion = conexionDAO.darIdAsociacion(identificador_usuario, identificadorCorredor);
+				if(id_asociacion == -1 ){
+					conexionDAO.crearAsociacion(identificadorCorredor, identificador_usuario);
+				}else{
+					conexionDAO.habilitarCorredor(id_asociacion);
+				}
 			}
 			
 			response.sendRedirect("/ValorAndes/corredores.jsp?error=NO");
 			
 		}else{
+			String tableName = request.getParameter("table_name");
+			int start = Integer.parseInt(request.getParameter("start")) + 1;
+			int length = Integer.parseInt(request.getParameter("length"));
+			int columnOrder = Integer.parseInt(request.getParameter("order[0][column]"));
+			String columnName = request.getParameter("columns[" + columnOrder + "][data]");
+			String tipoFiltro = request.getParameter("order[0][dir]");
+			String search = request.getParameter("search[value]");
+			
+			
 			if(tabla.equals("eliminar-corredor")){
 				
-				response.setContentType("application/json");      
-				// 5. Add article to List<Article>
-				ArrayList<HashMap<String, String>> perros = null;
+				HttpSession session = request.getSession();
+				int idUsuario = (Integer) session.getAttribute("id");
+				
+				ObjectMapper mapper = new ObjectMapper();
+				response.setContentType("application/json");   
+				ArrayList<HashMap<String, String>> resultado = null;
+				int conteo=0;
+				int conteoSearch=0;
 				try {
-					perros = conexionDAO.makeQuery2("SELECT * FROM CORREDORES WHERE ROWNUM <= 10");
-				} catch (SQLException e) {
+					resultado = conexionDAO.darIntermediariosUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
+					conteo = conexionDAO.contarIntermediariosTotalUsuario(idUsuario);
+					conteoSearch = conexionDAO.contarIntermediariosUsuario(search, idUsuario);
+					System.out.println("conteo " + conteo);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 				DataTableObject dataTableObject = new DataTableObject();
-				dataTableObject.setAaData(perros);
-				
+				dataTableObject.setAaData(resultado);
+				dataTableObject.setRecordsFiltered(conteoSearch);
+				dataTableObject.setRecordsTotal(conteo);
 				PrintWriter out = response.getWriter();
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				String json = gson.toJson(dataTableObject);
 				out.print(json);
-				out.flush();
 				
 			}else if (tabla.equals("asociar-corredor")){
-				
-				response.setContentType("application/json");  
-				// 5. Add article to List<Article>
-				ArrayList<HashMap<String, String>> perros = null;
+						
+				ObjectMapper mapper = new ObjectMapper();
+				response.setContentType("application/json");   
+				ArrayList<HashMap<String, String>> resultado = null;
+				int conteo=0;
+				int conteoSearch=0;
 				try {
-					perros = conexionDAO.makeQuery2("SELECT * FROM CORREDORES WHERE ROWNUM <= 10");
-				} catch (SQLException e) {
+					resultado = conexionDAO.darIntermediarios(start, length, columnName, tipoFiltro, search);
+					conteo = conexionDAO.contarIntermediariosTotal();
+					conteoSearch = conexionDAO.contarIntermediarios(search);
+					System.out.println("conteo " + conteo);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 				DataTableObject dataTableObject = new DataTableObject();
-				dataTableObject.setAaData(perros);
-				
+				dataTableObject.setAaData(resultado);
+				dataTableObject.setRecordsFiltered(conteoSearch);
+				dataTableObject.setRecordsTotal(conteo);
 				PrintWriter out = response.getWriter();
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				String json = gson.toJson(dataTableObject);
 				out.print(json);
-				out.flush();
 			}
 		}
 

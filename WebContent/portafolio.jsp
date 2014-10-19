@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
 
-	var stringPortafolio = "";
+	var arrayPortafolio = new Array();
 	var theTable = $("#portafolio-tabla");
 
 	$(document).ready(function (){
@@ -89,7 +89,7 @@
 			        });
 
 					//Segundo se muestra la tabla
-					$("#portafolio-actual").show('slow');
+					$("#portafolio-actual").show();
 				});
 			},
             "columnDefs": [ {
@@ -138,10 +138,21 @@
 			},
             "columnDefs": [ {
 	            "render": function ( data, type, row ) {
-                    return "<button class=\"sociar btn btn-warning\" value=\"" + data + "\">Des-asociar</button>";
-                },
-                "targets": 3
-	        } ],
+                    return "
+                    <div class=\"form-group\">
+						<input type=\"text\" name=\"descripcion\" class=\"cantidad_valor_text form-control\">
+					</div>
+                    		";
+                	},
+                	"targets": 3
+	        	},
+	        	{
+	        		"render": function ( data, type, row ) {
+                    	return "<button class=\"seleccionar btn btn-warning\" value=\"" + data + "\">Seleccionar</button>";
+                	},
+                	"targets": 4
+            	}
+	        ],
             columns: [
                 { data : 'APELLIDO' },
                 { data: 'CEDULA'},

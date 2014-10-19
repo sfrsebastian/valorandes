@@ -1027,7 +1027,7 @@ public class ValorAndesDB {
 		return 0;
 	}
 	
-	public void agregarCorredorALista(int idCorredor,int idUsuario){
+	public void crearAsociacion(int idCorredor,int idUsuario){
 		boolean creada = false;
 		try{
 			if(conexion == null){
@@ -1059,7 +1059,7 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
-			String create = "UPDATE PUTS SET HABILITADO='0' WHERE id_asociacion=?";
+			String create = "UPDATE ASOCIACIONES SET ACTIVO='0' WHERE id=?";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idAsociacion);
 			state.executeUpdate();
@@ -1290,6 +1290,26 @@ public class ValorAndesDB {
 		return resultado;	
 	}
 	
+	public ArrayList<HashMap<String, String>> darIntermediariosUsuario(int start, int rows, String order, String tipo, String search, int idUsuario) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from ( select * from usuarios NATURAL JOIN corredores ) usuCorre INNER JOIN ASOCIACIONES ON usuCorre.ID = ASOCIACIONES.ID_CORREDOR WHERE ASOCIACIONES.ID_USUARIO = " +  idUsuario + " ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%') AND activo = '1') where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
 	public int contarIntermediarios(String search) throws Exception{
 		startConnection();
 		String query = "select count(*) as count from usuarios NATURAL JOIN corredores where NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%'";
@@ -1302,9 +1322,36 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
+	
+	public int contarIntermediariosUsuario(String search, int idUsuario) throws Exception{
+		startConnection();
+		String query = "select count(*) as count from ( select a.*, ROWNUM rnum from (select * from ( select * from usuarios NATURAL JOIN corredores ) usuCorre INNER JOIN ASOCIACIONES ON usuCorre.ID = ASOCIACIONES.ID_CORREDOR WHERE ASOCIACIONES.ID_USUARIO = " +  idUsuario + ") a where (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%') AND activo = '1' )";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
 	public int contarIntermediariosTotal()throws Exception{
 		startConnection();
 		String query = "select count(*) as count from usuarios NATURAL JOIN corredores";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public int contarIntermediariosTotalUsuario(int idUsuario)throws Exception{
+		startConnection();
+		String query = "select count(*) as count from ( select * from usuarios NATURAL JOIN corredores ) usuCorre INNER JOIN ASOCIACIONES ON usuCorre.ID = ASOCIACIONES.ID_CORREDOR WHERE ASOCIACIONES.ID_USUARIO = " +  idUsuario + " and activo = '1'";
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
@@ -1360,4 +1407,5 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
+
 }

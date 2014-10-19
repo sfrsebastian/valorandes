@@ -46,7 +46,7 @@
                 { data : 'APELLIDO' },
                 { data: 'CEDULA'},
                 { data: 'NUMERO_REGISTRO'},
-                { data : 'ID' }
+                { data : 'ID_CORREDOR' }
             ]
         });
 
@@ -140,6 +140,26 @@
                             </table>
                         </div>
                     </div>
+
+                    <hr>
+
+                    <sql:setDataSource var="snapshot" driver="oracle.jdbc.OracleDriver"
+                            url="jdbc:oracle:thin:@prod.oracle.virtual.uniandes.edu.co:1531:prod"
+                            user="ISIS2304141420" password="yatai48ea6" />
+
+	                <sql:query dataSource="${snapshot}" var="result">
+	                    select nombre,apellido,asociaciones.id as asoci from corredores, asociaciones, usuarios WHERE corredores.id = asociaciones.ID_CORREDOR AND corredores.id = usuarios.ID AND asociaciones.ID_USUARIO = '${sessionScope.id}' ORDER BY NOMBRE
+	                </sql:query>
+
+                    <h3>Reasignar operaciones inactivas a corredor</h3>
+                    <form action="./corredores.html" method="POST" role="form">
+                    	<select class="form-control" name="id_asociacion">
+		                    <c:forEach var="row" items="${result.rows}">
+		                    <option value="${row.asoci}"><c:out value="${row.nombre} ${row.apellido}"/></option>
+		                    </c:forEach>
+		                </select>
+		                <button class="btn btn-info" type="submit" style="margin-top:15px;">Reasginar</button>
+                    </form>
 
                 </div>
                 <!-- /.col-lg-12 -->

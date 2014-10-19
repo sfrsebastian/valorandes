@@ -49,6 +49,9 @@ public class ServletPortafolio extends HttpServlet {
 
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		String global = request.getParameter("global");
+		
+		
 		response.setContentType("application/json");      
 
 		// 5. Add article to List<Article>
