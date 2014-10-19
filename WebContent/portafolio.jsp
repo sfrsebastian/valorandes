@@ -10,7 +10,11 @@
 
 <script type="text/javascript">
 
-	var arrayPortafolio = new Array();
+	var arrayPortafolio = {
+		'valores' : []
+	};
+	var cantidad = 0;
+	var id_valor = 0;
 	var theTable = $("#portafolio-tabla");
 
 	$(document).ready(function (){
@@ -21,7 +25,7 @@
             "ajax": {
                 "url": "/ValorAndes/portafolio.html",
                 "type": "POST",
-                "data" : {"global" : "mostrarPortafolios-${sessionScope.id}"}
+                "data" : {"global" : "mostrarPortafolios"}
             },
             "initComplete": function(settings, json) {
             	console.log("DONE Des-asociar");
@@ -56,7 +60,7 @@
 			            "ajax": {
 			                "url": "/ValorAndes/portafolio.html",
 			                "type": "POST",
-			                "data" : {"global" : "mostrarValoresPortafolio-${sessionScope.id}"}
+			                "data" : {"global" : "mostrarValoresPortafolio"}
 			            },
 			            "initComplete": function(settings, json) {
 			            	console.log("DONE Des-asociar");
@@ -108,7 +112,7 @@
 
 		$("#portafolio-actual").hide();
 		$("#crearPortafolio").click(function (){
-			stringPortafolio = "";
+			arrayPortafolio = new Array();
 			$("#modal-crear-portafolio").modal();
 		});
 
@@ -118,37 +122,33 @@
             "ajax": {
                 "url": "/ValorAndes/portafolio.html",
                 "type": "POST",
-                "data" : {"tabla" : "eliminar-corredor=${sessionScope.id}"}
+                "data" : {"tabla" : "mostrarTablaValores"}
             },
             "initComplete": function(settings, json) {
             	console.log("DONE Des-asociar");
-			   $(".sociar").click(function (){
-				   	console.log('HELLO');
-				   	var id_actual = this.value;
+			   $(".seleccionar").click(function (){
+				   	id_valor = parseInt(this.value);
 
-				   	var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");
-				   	var input = $("<input>").attr("type", "hidden").attr("name", "id_valor").val(id_actual);
-				   	var tipo = $("<input>").attr("type", "hidden").attr("name", "tipo-post").val("des-asociar");
-				   	var myID = $("<input>").attr("type", "hidden").attr("name", "id").val("${sessionScope.id}");
-		            $((form)).append($(input));
-		            $((form)).append($(tipo));
-		            $((form)).append($(myID));
-		            $((form)).submit();
+				 	console.log('Pareja a agregar: ' + cantidad + " - " + id_valor);
+				 	$(this).attr("class", "btn btn-success").text("Seleccionado").unbind();
+
+				 	arrayPortafolio.push({"cantidad" : cantidad , "id_valor" : id_valor});
+			   });
+			   $(".cantidad_valor_text").blur(function (){
+			   		console.log("blurred");
+			   		cantidad = parseInt(this.value);
+			   		//TODO: error handling, if cantidad is NaN, asign -1 and check in .seleccionar event
 			   });
 			},
             "columnDefs": [ {
 	            "render": function ( data, type, row ) {
-                    return "
-                    <div class=\"form-group\">
-						<input type=\"text\" name=\"descripcion\" class=\"cantidad_valor_text form-control\">
-					</div>
-                    		";
+                    return "<div class=\"form-group\"><input type=\"text\" name=\"descripcion\" class=\"cantidad_valor_text form-control\"></div>";
                 	},
                 	"targets": 3
 	        	},
 	        	{
 	        		"render": function ( data, type, row ) {
-                    	return "<button class=\"seleccionar btn btn-warning\" value=\"" + data + "\">Seleccionar</button>";
+                    	return "<button class=\"seleccionar btn btn-warning\" value=\"" + 1 + "\">Seleccionar</button>";
                 	},
                 	"targets": 4
             	}
@@ -161,6 +161,13 @@
             ]
         });
 
+		$("#btn-crear-portafolio").click(function (){
+			var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");
+			var jsonData = JSON.stringify(arrayPortafolio);
+			var jsonInput = $("<input>").attr("type", "hidden").attr("json", jsonData);
+			var global = $("<input>").attr("type", "hidden").attr("global", "crearPortafolio");
+			$((form)).submit();
+		});
 	});
 </script>
 
@@ -323,7 +330,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="btn-comprar">Crear Portafolio</button>
+                <button type="button" class="btn btn-primary" id="btn-crear-portafolio">Crear Portafolio</button>
             </div>
         </div>
         <!-- /.modal-content -->

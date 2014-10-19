@@ -10,11 +10,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import test.DataTableObject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import db.ValorAndesDB;
 
@@ -50,25 +56,113 @@ public class ServletPortafolio extends HttpServlet {
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
 		String global = request.getParameter("global");
-		
-		
-		response.setContentType("application/json");      
+		if(global.equals("mostrarPortafolios")){
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer) session.getAttribute("id");
+			
+			int start = Integer.parseInt(request.getParameter("start")) + 1;
+			int length = Integer.parseInt(request.getParameter("length"));
+			int columnOrder = Integer.parseInt(request.getParameter("order[0][column]"));
+			String columnName = request.getParameter("columns[" + columnOrder + "][data]");
+			String tipoFiltro = request.getParameter("order[0][dir]");
+			String search = request.getParameter("search[value]");
+			
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darPortafoliosUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
+				conteo = conexionDAO.contarPortafoliosUsuario(search, idUsuario);
+				conteoSearch = conexionDAO.contarPortafoliosUsuarioTotal(idUsuario);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-		// 5. Add article to List<Article>
-		ArrayList<HashMap<String, String>> perros = null;
-		try {
-			perros = conexionDAO.makeQuery2("SELECT * FROM USUARIOS WHERE ROWNUM <= 2");
-		} catch (SQLException e) {
-			e.printStackTrace();
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
 		}
+		else if (global.equals("mostrarValoresPortafolio")){
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer) session.getAttribute("id");
+			
+			int start = Integer.parseInt(request.getParameter("start")) + 1;
+			int length = Integer.parseInt(request.getParameter("length"));
+			int columnOrder = Integer.parseInt(request.getParameter("order[0][column]"));
+			String columnName = request.getParameter("columns[" + columnOrder + "][data]");
+			String tipoFiltro = request.getParameter("order[0][dir]");
+			String search = request.getParameter("search[value]");
+			
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darPortafoliosUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
+				conteo = conexionDAO.contarPortafoliosUsuario(search, idUsuario);
+				conteoSearch = conexionDAO.contarPortafoliosUsuarioTotal(idUsuario);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("hola");
+			}
 
-		DataTableObject dataTableObject = new DataTableObject();
-		dataTableObject.setAaData(perros);
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}else if (global.equals("mostrarTablaValores")){
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer) session.getAttribute("id");
+			
+			int start = Integer.parseInt(request.getParameter("start")) + 1;
+			int length = Integer.parseInt(request.getParameter("length"));
+			int columnOrder = Integer.parseInt(request.getParameter("order[0][column]"));
+			String columnName = request.getParameter("columns[" + columnOrder + "][data]");
+			String tipoFiltro = request.getParameter("order[0][dir]");
+			String search = request.getParameter("search[value]");
+			
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darPortafoliosUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
+				conteo = conexionDAO.contarPortafoliosUsuario(search, idUsuario);
+				conteoSearch = conexionDAO.contarPortafoliosUsuarioTotal(idUsuario);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("hola");
+			}
 
-		PrintWriter out = response.getWriter();
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(dataTableObject);
-		out.print(json);
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}else if (global.equals("crearPortafolio")){
+			String jsonReceived = request.getParameter("json");
+			JsonElement jelement = new JsonParser().parse(jsonReceived);
+			JsonObject jobject = jelement.getAsJsonObject();
+			JsonArray jsonArray = jobject.getAsJsonArray();
+			
+			response.sendRedirect("/ValorAndes/home.jsp");
+		}
 	}
 	
 }

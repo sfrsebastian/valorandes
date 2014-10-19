@@ -1449,7 +1449,7 @@ public class ValorAndesDB {
 			tipo = "asc";
 		}
 		startConnection();
-		String query = "select * from ( select a.*, ROWNUM rnum from (select portafolios.*, ti.nombre as nombre_tipo from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_USUARIO = "+ idUsuario +") where rnum  >= ?";
+		String query = "select * from ( select a.*, ROWNUM rnum from (select portafolios.*, ti.nombre as nombre_tipo from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id ORDER BY PORTAFOLIOS.NOMBRE) a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_USUARIO = "+ idUsuario +") where rnum  >= ?";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, start + rows-1);
 		st.setInt(2, start);
@@ -1463,7 +1463,7 @@ public class ValorAndesDB {
 
 	public int contarPortafoliosUsuarioTotal(int idUsuario) throws SQLException {
 		startConnection();
-		String query = "select count(*) as count portafolios.*, ti.nombre as nombre_tipo from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id where id_usuario = " + idUsuario;
+		String query = "select count(*) as count from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id where ID_USUARIO = "+ idUsuario;
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
@@ -1476,7 +1476,7 @@ public class ValorAndesDB {
 
 	public int contarPortafoliosUsuario(String search,int idUsuario) throws SQLException{
 		startConnection();
-		String query = "select count(*) as count portafolios.*, ti.nombre as nombre_tipo from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id) where (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_USUARIO = "+ idUsuario;
+		String query = "select count(*) as count from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id where (PORTAFOLIOS.NOMBRE like '" + search +"%') AND ID_USUARIO = "+ idUsuario;
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
