@@ -65,12 +65,12 @@ public class ServletAdmin extends HttpServlet {
 		String tipo = request.getParameter("order[0][dir]");
 		String search = request.getParameter("search[value]");
 		if (tableName.equals("intermediarios")){
-			
-			Enumeration enums = request.getParameterNames();
-			while(enums.hasMoreElements()){
-				String paramName = (String) enums.nextElement();
-				System.out.println(paramName + " - value : " + request.getParameter(paramName));
-			}
+//
+//			Enumeration enums = request.getParameterNames();
+//			while(enums.hasMoreElements()){
+//				String paramName = (String) enums.nextElement();
+//				System.out.println(paramName + " - value : " + request.getParameter(paramName));
+//			}
 
 			ObjectMapper mapper = new ObjectMapper();
 
@@ -98,9 +98,30 @@ public class ServletAdmin extends HttpServlet {
 			String json = gson.toJson(dataTableObject);
 			out.print(json);
 
-		}else if (tableName.equals("")){
-			
+		}
+		else if (tableName.equals("inversionistas")){
+			ObjectMapper mapper = new ObjectMapper();
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darInversionistas(start, length, columnName, tipo, search);
+				conteo = conexionDAO.contarInversionistasTotal();
+				conteoSearch = conexionDAO.contarIversionistas(search);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
 		}
 	}
-
 }
