@@ -641,7 +641,7 @@ public class ValorAndesDB {
 		try {
 			startConnection();
 			int id = proximoPut();
-
+			
 			String sql = "INSERT INTO PUTS (ID, ID_VALOR, CANTIDAD, FECHA, ID_ASOCIACION, TIPO_MERCADO) VALUES (?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
@@ -654,6 +654,16 @@ public class ValorAndesDB {
 			ps.setInt(5, idAsociacion);
 			ps.setString(6, tipoMercado);
 			ps.executeUpdate();
+			ps.close();
+			
+			//Asegura lock asociacion
+			String lock2 = "SELECT * FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ? FOR UPDATE";
+			PreparedStatement stat2 = conexion.prepareStatement(lock2);
+			stat2.setString(1, "Venta");
+			stat2.setInt(2, idValor);
+			stat2.setInt(3, idAsociacion);
+			stat2.executeQuery();
+			stat2.close();
 
 			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
 			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
@@ -661,13 +671,19 @@ public class ValorAndesDB {
 			ps1.setInt(2, idValor);
 			ps1.setInt(3, idAsociacion);
 			ps1.executeUpdate();
-
-			conexion.commit();
-
 			ps1.close();
-			ps.close();
+			
+			conexion.commit();
+			
+		
 		} catch (SQLException e) {
-			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+			try {
+				conexion.rollback();
+				System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			closeConnection();
@@ -745,6 +761,7 @@ public class ValorAndesDB {
 	public void realizarCall(int idValor, int cantidad, int idAsociacion) {
 		try {
 			startConnection();
+			
 			String sql = "INSERT INTO CALLS (ID, CANTIDAD, FECHA, ID_PUT, ID_ASOCIACION) VALUES (?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
@@ -756,6 +773,16 @@ public class ValorAndesDB {
 			ps.setInt(4, idPut);
 			ps.setInt(5, idAsociacion);
 			ps.executeUpdate();
+			ps.close();
+			
+			//Asegura lock asociacion
+			String lock2 = "SELECT * FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ? FOR UPDATE";
+			PreparedStatement stat2 = conexion.prepareStatement(lock2);
+			stat2.setString(1, "Compra");
+			stat2.setInt(2, idValor);
+			stat2.setInt(3, idAsociacion);
+			stat2.executeQuery();
+			stat2.close();
 
 			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
 			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
@@ -763,12 +790,20 @@ public class ValorAndesDB {
 			ps1.setInt(2, idValor);
 			ps1.setInt(3, idAsociacion);
 			ps1.executeUpdate();
-
-			conexion.commit();
-			ps.close();
 			ps1.close();
+			
+			conexion.commit();
+			
+			
 		} catch (SQLException e) {
-			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+			try {
+				conexion.rollback();
+				System.out.println("Error agregando call idAu: " + idAsociacion + " idValor: " + idValor);
+			}
+			catch(SQLException e1){
+
+			}
+			
 		}
 		finally{
 			closeConnection();
@@ -1267,8 +1302,8 @@ public class ValorAndesDB {
 			stat1.setInt(2, idPortafolio);
 			stat1.executeQuery();
 			stat1.close();
-
-			if(deltaCantidad<0 ){
+			
+			if(deltaCantidad<0){
 				autorizarAccion(idAsociacion, idValor, "Venta", Math.abs(deltaCantidad));
 				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
 				PreparedStatement state = conexion.prepareStatement(uPort);
