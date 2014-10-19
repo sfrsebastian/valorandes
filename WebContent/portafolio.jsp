@@ -60,7 +60,7 @@
 			            "ajax": {
 			                "url": "/ValorAndes/portafolio.html",
 			                "type": "POST",
-			                "data" : {"global" : "mostrarValoresPortafolio"}
+			                "data" : {"global" : "mostrarValoresPortafolio", "otra" : idPortafolio}
 			            },
 			            "initComplete": function(settings, json) {
 			            	console.log("DONE Des-asociar");
@@ -80,15 +80,15 @@
 						},
 			            "columnDefs": [ {
 				            "render": function ( data, type, row ) {
-			                    return "<button class=\"ver-portafolio btn btn-warning\" value=\"" + data + "\">Ver portafolio</button>";
+			                    return "<button class=\"ver-valores-portafolio btn btn-warning\" value=\"" + data + "\">Ver portafolio</button>";
 			                },
-			                "targets": 3
+			                "targets": -1
 				        } ],
 			            columns: [
 			                { data : 'NOMBRE' },
-			                { data: 'CODIGO_POSTAL'},
-			                { data: 'TIPO'},
-			                { data : 'TELEFONO' }
+			                { data: 'CANTIDAD'},
+			                { data: 'NOMBRE_TIPO'},
+			                { data : 'ID' }
 			            ]
 			        });
 
@@ -104,9 +104,9 @@
 	        } ],
             columns: [
                 { data : 'NOMBRE' },
-                { data: 'CODIGO_POSTAL'},
-                { data: 'TIPO'},
-                { data : 'TELEFONO' }
+                { data: 'DESCRIPCION'},
+                { data: 'NOMBRE_TIPO'},
+                { data : 'ID' }
             ]
         });
 
@@ -122,7 +122,7 @@
             "ajax": {
                 "url": "/ValorAndes/portafolio.html",
                 "type": "POST",
-                "data" : {"tabla" : "mostrarTablaValores"}
+                "data" : {"global" : "mostrarTablaValores"}
             },
             "initComplete": function(settings, json) {
             	console.log("DONE Des-asociar");
@@ -144,28 +144,31 @@
 	            "render": function ( data, type, row ) {
                     return "<div class=\"form-group\"><input type=\"text\" name=\"descripcion\" class=\"cantidad_valor_text form-control\"></div>";
                 	},
-                	"targets": 3
+                	"targets": -2
 	        	},
 	        	{
 	        		"render": function ( data, type, row ) {
-                    	return "<button class=\"seleccionar btn btn-warning\" value=\"" + 1 + "\">Seleccionar</button>";
+                    	return "<button class=\"seleccionar btn btn-warning\" value=\"" + data + "\">Seleccionar</button>";
                 	},
-                	"targets": 4
+                	"targets": -1
             	}
 	        ],
             columns: [
-                { data : 'APELLIDO' },
-                { data: 'CEDULA'},
-                { data: 'NUMERO_REGISTRO'},
+                { data : 'NOMBRE' },
+                { data: 'CANTIDAD' },
+                { data: 'NOMBRE_TIPO' },
+                { data: 'TIPO' },
                 { data : 'ID' }
             ]
         });
 
 		$("#btn-crear-portafolio").click(function (){
-			var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");
+			var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/portafolio.html");
 			var jsonData = JSON.stringify(arrayPortafolio);
-			var jsonInput = $("<input>").attr("type", "hidden").attr("json", jsonData);
-			var global = $("<input>").attr("type", "hidden").attr("global", "crearPortafolio");
+			var jsonInput = $("<input>").attr("type", "hidden").attr("value", jsonData).attr("name","json");
+			var global = $("<input>").attr("type", "hidden").attr("value", "crearPortafolio").attr("name","global");
+			$(form).append($(jsonInput));
+			$(form).append($(global));
 			$((form)).submit();
 		});
 	});
@@ -205,9 +208,9 @@
                             <table class="table table-striped" id="portafolios">
                                 <thead>
                                     <tr>
-                                        <th>Apellido</th>
-                                        <th>Cedula</th>
-                                        <th>Numero Registro</th>
+                                        <th>Nombre</th>
+                                        <th>Descripcion</th>
+                                        <th>Tipo</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -223,7 +226,7 @@
                             <table class="table table-striped" id="portafolio-tabla">
                                 <thead>
                                     <tr>
-                                        <th>Apellido</th>
+                                        <th>Nombre</th>
                                         <th>Cedula</th>
                                         <th>Numero Registro</th>
                                         <th>Acciones</th>
@@ -317,8 +320,8 @@
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Tipo</th>
                                         <th>Cantidad Actual</th>
+                                        <th>Tipo</th>
                                         <th>Cantidad a Agregar</th>
                                         <th>Acciones</th>
                                     </tr>

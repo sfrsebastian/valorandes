@@ -158,6 +158,7 @@
 		                    <option value="${row.asoci}"><c:out value="${row.nombre} ${row.apellido}"/></option>
 		                    </c:forEach>
 		                </select>
+		                <input type="hidden" name="tipo" value="reasignarOperaciones">
 		                <button class="btn btn-info" type="submit" style="margin-top:15px;">Reasginar</button>
                     </form>
 

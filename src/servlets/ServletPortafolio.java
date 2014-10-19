@@ -100,14 +100,16 @@ public class ServletPortafolio extends HttpServlet {
 			String tipoFiltro = request.getParameter("order[0][dir]");
 			String search = request.getParameter("search[value]");
 			
+			int idPortafolio = Integer.parseInt(request.getParameter("otra"));
+			
 			response.setContentType("application/json");   
 			ArrayList<HashMap<String, String>> resultado = null;
 			int conteo=0;
 			int conteoSearch=0;
 			try {
-				resultado = conexionDAO.darPortafoliosUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
-				conteo = conexionDAO.contarPortafoliosUsuario(search, idUsuario);
-				conteoSearch = conexionDAO.contarPortafoliosUsuarioTotal(idUsuario);
+				resultado = conexionDAO.darValoresPortafoliosUsuario(start, length, columnName, tipoFiltro, search, idPortafolio);
+				conteo = conexionDAO.contarValoresPortafoliosUsuario(search, idPortafolio);
+				conteoSearch = conexionDAO.contarValoresPortafoliosUsuarioTotal(idPortafolio);
 				System.out.println("conteo " + conteo);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -138,13 +140,12 @@ public class ServletPortafolio extends HttpServlet {
 			int conteo=0;
 			int conteoSearch=0;
 			try {
-				resultado = conexionDAO.darPortafoliosUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
-				conteo = conexionDAO.contarPortafoliosUsuario(search, idUsuario);
-				conteoSearch = conexionDAO.contarPortafoliosUsuarioTotal(idUsuario);
+				resultado = conexionDAO.darValoresUsuario(start, length, columnName, tipoFiltro, search, idUsuario);
+				conteo = conexionDAO.contarValoresUsuario(search, idUsuario);
+				conteoSearch = conexionDAO.contarValoresUsuarioTotal(idUsuario);
 				System.out.println("conteo " + conteo);
 			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("hola");
 			}
 
 			DataTableObject dataTableObject = new DataTableObject();
@@ -156,12 +157,22 @@ public class ServletPortafolio extends HttpServlet {
 			String json = gson.toJson(dataTableObject);
 			out.print(json);
 		}else if (global.equals("crearPortafolio")){
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer) session.getAttribute("id");
+			int idPortafolio = conexionDAO.agregarPortafolio("Nuevo Portafolio", 1, idUsuario, "El mejor portafolio de la historio");
+			
 			String jsonReceived = request.getParameter("json");
 			JsonElement jelement = new JsonParser().parse(jsonReceived);
-			JsonObject jobject = jelement.getAsJsonObject();
-			JsonArray jsonArray = jobject.getAsJsonArray();
+			JsonArray jsonArray = jelement.getAsJsonArray();
+			System.out.println("hola");
 			
-			response.sendRedirect("/ValorAndes/home.jsp");
+			for (JsonElement jsonElement : jsonArray) {
+				JsonObject jsonObject = jsonElement.getAsJsonObject();
+				int cantidad = jsonObject.get("cantidad").getAsInt();
+				int id_valor = jsonObject.get("id_valor").getAsInt();
+				conexionDAO.agregarValorAPortafolio(id_valor, cantidad, idPortafolio);
+			}
+			response.sendRedirect("/ValorAndes/portafolio.jsp?error=NO");
 		}
 	}
 	
