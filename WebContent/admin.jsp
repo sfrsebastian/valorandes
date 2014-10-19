@@ -46,11 +46,12 @@
 //             "ajax": {
 //                 "url": "/ValorAndes/admin.html",
 //                 "type": "POST",
-//                 "data" : { "table_name" : "oferentes" } 
+//                 "data" : { "table_name" : "empresas" } 
 //             },
 //             columns: [
 //                 { data : 'NOMBRE' },
-//                 { data : 'CIUDAD' }
+//                 { data : 'CORREO' },
+//                 { data : 'NOMBRE_TIPO'}
 //             ]
 //         });
 	});
@@ -87,18 +88,15 @@
                             </thead>
                         </table>
                     </div>
-
+					<br><br>
+					<h1>Empresas</h1>
                     <div>
                         <table class="table table-striped" id="tabla-rec3">
                             <thead>
                                 <tr>
-                                    <th>TABLA 3</th>
-                                    <th>Tipo TABLA 3</th>
-<!--                                     <th>Esta siendo negociado</th>
-                                    <th>Fecha Expiracion</th>
-                                    <th>ID Oferente</th>
-                                    <th>ID Intermediario</th>
-                                    <th>ID Inversionista</th> -->
+                                    <th>Nombre</th>
+                                    <th>Correo</th>
+                                	<th>Tipo</th>
                                 </tr>
                             </thead>
                         </table>

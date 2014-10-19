@@ -1536,6 +1536,52 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
+	
+	public ArrayList<HashMap<String, String>> darEmpresas(int start,int rows, String order, String tipo, String search) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from (select empresas.*,tipos_empresa.nombre as nombre_tipo from empresas inner join tipos_empresa on empresas.tipo = tipos_empresa.id)jo inner join usuarios on jo.id = usuarios.id ORDER BY " +  order +" " +  tipo + ")a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarEmpresasTotal() throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from usuarios INNER JOIN empresas ON usuarios.id = empresas.id";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarEmpresas(String search) throws SQLException{
+		startConnection();
+		String query = "select count(*) as count from (select * from (select empresas.*,tipos_empresa.nombre as nombre_tipo from empresas inner join tipos_empresa on empresas.tipo = tipos_empresa.id)jo inner join usuarios on jo.id = usuarios.id; ) WHERE NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%' OR CORREO like '" + search +"%'";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
 
 	public void reasignarOperaciones(int idAsociacion, int idUsuario){
 		boolean creada = false;

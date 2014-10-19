@@ -71,12 +71,8 @@ public class ServletAdmin extends HttpServlet {
 //				String paramName = (String) enums.nextElement();
 //				System.out.println(paramName + " - value : " + request.getParameter(paramName));
 //			}
-
 			ObjectMapper mapper = new ObjectMapper();
-
-			response.setContentType("application/json");      
-
-			// 5. Add article to List<Article>
+			response.setContentType("application/json");
 			ArrayList<HashMap<String, String>> resultado = null;
 			int conteo=0;
 			int conteoSearch=0;
@@ -109,6 +105,30 @@ public class ServletAdmin extends HttpServlet {
 				resultado = conexionDAO.darInversionistas(start, length, columnName, tipo, search);
 				conteo = conexionDAO.contarInversionistasTotal();
 				conteoSearch = conexionDAO.contarIversionistas(search);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}
+		else if (tableName.equals("empresas")){
+			ObjectMapper mapper = new ObjectMapper();
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darEmpresas(start, length, columnName, tipo, search);
+				conteo = conexionDAO.contarEmpresasTotal();
+				conteoSearch = conexionDAO.contarEmpresas(search);
 				System.out.println("conteo " + conteo);
 			} catch (Exception e) {
 				e.printStackTrace();
