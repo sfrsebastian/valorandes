@@ -8519,3 +8519,6 @@ VALUES (299.0, 42.56, to_date('06/10/2014', 'mm/dd/YYYY'));
 INSERT INTO PRECIOS_VALOR (ID_VALOR, PRECIO_UNITARIO, FECHA) 
 VALUES (300.0, 878.556, to_date('02/21/2013', 'mm/dd/YYYY'));
 
+insert into tipos_portafolio Values(1,'Alto');
+insert into tipos_portafolio Values(2,'Moderado');
+insert into tipos_portafolio Values(3,'Bajo');

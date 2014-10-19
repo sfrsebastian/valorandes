@@ -433,7 +433,7 @@ CREATE TABLE VALORPORTAFOLIO(
 	CONSTRAINT PK_VALORPORTAFOLIO PRIMARY KEY (id_valor,id_portafolio)
 );
 
-CREATE VIEW valores_info AS select valores.*, ti.nombre as nombre_tipo from valores inner join tipos_valor ti on valores.tipo = ti.id;
+CREATE VIEW VALORES_INFO AS select * from (select valores.*, ti.nombre as nombre_tipo from valores inner join tipos_valor ti on valores.tipo = ti.id) vals inner join dueno_valor due on vals.id = due.ID_VALOR;
 
 CREATE VIEW CALLS_INACTIVOS AS select calls.*, asociaciones.id as id_de_asociacion, asociaciones.id_corredor, asociaciones.id_usuario,asociaciones.activo from calls INNER JOIN ASOCIACIONES ON calls.ID_ASOCIACION = ASOCIACIONES.ID where ASOCIACIONES.ACTIVO = 0;
 
