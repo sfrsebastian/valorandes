@@ -1578,5 +1578,25 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
+	
+	public ArrayList<HashMap<String, String>> darCorredoresUsuario(int start,int rows, String order, String tipo, String search,int idUsuario) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select corr.*, aso.id as id_asociacion,aso.activo, aso.id_usuario from (select * from usuarios natural join corredores)corr INNER JOIN asociaciones aso ON corr.id = aso.id_corredor ORDER BY "+ order + " " + tipo +") a where ROWNUM <= ? AND (NOMBRE like '%' OR APELLIDO like '%') AND id_usuario = "+ idUsuario +" AND activo = '1') where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
 
 }
