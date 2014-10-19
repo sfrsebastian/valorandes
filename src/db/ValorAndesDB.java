@@ -1407,5 +1407,47 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
+	
+	public void reasignarOperaciones(int idAsociacion, int idUsuario){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			String uPort = "update puts set id_asociacion = ? where id_asociacion = (select id_de_asociacion from puts_inactivos where puts_inactivos.ID_USUARIO = ?)";
+			PreparedStatement state = conexion.prepareStatement(uPort);
+			state.setInt(1, idAsociacion);
+			state.setInt(2, idUsuario);
+			state.executeUpdate();
+			state.close();
+			
+			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where puts_inactivos.ID_USUARIO = ?)";
+			PreparedStatement state1 = conexion.prepareStatement(ucall);
+			state1.setInt(1, idAsociacion);
+			state1.setInt(2, idUsuario);
+			state1.executeUpdate();
+			state1.close();
+		}
+		catch(SQLException e){
+			System.out.println("Error reasignando operaciones");
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
+	
+	public void reasignarCalls(int idAsociacion, int idUsuario){
+		try{
+			startConnection();
+			
+			closeConnection();
+		}
+		catch(Exception e){
+			System.out.println("Error reasignando calls");
+		}
+	}
+	
 
 }
