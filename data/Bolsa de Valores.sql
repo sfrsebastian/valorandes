@@ -407,8 +407,8 @@ CREATE TABLE TIPOS_PORTAFOLIO(
 );
 
 CREATE TABLE PORTAFOLIOS(
-	id 				NUMBER(2),
-		CONSTRAINT PK_PORTAFOLIO PRIMARY KEY (id),
+	id 				NUMBER(2) CONSTRAINT NN_ID_PORTAFOLIOS NOT NULL,
+		CONSTRAINT UK_ID_PORTAFOLIO UNIQUE(id),
 
 	nombre 			VARCHAR(50) CONSTRAINT NN_NOMBRE_PORTAFOLIOS NOT NULL,
 
@@ -419,6 +419,8 @@ CREATE TABLE PORTAFOLIOS(
 
 	id_usuario		NUMBER(8) CONSTRAINT NN_USUAROIO_PORTAFOLIOS NOT NULL,
 		CONSTRAINT FK_USUARIOS_PORTAFOLIO FOREIGN KEY(id_usuario) REFERENCES USUARIOS(id)
+
+	CONSTRAINT PK_PORTAFOLIO PRIMARY KEY (id,nombre)
 );
 
 CREATE TABLE VALORPORTAFOLIO(
@@ -426,14 +428,15 @@ CREATE TABLE VALORPORTAFOLIO(
 		CONSTRAINT FK_VALOR_VALORPORTAFOLIO FOREIGN KEY(id_valor) REFERENCES VALORES(id),
 
 	cantidad 		NUMBER(8) CONSTRAINT NN_CANTIDAD_VALORSPORTAFOLIO NOT NULL,
-
+		CONSTRAINT CK_CANTIDAD_VALORPORTAFOLIO CHECK(cantidad >= 0),
+		
 	id_portafolio	NUMBER(8) CONSTRAINT NN_PORTAFOLIO_VALORPORTAFOLIO NOT NULL,
 		CONSTRAINT FK_PORTAFOLIO_VALORPORTAFOLIO FOREIGN KEY(id_portafolio) REFERENCES PORTAFOLIOS(id),
 
 	CONSTRAINT PK_VALORPORTAFOLIO PRIMARY KEY (id_valor,id_portafolio)
 );
 
-CREATE VIEW valores_info AS select valores.*, ti.nombre as nombre_tipo from valores inner join tipos_valor ti on valores.tipo = ti.id;
+CREATE VIEW VALORES_INFO AS select * from (select valores.*, ti.nombre as nombre_tipo from valores inner join tipos_valor ti on valores.tipo = ti.id) vals inner join dueno_valor due on vals.id = due.ID_VALOR;
 
 CREATE VIEW CALLS_INACTIVOS AS select calls.*, asociaciones.id as id_de_asociacion, asociaciones.id_corredor, asociaciones.id_usuario,asociaciones.activo from calls INNER JOIN ASOCIACIONES ON calls.ID_ASOCIACION = ASOCIACIONES.ID where ASOCIACIONES.ACTIVO = 0;
 

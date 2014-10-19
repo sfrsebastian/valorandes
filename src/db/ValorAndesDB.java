@@ -134,7 +134,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;		
 	}
-	
+
 	/**
 	 * Ejecuta la sentencia pasada por parametro
 	 * @param query
@@ -189,9 +189,9 @@ public class ValorAndesDB {
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			ps.setString(1, usuario);
 			ps.setString(2, contrasena);
-			
+
 			ResultSet set = ps.executeQuery();
-			
+
 			if(set.next()){
 				Object[] hola = {set.getInt("ID"), set.getString("nombre")};
 				set.close();
@@ -206,7 +206,7 @@ public class ValorAndesDB {
 		}finally{
 			closeConnection();
 		}
-		
+
 		return null;
 	}
 
@@ -296,7 +296,7 @@ public class ValorAndesDB {
 			ps.setInt(8,valor.getIdOferente());
 			ps.executeUpdate();
 			ps.close();
-			
+
 			return true;
 		}
 		catch(SQLException e){
@@ -331,7 +331,7 @@ public class ValorAndesDB {
 					ps.setInt(3, bono.getTipoInteres());
 					ps.setString(4, bono.getTipoBono());
 					ps.executeQuery();
-					
+
 					String sqlDuen = "INSERT INTO DUENO_VALOR VALUES (? , ? , ? , ? , ?)";
 					PreparedStatement ps1 = conexion.prepareStatement(sqlDuen);
 					ps1.setInt(1, id);
@@ -340,7 +340,7 @@ public class ValorAndesDB {
 					Calendar c = Calendar.getInstance();
 					ps1.setDate(4,new Date(c.getTimeInMillis()));
 					ps1.setInt(5, bono.getIdOferente());
-					
+
 					ps1.executeUpdate();
 					String sqlPrecio = "INSERT INTO PRECIOS_VALOR VALUES (? , ? , ?) ";
 					PreparedStatement ps2 = conexion.prepareStatement(sqlPrecio);
@@ -348,7 +348,7 @@ public class ValorAndesDB {
 					ps2.setDouble(2, precio);
 					ps2.setDate(3, new Date(c.getTimeInMillis()));
 					ps2.executeUpdate();
-					
+
 					conexion.commit();
 					ps.close();
 					ps1.close();
@@ -389,7 +389,7 @@ public class ValorAndesDB {
 					ps.setDouble(3, accion.getPrecioEsperadoAnioActual());
 					ps.setDouble(4, accion.getRendimiento());
 					ps.executeQuery();
-					
+
 					String sqlDuen = "INSERT INTO DUENO_VALOR VALUES (? , ? , ? , ? , ?)";
 					PreparedStatement ps1 = conexion.prepareStatement(sqlDuen);
 					ps1.setInt(1, id);
@@ -398,7 +398,7 @@ public class ValorAndesDB {
 					Calendar c = Calendar.getInstance();
 					ps1.setDate(4,new Date(c.getTimeInMillis()));
 					ps1.setInt(5, accion.getIdOferente());
-					
+
 					ps1.executeUpdate();
 					String sqlPrecio = "INSERT INTO PRECIOS_VALOR VALUES (? , ? , ?) ";
 					PreparedStatement ps2 = conexion.prepareStatement(sqlPrecio);
@@ -406,7 +406,7 @@ public class ValorAndesDB {
 					ps2.setDouble(2, precio);
 					ps2.setDate(3, new Date(c.getTimeInMillis()));
 					ps2.executeUpdate();
-					
+
 					conexion.commit();
 					ps.close();
 					ps1.close();
@@ -424,7 +424,7 @@ public class ValorAndesDB {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Agrega en tabla de certificados un nuevo certificado con valores dados.
 	 * Si ocurre error registrando certificado se elimina el cambio del valor que se agrego.
@@ -446,7 +446,7 @@ public class ValorAndesDB {
 					ps.setInt(2, certificado.getTipoCertificado());
 					ps.setString(3, certificado.getNumero());
 					ps.executeQuery();
-					
+
 					String sqlDuen = "INSERT INTO DUENO_VALOR VALUES (? , ? , ? , ? , ?)";
 					PreparedStatement ps1 = conexion.prepareStatement(sqlDuen);
 					ps1.setInt(1, id);
@@ -455,7 +455,7 @@ public class ValorAndesDB {
 					Calendar c = Calendar.getInstance();
 					ps1.setDate(4,new Date(c.getTimeInMillis()));
 					ps1.setInt(5, certificado.getIdOferente());
-					
+
 					ps1.executeUpdate();
 					String sqlPrecio = "INSERT INTO PRECIOS_VALOR VALUES (? , ? , ?) ";
 					PreparedStatement ps2 = conexion.prepareStatement(sqlPrecio);
@@ -463,7 +463,7 @@ public class ValorAndesDB {
 					ps2.setDouble(2, precio);
 					ps2.setDate(3, new Date(c.getTimeInMillis()));
 					ps2.executeUpdate();
-					
+
 					conexion.commit();
 					ps.close();
 					ps1.close();
@@ -481,16 +481,16 @@ public class ValorAndesDB {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Asocia el corredor a la empresa determinada
 	 * @param empresa La empresa a la que se quiere asociar al corredor
 	 * @param corredor El corredor que se quiere asociar a la empresa
 	 */
 	public void asociarCorredorEmpresa(Empresa empresa, Corredor corredor){
-		
+
 	}
-	
+
 	/**
 	 * Asocia un corredor a un inversionista determinado <br>
 	 * pre: El inversionista y el corredor deben existir
@@ -502,9 +502,9 @@ public class ValorAndesDB {
 			startConnection();
 			String sql = "DELETE FROM VALORES WHERE ID = ?";
 			PreparedStatement ps = conexion.prepareStatement(sql);
-			
-			
-			
+
+
+
 			ps.executeUpdate();
 			conexion.commit();
 			ps.close();
@@ -514,7 +514,7 @@ public class ValorAndesDB {
 			System.out.println("Error asociando corredor e inversionista");
 		}
 	}
-	
+
 	/**
 	 * Retorna el id del proximo valor.
 	 * @return max(id) + 1
@@ -636,7 +636,7 @@ public class ValorAndesDB {
 		try {
 			startConnection();
 			int id = proximoPut();
-			
+
 			String sql = "INSERT INTO PUTS (ID, ID_VALOR, CANTIDAD, FECHA, ID_ASOCIACION, TIPO_MERCADO) VALUES (?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
@@ -649,16 +649,16 @@ public class ValorAndesDB {
 			ps.setInt(5, idAsociacion);
 			ps.setString(6, tipoMercado);
 			ps.executeUpdate();
-			
+
 			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
 			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
 			ps1.setString(1, "Venta");
 			ps1.setInt(2, idValor);
 			ps1.setInt(3, idAsociacion);
 			ps1.executeUpdate();
-			
+
 			conexion.commit();
-			
+
 			ps1.close();
 			ps.close();
 		} catch (SQLException e) {
@@ -751,14 +751,14 @@ public class ValorAndesDB {
 			ps.setInt(4, idPut);
 			ps.setInt(5, idAsociacion);
 			ps.executeUpdate();
-			
+
 			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
 			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
 			ps1.setString(1, "Compra");
 			ps1.setInt(2, idValor);
 			ps1.setInt(3, idAsociacion);
 			ps1.executeUpdate();
-			
+
 			conexion.commit();
 			ps.close();
 			ps1.close();
@@ -910,18 +910,18 @@ public class ValorAndesDB {
 			ps5.setInt(7,idValor);
 			ps5.executeQuery();
 			ps5.close();
-			
+
 			String sqlElimCall = "DELETE FROM CALLS WHERE ID = ?";
 			PreparedStatement psEl = conexion.prepareStatement(sqlElimCall);
 			psEl.setInt(1,callId);
 			psEl.executeUpdate();
 			psEl.close();
-			
+
 			String quer = "UPDATE PUTS SET CANTIDAD = CANTIDAD - "+ (cantidad) +" WHERE ID=" + putId;
 			PreparedStatement ps1000 = conexion.prepareStatement(quer);
 			ps1000.executeQuery();
 			ps1000.close();
-			
+
 			conexion.commit();
 		}
 		catch(SQLException e){
@@ -1026,7 +1026,7 @@ public class ValorAndesDB {
 		}
 		return 0;
 	}
-	
+
 	public void crearAsociacion(int idCorredor,int idUsuario){
 		boolean creada = false;
 		try{
@@ -1034,6 +1034,12 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
+			//Asegura lock asociacino
+			String lock = "SELECT * FROM ASOCIACIONES FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.executeQuery();
+			stat1.close();
+
 			String create = "INSERT INTO ASOCIACIONES (ID, ID_CORREDOR, ID_USUARIO, ACTIVO) VALUES (?, ?, ?, '1')";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1,darProximoIdAsociacion());
@@ -1044,14 +1050,21 @@ public class ValorAndesDB {
 			conexion.commit();
 		}
 		catch(SQLException e){
-			System.out.println("Error insertando corredor id: " + idCorredor + "con usuario id: " + idUsuario);
+			try {
+				conexion.rollback();
+				System.out.println("Error insertando corredor id: " + idCorredor + "con usuario id: " + idUsuario);
+			}
+			catch(SQLException e1){
+
+			}
+			
 		}
 		finally{
 			if(creada)
 				closeConnection();
 		}
 	}
-	
+
 	public void desHabilitarCorredor(int idAsociacion){
 		boolean creada = false;
 		try{
@@ -1059,6 +1072,13 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
+			//Asegura lock asociacion
+			String lock = "SELECT * FROM ASOCIACIONES WHERE id_asociacion=? FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.setInt(1, idAsociacion);
+			stat1.executeQuery();
+			stat1.close();
+
 			String create = "UPDATE ASOCIACIONES SET ACTIVO='0' WHERE id=?";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idAsociacion);
@@ -1067,14 +1087,21 @@ public class ValorAndesDB {
 			conexion.commit();
 		}
 		catch(SQLException e){
-			System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+			try {
+				conexion.rollback();
+				System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+			}
+			catch(SQLException e1){
+
+			}
+			
 		}
 		finally{
 			if(creada)
 				closeConnection();
 		}
 	}
-	
+
 	public void habilitarCorredor(int idAsociacion){
 		boolean creada = false;
 		try{
@@ -1082,6 +1109,13 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
+			//Asegura lock asociacion
+			String lock = "SELECT * FROM ASOCIACIONES WHERE id_asociacion=? FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.setInt(1, idAsociacion);
+			stat1.executeQuery();
+			stat1.close();
+
 			String create = "UPDATE PUTS SET HABILITADO='1' WHERE id_asociacion=?";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idAsociacion);
@@ -1090,14 +1124,20 @@ public class ValorAndesDB {
 			conexion.commit();
 		}
 		catch(SQLException e){
-			System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+			try {
+				conexion.rollback();
+				System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			if(creada)
 				closeConnection();
 		}
 	}
-	
+
 	public int agregarPortafolio(String nombre, int tipo, int idUsuario, String descripcion){
 		boolean creada = false;
 		try{
@@ -1105,6 +1145,12 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
+			//Asegura lock portafolio
+			String lock = "SELECT * FROM PORTAFOLIOS FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.executeQuery();
+			stat1.close();
+
 			String create = "INSERT INTO PORTAFOLIOS (ID, NOMBRE, DESCRIPCION, TIPO, ID_USUARIO) VALUES (?, ?, ?, ?, ?)";
 			PreparedStatement state = conexion.prepareStatement(create);
 			int id = darProximioIdPortafolio();
@@ -1119,7 +1165,13 @@ public class ValorAndesDB {
 			return id;
 		}
 		catch(SQLException e){
-			System.out.println("Error creando portafolio: " + nombre);
+			try {
+				conexion.rollback();
+				System.out.println("Error creando portafolio: " + nombre);
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			if(creada)
@@ -1144,8 +1196,13 @@ public class ValorAndesDB {
 			return respuesta;
 		}
 		catch(SQLException e){
-			System.out.println("Error consultando proximo id en tabla Portafolios");
-			e.printStackTrace();
+			try {
+				conexion.rollback();
+				System.out.println("Error consultando proximo id en tabla Portafolios");
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			if(creada)
@@ -1161,6 +1218,12 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
+			//Asegura lock de tabla
+			String lock = "SELECT * FROM VALORPORTAFOLIO FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.executeQuery();
+			stat1.close();
+
 			String create = "INSERT INTO VALORPORTAFOLIO (ID_VALOR, CANTIDAD, ID_PORTAFOLIO) VALUES (?, ?, ?)";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idValor);
@@ -1171,14 +1234,20 @@ public class ValorAndesDB {
 			conexion.commit();
 		}
 		catch(SQLException e){
-			System.out.println("Error agregando valor a portafolio idValor: " + idValor);
+			try {
+				conexion.rollback();
+				System.out.println("Error agregando valor a portafolio idValor: " + idValor);
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			if(creada)
 				closeConnection();
 		}
 	}
-	
+
 	public void actualizarValorPortafolio(int idValor, int deltaCantidad, int idDueno, int idCorredor, int idPortafolio){
 		boolean creada = false;
 		try{
@@ -1187,8 +1256,17 @@ public class ValorAndesDB {
 				creada = true;
 			}
 			int idAsociacion = darIdAsociacion(idDueno, idCorredor);
+
+			//Asegura lock de update
+			String lock = "SELECT * FROM VALORPORTAFOLIO WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ? FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.setInt(2, idValor);
+			stat1.setInt(3, idPortafolio);
+			stat1.executeQuery();
+			stat1.close();
+
 			if(deltaCantidad<0 && idAsociacion>=0){
-				autorizarAccion(idAsociacion, idValor, "Venta", Math.abs(deltaCantidad));;
+				autorizarAccion(idAsociacion, idValor, "Venta", Math.abs(deltaCantidad));
 				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
 				PreparedStatement state = conexion.prepareStatement(uPort);
 				state.setInt(1, deltaCantidad);
@@ -1198,7 +1276,7 @@ public class ValorAndesDB {
 				state.close();
 			}
 			else if(deltaCantidad>0 && idAsociacion>=0){
-				autorizarAccion(idAsociacion, idValor, "Compra", Math.abs(deltaCantidad));;
+				autorizarAccion(idAsociacion, idValor, "Compra", Math.abs(deltaCantidad));				
 				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
 				PreparedStatement state = conexion.prepareStatement(uPort);
 				state.setInt(1, deltaCantidad);
@@ -1207,13 +1285,17 @@ public class ValorAndesDB {
 				state.executeUpdate();
 				state.close();
 			}
-			else{
-				throw new Exception();
-			}
 			conexion.commit();
 		}
 		catch(Exception e){
-			System.out.println("Error agregando valor a portafolio idValor: " + idValor);
+			try {
+				conexion.rollback();
+				System.out.println("Error agregando valor a portafolio idValor: " + idValor);
+			}
+			catch(SQLException e1){
+
+			}
+
 		}
 		finally{
 			if(creada)
@@ -1240,15 +1322,21 @@ public class ValorAndesDB {
 			return id; 
 		}
 		catch(SQLException e){
-			System.out.println("Error encontrando asociacion idUsuario: " + idUsuario + " idCorredor" + idCorredor);
-			return -1;
+			try {
+				conexion.rollback();
+				System.out.println("Error encontrando asociacion idUsuario: " + idUsuario + " idCorredor" + idCorredor);
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			if(creada)
 				closeConnection();
 		}
+		return -1;
 	}
-	
+
 	public ArrayList<HashMap<String, String>> darHola(ResultSet resSet) throws SQLException{
 		ArrayList<HashMap<String, String>> finale = new ArrayList<HashMap<String,String>>();
 		int j = 0;
@@ -1263,10 +1351,10 @@ public class ValorAndesDB {
 			finale.add(temp);
 			j++;
 		}
-		
+
 		return finale;
 	}
-	
+
 	public HashMap<String,String> sendError (String message){
 		HashMap<String,String> ans = new HashMap<String,String>();
 		ans.put("error", message);
@@ -1292,7 +1380,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public ArrayList<HashMap<String, String>> darIntermediariosUsuario(int start, int rows, String order, String tipo, String search, int idUsuario) throws SQLException {
 		if(order == null){
 			order = "NOMBRE";
@@ -1312,7 +1400,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public int contarIntermediarios(String search) throws Exception{
 		startConnection();
 		String query = "select count(*) as count from usuarios NATURAL JOIN corredores where NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%'";
@@ -1325,7 +1413,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public int contarIntermediariosUsuario(String search, int idUsuario) throws Exception{
 		startConnection();
 		String query = "select count(*) as count from ( select a.*, ROWNUM rnum from (select * from ( select * from usuarios NATURAL JOIN corredores ) usuCorre INNER JOIN ASOCIACIONES ON usuCorre.ID = ASOCIACIONES.ID_CORREDOR WHERE ASOCIACIONES.ID_USUARIO = " +  idUsuario + ") a where (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%') AND activo = '1' )";
@@ -1338,7 +1426,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public int contarIntermediariosTotal()throws Exception{
 		startConnection();
 		String query = "select count(*) as count from usuarios NATURAL JOIN corredores";
@@ -1351,7 +1439,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public int contarIntermediariosTotalUsuario(int idUsuario)throws Exception{
 		startConnection();
 		String query = "select count(*) as count from ( select * from usuarios NATURAL JOIN corredores ) usuCorre INNER JOIN ASOCIACIONES ON usuCorre.ID = ASOCIACIONES.ID_CORREDOR WHERE ASOCIACIONES.ID_USUARIO = " +  idUsuario + " and activo = '1'";
@@ -1410,7 +1498,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public void reasignarOperaciones(int idAsociacion, int idUsuario){
 		boolean creada = false;
 		try{
@@ -1424,7 +1512,7 @@ public class ValorAndesDB {
 			state.setInt(2, idUsuario);
 			state.executeUpdate();
 			state.close();
-			
+
 			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where puts_inactivos.ID_USUARIO = ?)";
 			PreparedStatement state1 = conexion.prepareStatement(ucall);
 			state1.setInt(1, idAsociacion);
@@ -1433,14 +1521,20 @@ public class ValorAndesDB {
 			state1.close();
 		}
 		catch(SQLException e){
-			System.out.println("Error reasignando operaciones");
+			try {
+				conexion.rollback();
+				System.out.println("Error reasignando operaciones");
+			} catch (SQLException e1) {
+
+			}
+
 		}
 		finally{
 			if(creada)
 				closeConnection();
 		}
 	}
-	
+
 	public ArrayList<HashMap<String, String>> darPortafoliosUsuario(int start,int rows, String order, String tipo, String search,int idUsuario) throws SQLException {
 		if(order == null){
 			order = "NOMBRE";
@@ -1486,7 +1580,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public ArrayList<HashMap<String, String>> darValoresPortafoliosUsuario(int start,int rows, String order, String tipo, String search,int idPortafolio) throws SQLException {
 		if(order == null){
 			order = "NOMBRE";
@@ -1532,7 +1626,7 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-	
+
 	public ArrayList<HashMap<String, String>> darValoresUsuario(int start,int rows, String order, String tipo, String search,int idUsuario) throws SQLException {
 		if(order == null){
 			order = "NOMBRE";
@@ -1573,6 +1667,26 @@ public class ValorAndesDB {
 		ResultSet set = st.executeQuery();
 		set.next();
 		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public ArrayList<HashMap<String, String>> darCorredoresUsuario(int start,int rows, String order, String tipo, String search,int idUsuario) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select corr.*, aso.id as id_asociacion,aso.activo, aso.id_usuario from (select * from usuarios natural join corredores)corr INNER JOIN asociaciones aso ON corr.id = aso.id_corredor ORDER BY "+ order + " " + tipo +") a where ROWNUM <= ? AND (NOMBRE like '%' OR APELLIDO like '%') AND id_usuario = "+ idUsuario +" AND activo = '1') where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
 		set.close();
 		st.close();
 		closeConnection();
