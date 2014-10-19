@@ -25,6 +25,14 @@
     <servlet-name>Admin</servlet-name>
     <servlet-class>servlets.ServletAdmin</servlet-class>
   </servlet>
+           <servlet>
+    <servlet-name>Corredores</servlet-name>
+    <servlet-class>servlets.ServletCorredores</servlet-class>
+  </servlet>
+           <servlet>
+    <servlet-name>Portafolio</servlet-name>
+    <servlet-class>servlets.ServletPortafolio</servlet-class>
+  </servlet>
   
   
   <servlet-mapping>
@@ -50,5 +58,13 @@
          <servlet-mapping>
     <servlet-name>Admin</servlet-name>
     <url-pattern>/admin.html</url-pattern>
+  </servlet-mapping>
+           <servlet-mapping>
+    <servlet-name>Corredores</servlet-name>
+    <url-pattern>/corredores.html</url-pattern>
+  </servlet-mapping>
+           <servlet-mapping>
+    <servlet-name>Portafolio</servlet-name>
+    <url-pattern>/portafolio.html</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -1218,7 +1218,7 @@ public class ValorAndesDB {
 		}
 	}
 
-	private int darIdAsociacion(int idUsuario, int idCorredor){
+	public int darIdAsociacion(int idUsuario, int idCorredor){
 		boolean creada = false;
 		try{
 			if(conexion == null){

@@ -294,6 +294,12 @@
                             <a href="valores.jsp"><i class="fa fa-edit fa-fw"></i> Valores</a>
                         </li>
                         </c:if>
+                        <li>
+                            <a href="corredores.jsp"><i class="fa fa-sitemap fa-fw"></i> Corredores</a>
+                        </li>
+                        <li>
+                            <a href="portafolio.jsp"><i class="fa fa-files-o fa-fw"></i> Portafolio</a>
+                        </li>
 
                         <li>
                             <a href="#"><i class="fa fa-wrench fa-fw"></i> UI Elements<span class="fa arrow"></span></a>
