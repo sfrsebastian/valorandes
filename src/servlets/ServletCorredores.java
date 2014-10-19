@@ -81,6 +81,11 @@ public class ServletCorredores extends HttpServlet {
 				}else{
 					conexionDAO.habilitarCorredor(id_asociacion);
 				}
+			}else if(tipo.equals("reasignarOperaciones")){
+				HttpSession session = request.getSession();
+				int idUsuario = (Integer) session.getAttribute("id");
+				int idAsociacion = Integer.parseInt(request.getParameter("id_asociacion"));
+				conexionDAO.reasignarOperaciones(idAsociacion, idUsuario);
 			}
 			
 			response.sendRedirect("/ValorAndes/corredores.jsp?error=NO");
