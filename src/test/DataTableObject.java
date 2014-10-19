@@ -39,8 +39,6 @@ public class DataTableObject {
 
 	public void setAaData(ArrayList aaData) {
 		this.data = aaData;
-		this.recordsFiltered = data.size();
-		this.draw = data.size();
 	}
 
 	public int getRecordsTotal() {

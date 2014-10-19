@@ -1269,6 +1269,95 @@ public class ValorAndesDB {
 		ans.put("error", message);
 		return ans;
 	}
+
+	public ArrayList<HashMap<String, String>> darIntermediarios(int start, int rows, String order, String tipo, String search) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from usuarios NATURAL JOIN corredores ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
 	
-	
+	public int contarIntermediarios(String search) throws Exception{
+		startConnection();
+		String query = "select count(*) as count from usuarios NATURAL JOIN corredores where NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%'";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	public int contarIntermediariosTotal()throws Exception{
+		startConnection();
+		String query = "select count(*) as count from usuarios NATURAL JOIN corredores";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public ArrayList<HashMap<String, String>> darInversionistas(int start,int rows, String order, String tipo, String search) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from usuarios INNER  JOIN inversionistas ON usuarios.id = inversionistas.id ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarInversionistasTotal() throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from usuarios INNER JOIN inversionistas ON usuarios.id = inversionistas.id";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarIversionistas(String search) throws SQLException{
+		startConnection();
+		String query = "select count(*) as count from usuarios INNER JOIN inversionistas ON usuarios.id = inversionistas.id WHERE NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%'";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
 }

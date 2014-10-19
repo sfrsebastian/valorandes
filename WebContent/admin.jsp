@@ -18,9 +18,10 @@
                 "type": "POST",
                 "data" : { "table_name" : "intermediarios" } 
             },
-            columns: [
+            "columns": [
                 { data : 'NOMBRE' },
-                { data : 'CIUDAD' },
+                { data : 'APELLIDO' },
+                { data : 'CORREO' },
             ]
         });
 
@@ -34,23 +35,24 @@
             },
             columns: [
                 { data : 'NOMBRE' },
-                { data : 'CIUDAD' }
+                { data : 'APELLIDO' },
+                { data : 'CORREO'}
             ]
         });
 
-        $( "#tabla-rec3" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/admin.html",
-                "type": "POST",
-                "data" : { "table_name" : "oferentes" } 
-            },
-            columns: [
-                { data : 'NOMBRE' },
-                { data : 'CIUDAD' }
-            ]
-        });
+//         $( "#tabla-rec3" ).dataTable({
+//             "processing" : true,
+//             "serverSide" : true,
+//             "ajax": {
+//                 "url": "/ValorAndes/admin.html",
+//                 "type": "POST",
+//                 "data" : { "table_name" : "oferentes" } 
+//             },
+//             columns: [
+//                 { data : 'NOMBRE' },
+//                 { data : 'CIUDAD' }
+//             ]
+//         });
 	});
 </script>
 
@@ -60,34 +62,27 @@
                 <div class="col-lg-12">
 
                     <h1 class="page-header">Ventana de Administrador</h1>
-                    
+                    <h1>Corredores</h1>
                     <div>
                         <table class="table table-striped" id="tabla-rec1">
                             <thead>
                                 <tr>
-                                    <th>Ciudad</th>
-                                    <th>Tipo Valor</th>
-<!--                                     <th>Esta siendo negociado</th>
-                                    <th>Fecha Expiracion</th>
-                                    <th>ID Oferente</th>
-                                    <th>ID Intermediario</th>
-                                    <th>ID Inversionista</th> -->
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+	                               	<th>Correo</th>
                                 </tr>
                             </thead>
                         </table>
                     </div>
-
+					<br><br>
+					<h1>Inversionistas</h1>
                     <div>
                         <table class="table table-striped" id="tabla-rec2">
                             <thead>
                                 <tr>
-                                    <th>TABLA 2</th>
-                                    <th>Tipo TABLA 2 </th>
-<!--                                     <th>Esta siendo negociado</th>
-                                    <th>Fecha Expiracion</th>
-                                    <th>ID Oferente</th>
-                                    <th>ID Intermediario</th>
-                                    <th>ID Inversionista</th> -->
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                               		<th>Correo</th>
                                 </tr>
                             </thead>
                         </table>
