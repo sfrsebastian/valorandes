@@ -18,39 +18,40 @@
                 "type": "POST",
                 "data" : { "table_name" : "intermediarios" } 
             },
-            columns: [
+            "columns": [
                 { data : 'NOMBRE' },
-                { data : 'CIUDAD' },
+                { data : 'APELLIDO' },
+                { data : 'CORREO' },
             ]
         });
 
-        $( "#tabla-rec2" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/admin.html",
-                "type": "POST",
-                "data" : { "table_name" : "inversionistas" } 
-            },
-            columns: [
-                { data : 'NOMBRE' },
-                { data : 'CIUDAD' }
-            ]
-        });
+//         $( "#tabla-rec2" ).dataTable({
+//             "processing" : true,
+//             "serverSide" : true,
+//             "ajax": {
+//                 "url": "/ValorAndes/admin.html",
+//                 "type": "POST",
+//                 "data" : { "table_name" : "inversionistas" } 
+//             },
+//             columns: [
+//                 { data : 'NOMBRE' },
+//                 { data : 'CIUDAD' }
+//             ]
+//         });
 
-        $( "#tabla-rec3" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/admin.html",
-                "type": "POST",
-                "data" : { "table_name" : "oferentes" } 
-            },
-            columns: [
-                { data : 'NOMBRE' },
-                { data : 'CIUDAD' }
-            ]
-        });
+//         $( "#tabla-rec3" ).dataTable({
+//             "processing" : true,
+//             "serverSide" : true,
+//             "ajax": {
+//                 "url": "/ValorAndes/admin.html",
+//                 "type": "POST",
+//                 "data" : { "table_name" : "oferentes" } 
+//             },
+//             columns: [
+//                 { data : 'NOMBRE' },
+//                 { data : 'CIUDAD' }
+//             ]
+//         });
 	});
 </script>
 
@@ -65,13 +66,9 @@
                         <table class="table table-striped" id="tabla-rec1">
                             <thead>
                                 <tr>
-                                    <th>Ciudad</th>
-                                    <th>Tipo Valor</th>
-<!--                                     <th>Esta siendo negociado</th>
-                                    <th>Fecha Expiracion</th>
-                                    <th>ID Oferente</th>
-                                    <th>ID Intermediario</th>
-                                    <th>ID Inversionista</th> -->
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+	                               	<th>Correo</th>
                                 </tr>
                             </thead>
                         </table>
