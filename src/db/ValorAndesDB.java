@@ -1098,7 +1098,7 @@ public class ValorAndesDB {
 		}
 	}
 	
-	public void agregarPortafolio(String nombre, int tipo, int idUsuario, String descripcion){
+	public int agregarPortafolio(String nombre, int tipo, int idUsuario, String descripcion){
 		boolean creada = false;
 		try{
 			if(conexion == null){
@@ -1107,7 +1107,8 @@ public class ValorAndesDB {
 			}
 			String create = "INSERT INTO PORTAFOLIOS (ID, NOMBRE, DESCRIPCION, TIPO, ID_USUARIO) VALUES (?, ?, ?, ?, ?)";
 			PreparedStatement state = conexion.prepareStatement(create);
-			state.setInt(1, darProximioIdPortafolio());
+			int id = darProximioIdPortafolio();
+			state.setInt(1, id);
 			state.setString(2,nombre);
 			state.setString(3, descripcion);
 			state.setInt(4, tipo);
@@ -1115,6 +1116,7 @@ public class ValorAndesDB {
 			state.executeUpdate();
 			state.close();
 			conexion.commit();
+			return id;
 		}
 		catch(SQLException e){
 			System.out.println("Error creando portafolio: " + nombre);
@@ -1123,6 +1125,7 @@ public class ValorAndesDB {
 			if(creada)
 				closeConnection();
 		}
+		return -1;
 	}
 	private int darProximioIdPortafolio() {
 		boolean creada = false;
@@ -1438,17 +1441,6 @@ public class ValorAndesDB {
 		}
 	}
 	
-	public void reasignarCalls(int idAsociacion, int idUsuario){
-		try{
-			startConnection();
-			
-			closeConnection();
-		}
-		catch(Exception e){
-			System.out.println("Error reasignando calls");
-		}
-	}
-	
 	public ArrayList<HashMap<String, String>> darPortafoliosUsuario(int start,int rows, String order, String tipo, String search,int idUsuario) throws SQLException {
 		if(order == null){
 			order = "NOMBRE";
@@ -1485,6 +1477,52 @@ public class ValorAndesDB {
 	public int contarPortafoliosUsuario(String search,int idUsuario) throws SQLException{
 		startConnection();
 		String query = "select count(*) as count portafolios.*, ti.nombre as nombre_tipo from portafolios inner join tipos_portafolio ti on portafolios.tipo = ti.id) where (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_USUARIO = "+ idUsuario;
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public ArrayList<HashMap<String, String>> darValoresPortafoliosUsuario(int start,int rows, String order, String tipo, String search,int idPortafolio) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from valores_info inner join valorPortafolio vals on valores_info.id = vals.id_valor ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_PORTAFOLIO = "+ idPortafolio +") where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarValoresPortafoliosUsuarioTotal(int idPortafolio) throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from valores_info inner join valorPortafolio vals on valores_info.id = vals.id_valor where id_Portafolio = " + idPortafolio;
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarValoresPortafoliosUsuario(String search,int idPortafolio) throws SQLException{
+		startConnection();
+		String query = "select count(*) as count from valores_info inner join valorPortafolio vals on valores_info.id = vals.id_valor where (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_PORTAFOLIO = "+ idPortafolio;
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
