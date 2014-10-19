@@ -1150,13 +1150,13 @@ public class ValorAndesDB {
 				creada = true;
 			}
 			//Asegura lock asociacion
-			String lock = "SELECT * FROM ASOCIACIONES WHERE id_asociacion=? FOR UPDATE";
+			String lock = "SELECT * FROM ASOCIACIONES WHERE id= ? FOR UPDATE";
 			PreparedStatement stat1 = conexion.prepareStatement(lock);
 			stat1.setInt(1, idAsociacion);
 			stat1.executeQuery();
 			stat1.close();
 
-			String create = "UPDATE PUTS SET HABILITADO='1' WHERE id_asociacion=?";
+			String create = "UPDATE ASOCIACIONES SET ACTIVO='1' WHERE id=?";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idAsociacion);
 			state.executeUpdate();
