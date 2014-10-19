@@ -173,6 +173,42 @@ public class ServletPortafolio extends HttpServlet {
 				conexionDAO.agregarValorAPortafolio(id_valor, cantidad, idPortafolio);
 			}
 			response.sendRedirect("/ValorAndes/portafolio.jsp?error=NO");
+		}else if(global.equals("modificarCantidadValor")){
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer) session.getAttribute("id");
+			int idCorredor = Integer.parseInt( request.getParameter("id_corredor_valor"));
+			int idValor = Integer.parseInt(request.getParameter("modificarValor_id_final"));
+			int cantidad = Integer.parseInt(request.getParameter("cantidad_nueva"));
+			int idPortafolio = Integer.parseInt(request.getParameter("id_portafolio"));
+			conexionDAO.actualizarValorPortafolio(idValor, cantidad, idUsuario, idCorredor, idPortafolio);
+			
+			response.sendRedirect("/ValorAndes/portafolio.html?error=NO");
+			
+		}else if(global.equals("cargarCorredores")){
+			HttpSession session = request.getSession();
+			int idUsuario = (Integer) session.getAttribute("id");
+			
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darIntermediariosUsuario(1, 100, "NOMBRE", "asc", "", idUsuario);
+//				conteo = conexionDAO.contarValoresUsuario(search, idUsuario);
+//				conteoSearch = conexionDAO.contarValoresUsuarioTotal(idUsuario);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
 		}
 	}
 	

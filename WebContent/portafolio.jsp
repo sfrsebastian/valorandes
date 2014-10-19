@@ -17,6 +17,9 @@
 	var id_valor = 0;
 	var theTable = $("#portafolio-tabla");
 
+    var modificarValor_id = 0;
+    var idPortafolio = 0;
+
 	$(document).ready(function (){
 
 		$( "#portafolios" ).dataTable({
@@ -35,16 +38,17 @@
 					console.log("hello");
 					$("#portafolio-actual-body").empty();
 
-					var idPortafolio = this.value;
+					idPortafolio = this.value;
+                    console.log("El id del portafolio es: " + idPortafolio);
 					var gTable = $("<table>").attr("class","table table-striped").attr("id","portafolio-tabla");
 					var gTableHead = $("<thead>");
 					var gTr = $("<tr>");
 
 					//THEADS
-					var gth1 = $("<th>").text("HOLA");
-					var gth2 = $("<th>").text("HOLA");
-					var gth3 = $("<th>").text("HOLA");
-					var gth4 = $("<th>").text("HOLA");
+					var gth1 = $("<th>").text("Nombre Valor");
+					var gth2 = $("<th>").text("Cantidad Total");
+					var gth3 = $("<th>").text("% Invertido");
+					var gth4 = $("<th>").text("Acciones");
 
 					gTr.append($(gth1));
 					gTr.append($(gth2));
@@ -63,30 +67,57 @@
 			                "data" : {"global" : "mostrarValoresPortafolio", "otra" : idPortafolio}
 			            },
 			            "initComplete": function(settings, json) {
-			            	console.log("DONE Des-asociar");
-						   // $(".sociar").click(function (){
-							  //  	console.log('HELLO');
-							  //  	var id_actual = this.value;
+			            	console.log("DONE MODIFICAR PORTAFOLIO");
+						   $(".modificar-valores-portafolio").click(function (){
+							   	console.log('HELLO');
 
-							  //  	var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");
-							  //  	var input = $("<input>").attr("type", "hidden").attr("name", "id_valor").val(id_actual);
-							  //  	var tipo = $("<input>").attr("type", "hidden").attr("name", "tipo-post").val("des-asociar");
-							  //  	var myID = $("<input>").attr("type", "hidden").attr("name", "id").val("${sessionScope.id}");
-					    //         $((form)).append($(input));
-					    //         $((form)).append($(tipo));
-					    //         $((form)).append($(myID));
-					    //         $((form)).submit();
-						   // });
+                                $("#modal-modificar-valor").modal();
+							   	// var id_actual = this.value;
+                                modificarValor_id = this.value;
+
+                                $.post( "/ValorAndes/portafolio.html", { global: "cargarCorredores", value: "cargarCorredores" }).done(function( data ) {
+
+                                    $("#select_corredor_valor").empty();
+                                    jQuery.each(data.data, function ( i , val){
+                                        //<option value="${row.asoci}"><c:out value="${row.nombre} ${row.apellido}"/></option>
+                                        // var option  = $("<option>").attr("value", val.ID_CORREDOR).attr("nombre","id_corredor_valor_opt").text(val.NOMBRE + " " + val.APELLIDO);
+                                        var nombreApellido = val.NOMBRE + " " + val.APELLIDO; 
+                                        $("#select_corredor_valor").append($('<option>', { 
+                                            value: val.ID_CORREDOR,
+                                            text : nombreApellido
+                                        }));
+                                    })
+                                });
+							   	// var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");
+							   	// var input = $("<input>").attr("type", "hidden").attr("name", "id_valor").val(id_actual);
+							   	// var tipo = $("<input>").attr("type", "hidden").attr("name", "tipo-post").val("des-asociar");
+							   	// var myID = $("<input>").attr("type", "hidden").attr("name", "id").val("${sessionScope.id}");
+					      //       $((form)).append($(input));
+					      //       $((form)).append($(tipo));
+					      //       $((form)).append($(myID));
+					      //       $((form)).submit();
+						   });
 						},
 			            "columnDefs": [ {
 				            "render": function ( data, type, row ) {
-			                    return "<button class=\"ver-valores-portafolio btn btn-warning\" value=\"" + data + "\">Ver portafolio</button>";
+			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + data + "\">Modificar</button>";
 			                },
 			                "targets": -1
-				        } ],
+				        },
+                        {
+                            "render": function ( data, type, row ) {
+                                var cantidad_total_valor = parseInt(row.CANTIDAD_DISPONIBLE);
+                                var cantidad_invertida_valor = parseInt(row.CANTIDAD);
+                                var porcentaje = (cantidad_invertida_valor/cantidad_total_valor) * 100;
+
+                                return " <div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"20\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: " + porcentaje + "%\"><span class=\"sr-only\">20% Complete</span></div></div>";
+                            },
+                            "targets": -2
+                        }
+                         ],
 			            columns: [
 			                { data : 'NOMBRE' },
-			                { data: 'CANTIDAD'},
+			                { data: 'CANTIDAD_DISPONIBLE' },
 			                { data: 'NOMBRE_TIPO'},
 			                { data : 'ID' }
 			            ]
@@ -171,6 +202,18 @@
 			$(form).append($(global));
 			$((form)).submit();
 		});
+
+        $("#btn-modificar-valor").click(function (){
+            var input = $("<input>").attr("type", "hidden").attr("value", modificarValor_id).attr("name","modificarValor_id_final");
+            var idPortafolioInput = $("<input>").attr("type", "hidden").attr("value", idPortafolio).attr("name","id_portafolio");
+            $("#form-modificar-valor").append($(input));
+            $("#form-modificar-valor").append($(idPortafolioInput));
+            $("#form-modificar-valor").submit();
+        });
+
+        function crearCorredores(){
+
+        }
 	});
 </script>
 
@@ -334,6 +377,42 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="btn-crear-portafolio">Crear Portafolio</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+<!-- MODAL MODIFICAR VALOR -->
+<div class="modal fade in bs-example-modal-lg" id="modal-modificar-valor" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                <h4 class="modal-title" id="myModalLabel">Asociar Corredor</h4>
+            </div>
+            <div class="modal-body">
+
+                <form action="./portafolio.html" method="POST" role="form" id="form-modificar-valor">
+
+                    <div class="form-group">
+                        <label for="nombre_valor">Modificar cantidad</label> <input
+                            type="text" class="form-control" id="nombre_valor"
+                            placeholder="Asigne la nueva cantidad" name="cantidad_nueva">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_corredor_valor">Asigna un corredor</label>
+                        <select class="form-control" name="id_corredor_valor" id="select_corredor_valor"></select>
+                    </div>
+                    <input type="hidden" name="global" value="modificarCantidadValor">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-modificar-valor">Modificar Valor</button>
             </div>
         </div>
         <!-- /.modal-content -->
