@@ -31,7 +31,8 @@
                 "type": "POST",
                 "data" : {"global" : "mostrarPortafolios"}
             },
-            "initComplete": function(settings, json) {
+            "drawCallback": function(settings, json) {
+                console.log("redrawn");
             	console.log("DONE Des-asociar");
 			   	$(".ver-portafolio").click(function (){
 			   		//$("#portafolio-actual").hide();
@@ -67,7 +68,7 @@
 			                "type": "POST",
 			                "data" : {"global" : "mostrarValoresPortafolio", "otra" : idPortafolio}
 			            },
-			            "initComplete": function(settings, json) {
+			            "drawCallback": function(settings, json) {
 			            	console.log("DONE MODIFICAR PORTAFOLIO");
 						   $(".modificar-valores-portafolio").click(function (){
 							   	console.log('HELLO');
@@ -159,7 +160,7 @@
                 "type": "POST",
                 "data" : {"global" : "mostrarTablaValores"}
             },
-            "initComplete": function(settings, json) {
+            "drawCallback": function(settings, json) {
             	console.log("DONE Des-asociar");
 			   $(".seleccionar").click(function (){
 				   	id_valor = parseInt(this.value);
