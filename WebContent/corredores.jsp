@@ -20,7 +20,7 @@
                 "type": "POST",
                 "data" : {"tabla" : "eliminar-corredor=${sessionScope.id}"}
             },
-            "initComplete": function(settings, json) {
+            "drawCallback": function(settings, json) {
             	console.log("DONE Des-asociar");
 			   $(".sociar").click(function (){
 				   	console.log('HELLO');
@@ -58,7 +58,7 @@
                 "type": "POST",
                 "data" : {"tabla" : "asociar-corredor=${sessionScope.id}"} 
             },
-            "initComplete": function(settings, json) {
+            "drawCallback": function(settings, json) {
             	console.log("DONE-asociar");
 			   $(".sociar").click(function (){
 				   	console.log('HELLO');
