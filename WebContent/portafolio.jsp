@@ -105,24 +105,24 @@
 						},
 			            "columnDefs": [ {
 				            "render": function ( data, type, row ) {
-			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + row.ID_VALOR + "-" + row.CANTIDAD + "\">Modificar</button>";
+			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + row.ID_VALOR + "-" + row.CANTIDAD_DUENO + "\">Modificar</button>";
 			                },
 			                "targets": -1
 				        },
                         {
                             "render": function ( data, type, row ) {
-                                var cantidad_total_valor = parseInt(row.CANTIDAD_DISPONIBLE);
-                                var cantidad_invertida_valor = parseInt(row.CANTIDAD);
+                                var cantidad_total_valor = parseInt(row.CANTIDAD_DUENO);
+                                var cantidad_invertida_valor = parseInt(row.CANTIDAD_PORTAFOLIO);
                                 var porcentaje = (cantidad_invertida_valor/cantidad_total_valor) * 100;
 
-                                return " <div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"20\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: " + porcentaje + "%\"><span class=\"sr-only\">20% Complete</span></div></div>";
+                                return " <div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"20\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: " + porcentaje + "%\"><span class=\"sr-only\">" + porcentaje + "% Complete</span></div></div>";
                             },
                             "targets": -2
                         }
                          ],
 			            columns: [
 			                { data : 'NOMBRE' },
-			                { data: 'CANTIDAD_DISPONIBLE' },
+			                { data: 'CANTIDAD_DUENO' },
 			                { data: 'NOMBRE_TIPO'},
 			                { data : 'ID' }
 			            ]
@@ -235,7 +235,7 @@
                     
                     <div class="row">
                     	<div class="col-lg-12">
-                    		<button class="btn btn-success btn-lg btn-block" id="crearPortafolio" style="margin-bottom:20px;"><span class="glyphicon glyphicon-tag"></span> Crear Portafolio</button>
+                    		<button class="btn btn-info btn-lg btn-block" id="crearPortafolio" style="margin-bottom:20px;"><span class="glyphicon glyphicon-briefcase"></span> Crear Portafolio</button>
                     	</div>
                     </div>
 
@@ -252,7 +252,7 @@
                         </div>
                     </c:if>  
 
-                    <div class="panel panel-yellow">
+                    <div class="panel panel-warning">
                         <div class="panel-heading">
                             Desde aqui puedes ver tus portafolios
                         </div>
@@ -299,7 +299,7 @@
     <!-- /#wrapper -->
 
 <!-- MODAL CREAR PORTAFOLIO -->
-<div class="modal fade in bs-example-modal-lg" id="modal-crear-portafolio" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade in bs-example-modal-lg" id="modal-crear-portafolio" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -363,7 +363,7 @@
 
 				</form>
 
-            	<div class="panel panel-yellow">
+            	<div class="panel panel-green">
                         <div class="panel-heading">
                             Estos son tus valores a agregar
                         </div>

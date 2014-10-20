@@ -762,6 +762,7 @@ public class ValorAndesDB {
 		try {
 			startConnection();
 			
+			//bloquear ids
 			String sql = "INSERT INTO CALLS (ID, CANTIDAD, FECHA, ID_PUT, ID_ASOCIACION) VALUES (?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
@@ -1682,7 +1683,7 @@ public class ValorAndesDB {
 			tipo = "asc";
 		}
 		startConnection();
-		String query = "select * from ( select a.*, ROWNUM rnum from (select * from valores_info inner join valorPortafolio vals on valores_info.id = vals.id_valor ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_PORTAFOLIO = "+ idPortafolio +") where rnum  >= ?";
+		String query = "select * from ( select a.*, ROWNUM rnum from (select vals.*,DUENO_VALOR.CANTIDAD AS cantidad_dueno from (select valores_info.*,valos.id_portafolio,valos.cantidad as cantidad_portafolio from valores_info inner join valorportafolio valos on valores_info.id = valos.id_valor)vals INNER JOIN DUENO_VALOR ON vals.id = dueno_valor.id_valor ORDER BY " + order +" " + tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%') AND ID_PORTAFOLIO = "+ idPortafolio +") where rnum >= ?";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, start + rows-1);
 		st.setInt(2, start);
