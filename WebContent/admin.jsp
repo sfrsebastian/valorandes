@@ -40,20 +40,20 @@
             ]
         });
 
-//         $( "#tabla-rec3" ).dataTable({
-//             "processing" : true,
-//             "serverSide" : true,
-//             "ajax": {
-//                 "url": "/ValorAndes/admin.html",
-//                 "type": "POST",
-//                 "data" : { "table_name" : "empresas" } 
-//             },
-//             columns: [
-//                 { data : 'NOMBRE' },
-//                 { data : 'CORREO' },
-//                 { data : 'NOMBRE_TIPO'}
-//             ]
-//         });
+        $( "#tabla-rec3" ).dataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax": {
+                "url": "/ValorAndes/admin.html",
+                "type": "POST",
+                "data" : { "table_name" : "empresas" } 
+            },
+            columns: [
+                { data : 'NOMBRE' },
+                { data : 'CORREO' },
+                { data : 'NOMBRE_TIPO'}
+            ]
+        });
 	});
 </script>
 

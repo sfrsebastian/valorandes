@@ -250,7 +250,7 @@
                             user="ISIS2304141420" password="yatai48ea6" />
 
                 <sql:query dataSource="${snapshot}" var="result">
-                    select nombre,apellido,asociaciones.id as asoci from corredores, asociaciones, usuarios WHERE corredores.id = asociaciones.ID_CORREDOR AND corredores.id = usuarios.ID AND asociaciones.ID_USUARIO = '${sessionScope.id}' ORDER BY NOMBRE
+                    select nombre,apellido,asociaciones.id as asoci from corredores, asociaciones, usuarios WHERE corredores.id = asociaciones.ID_CORREDOR AND corredores.id = usuarios.ID AND asociaciones.ID_USUARIO = '${sessionScope.id}' AND ASOCIACIONES.ACTIVO = '1' ORDER BY NOMBRE
                 </sql:query>
 
                 <h3>Seleccione el Corredor</h3>
@@ -291,7 +291,7 @@
                             user="ISIS2304141420" password="yatai48ea6" />
 
                 <sql:query dataSource="${snapshot}" var="result">
-                    select nombre,apellido,asociaciones.id as asoci from corredores, asociaciones, usuarios WHERE corredores.id = asociaciones.ID_CORREDOR AND corredores.id = usuarios.ID AND asociaciones.ID_USUARIO = '${sessionScope.id}' ORDER BY NOMBRE
+                    select nombre,apellido,asociaciones.id as asoci from corredores, asociaciones, usuarios WHERE corredores.id = asociaciones.ID_CORREDOR AND corredores.id = usuarios.ID AND asociaciones.ID_USUARIO = '${sessionScope.id}' AND ASOCIACIONES.ACTIVO = '1' ORDER BY NOMBRE
                 </sql:query>
 
                 <h3>Seleccione el Corredor</h3>

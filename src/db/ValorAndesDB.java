@@ -1590,26 +1590,26 @@ public class ValorAndesDB {
 				startConnection();
 				creada = true;
 			}
-			String uPort = "update puts set id_asociacion = ? where id_asociacion = (select id_de_asociacion from puts_inactivos where puts_inactivos.ID_USUARIO = ?)";
+			String uPort = "update puts set id_asociacion = ? where id_asociacion = (select id_de_asociacion from puts_inactivos where puts_inactivos.ID_USUARIO = ? AND ROWNUM = 1)";//TODO cambiar esto
 			PreparedStatement state = conexion.prepareStatement(uPort);
 			state.setInt(1, idAsociacion);
 			state.setInt(2, idUsuario);
 			state.executeUpdate();
 			state.close();
 			
-			String uPort2 = "update autorizados set id_asociacion = ? where id_asociacion = (select id_asociacion from autorizados_inactivos where autorizados_inactivos.ID_USUARIO = ?)";
-			PreparedStatement state2 = conexion.prepareStatement(uPort);
-			state2.setInt(1, idAsociacion);
-			state2.setInt(2, idUsuario);
-			state2.executeUpdate();
-			state2.close();
-
-			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where calls_inactivos.ID_USUARIO = ?)";
+			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where calls_inactivos.ID_USUARIO = ? AND ROWNUM = 1)";
 			PreparedStatement state1 = conexion.prepareStatement(ucall);
 			state1.setInt(1, idAsociacion);
 			state1.setInt(2, idUsuario);
 			state1.executeUpdate();
 			state1.close();
+			
+			String uPort2 = "update autorizados set id_asociacion = ? where id_asociacion = (select id_asociacion from autorizados_inactivos where autorizados_inactivos.ID_USUARIO = ? AND ROWNUM = 1)";
+			PreparedStatement state2 = conexion.prepareStatement(uPort2);
+			state2.setInt(1, idAsociacion);
+			state2.setInt(2, idUsuario);
+			state2.executeUpdate();
+			state2.close();
 			
 			conexion.commit();
 		}
