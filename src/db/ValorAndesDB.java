@@ -1596,6 +1596,13 @@ public class ValorAndesDB {
 			state.setInt(2, idUsuario);
 			state.executeUpdate();
 			state.close();
+			
+			String uPort2 = "update autorizados set id_asociacion = ? where id_asociacion = (select id_asociacion from autorizados_inactivos where autorizados_inactivos.ID_USUARIO = ?)";
+			PreparedStatement state2 = conexion.prepareStatement(uPort);
+			state2.setInt(1, idAsociacion);
+			state2.setInt(2, idUsuario);
+			state2.executeUpdate();
+			state2.close();
 
 			String ucall = "update calls set id_asociacion = ? where id_asociacion = (select id_de_asociacion from calls_inactivos where calls_inactivos.ID_USUARIO = ?)";
 			PreparedStatement state1 = conexion.prepareStatement(ucall);
