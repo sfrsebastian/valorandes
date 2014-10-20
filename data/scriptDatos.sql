@@ -15,7 +15,7 @@ VALUES (4.0, 'Administrador');
 
 --USUARIOS
 INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CORREO, TELEFONO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, CODIGO_POSTAL) 
-VALUES (1.0, 1.0, 'Purus Mauris Incorporated', 'Purus Mauris Incorporated', 'FFA68PSK5FJ', to_date('08/10/2008', 'mm/dd/YYYY'), 'Proin@pedeblanditcongue.edu', '8889189', 'Philippines', 'Florida', 'Tampa', 'Ap #619-8252 Elementum, St.', '79643');
+VALUES (1.0, 1.0, 'Purus Mauris Incorporated', 'Purus', '1234', to_date('08/10/2008', 'mm/dd/YYYY'), 'Proin@pedeblanditcongue.edu', '8889189', 'Philippines', 'Florida', 'Tampa', 'Ap #619-8252 Elementum, St.', '79643');
 
 INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CORREO, TELEFONO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, CODIGO_POSTAL) 
 VALUES (2.0, 1.0, 'Nam Ligula Limited', 'Nam Ligula Limited', 'HLR94GJS5PY', to_date('10/11/2013', 'mm/dd/YYYY'), 'molestie.tellus@semperrutrum.ca', '2693845', 'Virgin Islands, United States', 'Indiana', 'Fort Wayne', 'P.O. Box 512, 435 Vestibulum. Ave', '56666');
@@ -315,7 +315,7 @@ INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CO
 VALUES (100.0, 1.0, 'Nunc Pulvinar Limited', 'Nunc Pulvinar Limited', 'NHW01USK3SJ', to_date('01/14/2012', 'mm/dd/YYYY'), 'quis@milacinia.ca', '3971644', 'Faroe Islands', 'Idaho', 'Boise', 'Ap #193-5702 Sed Rd.', '52853');
 
 INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CORREO, TELEFONO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, CODIGO_POSTAL) 
-VALUES (101.0, 2.0, 'L?on', 'L?on101', 'UWV90MHJ3PN', to_date('02/24/2003', 'mm/dd/YYYY'), 'non.arcu.Vivamus@magnaa.net', '6028941', 'Japan', 'Louisiana', 'Baton Rouge', '694-315 Libero Avenue', '40540');
+VALUES (101.0, 2.0, 'L?on', 'Lyon101', '1234', to_date('02/24/2003', 'mm/dd/YYYY'), 'non.arcu.Vivamus@magnaa.net', '6028941', 'Japan', 'Louisiana', 'Baton Rouge', '694-315 Libero Avenue', '40540');
 
 INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CORREO, TELEFONO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, CODIGO_POSTAL) 
 VALUES (102.0, 2.0, 'Oc?ane', 'Oc?ane102', 'NOY41QXK7LY', to_date('01/28/2007', 'mm/dd/YYYY'), 'Donec.est.mauris@lobortisrisus.org', '4280116', 'Venezuela', 'Wisconsin', 'Racine', 'Ap #581-9291 In Rd.', '81935');
@@ -915,10 +915,10 @@ INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CO
 VALUES (300.0, 3.0, 'Lucas', 'Lucas300', 'GAA04GXE8QY', to_date('04/25/2003', 'mm/dd/YYYY'), 'mollis.dui.in@nec.net', '2989022', 'Equatorial Guinea', 'Wisconsin', 'Kenosha', 'Ap #109-4671 Et Av.', '21950');
 
 INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CORREO, TELEFONO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, CODIGO_POSTAL) 
-VALUES (301.0, 4.0, 'Sebastian', 'sfrsebastian', '1234', to_date('04/25/2003', 'mm/dd/YYYY'), 'sfrsebastian@gmail.com', '2989022', 'Equatorial Guinea', 'Wisconsin', 'Kenosha', 'Ap #109-4671 Et Av.', '21950');
+VALUES (400.0, 4.0, 'Sebastian', 'sfrsebastian', '1234', to_date('04/25/2003', 'mm/dd/YYYY'), 'sfrsebastian@gmail.com', '2989022', 'Equatorial Guinea', 'Wisconsin', 'Kenosha', 'Ap #109-4671 Et Av.', '21950');
 
 INSERT INTO USUARIOS (ID, TIPO, NOMBRE, USUARIO, PASSWORD, FECHA_INSCRIPCION, CORREO, TELEFONO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, CODIGO_POSTAL) 
-VALUES (302.0, 4.0, 'Felipe', 'romsearcher', '1234', to_date('04/25/2003', 'mm/dd/YYYY'), 'felipeotalora@gmail.com', '2989022', 'Equatorial Guinea', 'Wisconsin', 'Kenosha', 'Ap #109-4671 Et Av.', '21950');
+VALUES (500.0, 4.0, 'Felipe', 'romsearcher', '1234', to_date('04/25/2003', 'mm/dd/YYYY'), 'felipeotalora@gmail.com', '2989022', 'Equatorial Guinea', 'Wisconsin', 'Kenosha', 'Ap #109-4671 Et Av.', '21950');
 
 --CASAS DE VALORES
 INSERT INTO CASAS_DE_VALORES (ID, NOMBRE, NUMERO_REGISTRO, PAIS, DEPARTAMENTO, CIUDAD, DIRECCION, TELEFONO, NOMBRE_REPRESENTANTE, CEDULA_REPRESENTANTE) 
