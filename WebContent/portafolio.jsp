@@ -104,7 +104,7 @@
 						},
 			            "columnDefs": [ {
 				            "render": function ( data, type, row ) {
-			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + row.ID_VALOR + "-" + row.CANTIDAD_DISPONIBLE + "\">Modificar</button>";
+			                    return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + row.ID_VALOR + "-" + row.CANTIDAD + "\">Modificar</button>";
 			                },
 			                "targets": -1
 				        },
