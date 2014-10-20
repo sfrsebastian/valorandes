@@ -641,7 +641,7 @@ public class ValorAndesDB {
 		try {
 			startConnection();
 			int id = proximoPut();
-
+			
 			String sql = "INSERT INTO PUTS (ID, ID_VALOR, CANTIDAD, FECHA, ID_ASOCIACION, TIPO_MERCADO) VALUES (?, ?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
@@ -654,6 +654,16 @@ public class ValorAndesDB {
 			ps.setInt(5, idAsociacion);
 			ps.setString(6, tipoMercado);
 			ps.executeUpdate();
+			ps.close();
+			
+			//Asegura lock asociacion
+			String lock2 = "SELECT * FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ? FOR UPDATE";
+			PreparedStatement stat2 = conexion.prepareStatement(lock2);
+			stat2.setString(1, "Venta");
+			stat2.setInt(2, idValor);
+			stat2.setInt(3, idAsociacion);
+			stat2.executeQuery();
+			stat2.close();
 
 			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
 			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
@@ -661,13 +671,19 @@ public class ValorAndesDB {
 			ps1.setInt(2, idValor);
 			ps1.setInt(3, idAsociacion);
 			ps1.executeUpdate();
-
-			conexion.commit();
-
 			ps1.close();
-			ps.close();
+			
+			conexion.commit();
+			
+		
 		} catch (SQLException e) {
-			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+			try {
+				conexion.rollback();
+				System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+			}
+			catch(SQLException e1){
+
+			}
 		}
 		finally{
 			closeConnection();
@@ -745,6 +761,7 @@ public class ValorAndesDB {
 	public void realizarCall(int idValor, int cantidad, int idAsociacion) {
 		try {
 			startConnection();
+			
 			String sql = "INSERT INTO CALLS (ID, CANTIDAD, FECHA, ID_PUT, ID_ASOCIACION) VALUES (?, ?, ?, ?, ?)";
 			PreparedStatement ps = conexion.prepareStatement(sql);
 			Calendar c = Calendar.getInstance();
@@ -756,6 +773,16 @@ public class ValorAndesDB {
 			ps.setInt(4, idPut);
 			ps.setInt(5, idAsociacion);
 			ps.executeUpdate();
+			ps.close();
+			
+			//Asegura lock asociacion
+			String lock2 = "SELECT * FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ? FOR UPDATE";
+			PreparedStatement stat2 = conexion.prepareStatement(lock2);
+			stat2.setString(1, "Compra");
+			stat2.setInt(2, idValor);
+			stat2.setInt(3, idAsociacion);
+			stat2.executeQuery();
+			stat2.close();
 
 			String sqlElim = "DELETE FROM AUTORIZADOS WHERE TIPO = ? AND ID_VALOR = ? AND ID_ASOCIACION = ?";
 			PreparedStatement ps1 = conexion.prepareStatement(sqlElim);
@@ -763,12 +790,20 @@ public class ValorAndesDB {
 			ps1.setInt(2, idValor);
 			ps1.setInt(3, idAsociacion);
 			ps1.executeUpdate();
-
-			conexion.commit();
-			ps.close();
 			ps1.close();
+			
+			conexion.commit();
+			
+			
 		} catch (SQLException e) {
-			System.out.println("Error agregando put idAu: " + idAsociacion + " idValor: " + idValor);
+			try {
+				conexion.rollback();
+				System.out.println("Error agregando call idAu: " + idAsociacion + " idValor: " + idValor);
+			}
+			catch(SQLException e1){
+
+			}
+			
 		}
 		finally{
 			closeConnection();
@@ -1115,13 +1150,13 @@ public class ValorAndesDB {
 				creada = true;
 			}
 			//Asegura lock asociacion
-			String lock = "SELECT * FROM ASOCIACIONES WHERE id_asociacion=? FOR UPDATE";
+			String lock = "SELECT * FROM ASOCIACIONES WHERE id= ? FOR UPDATE";
 			PreparedStatement stat1 = conexion.prepareStatement(lock);
 			stat1.setInt(1, idAsociacion);
 			stat1.executeQuery();
 			stat1.close();
 
-			String create = "UPDATE PUTS SET HABILITADO='1' WHERE id_asociacion=?";
+			String create = "UPDATE ASOCIACIONES SET ACTIVO='1' WHERE id=?";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idAsociacion);
 			state.executeUpdate();
@@ -1267,8 +1302,8 @@ public class ValorAndesDB {
 			stat1.setInt(2, idPortafolio);
 			stat1.executeQuery();
 			stat1.close();
-
-			if(deltaCantidad<0 ){
+			
+			if(deltaCantidad<0){
 				autorizarAccion(idAsociacion, idValor, "Venta", Math.abs(deltaCantidad));
 				String uPort = "UPDATE VALORPORTAFOLIO SET CANTIDAD = CANTIDAD + ? WHERE ID_VALOR = ? AND ID_PORTAFOLIO = ?";
 				PreparedStatement state = conexion.prepareStatement(uPort);
@@ -1492,6 +1527,52 @@ public class ValorAndesDB {
 	public int contarIversionistas(String search) throws SQLException{
 		startConnection();
 		String query = "select count(*) as count from usuarios INNER JOIN inversionistas ON usuarios.id = inversionistas.id WHERE NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%'";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public ArrayList<HashMap<String, String>> darEmpresas(int start,int rows, String order, String tipo, String search) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from (select empresas.*,tipos_empresa.nombre as nombre_tipo from empresas inner join tipos_empresa on empresas.tipo = tipos_empresa.id)jo inner join usuarios on jo.id = usuarios.id ORDER BY " +  order +" " +  tipo + ")a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarEmpresasTotal() throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from usuarios INNER JOIN empresas ON usuarios.id = empresas.id";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarEmpresas(String search) throws SQLException{
+		startConnection();
+		String query = "select count(*) as count from (select * from (select empresas.*,tipos_empresa.nombre as nombre_tipo from empresas inner join tipos_empresa on empresas.tipo = tipos_empresa.id)jo inner join usuarios on jo.id = usuarios.id; ) WHERE NOMBRE like '" + search +"%' OR NOMBRE_TIPO like '" + search +"%' OR CORREO like '" + search +"%'";
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
