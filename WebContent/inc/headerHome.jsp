@@ -21,6 +21,7 @@
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 	<script src="http://cdn.oesmith.co.uk/morris-0.5.1.min.js"></script>
     <script type="text/javascript" src="http://cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datepicker.js"></script>
     <!-- Estilo data-Tables -->
     <link href="css/plugins/dataTables.bootstrap.css" rel="stylesheet">
     <script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>

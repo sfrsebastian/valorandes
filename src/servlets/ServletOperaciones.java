@@ -58,6 +58,17 @@ public class ServletOperaciones extends HttpServlet {
 		String pedido = request.getParameter("tipo");
 		HttpSession session = request.getSession();
 		int idUsuario = (Integer) session.getAttribute("id");
+		
+		String fechaInicio = request.getParameter("fechaIni");
+		String fechaFin = request.getParameter("fechaFin");
+		String marcado = "";
+		try {		
+			marcado = request.getParameter("marcado");
+		} catch (Exception e) {
+			System.out.println("No hay fechas recibidas");
+			marcado = "-1";
+		}
+		
 		if(pedido.equals("comprar")){
 			ObjectMapper mapper = new ObjectMapper();
 			response.setContentType("application/json");
@@ -65,9 +76,26 @@ public class ServletOperaciones extends HttpServlet {
 			int conteo=0;
 			int conteoSearch=0;
 			try {
-				Date inicio = new Date(102,7,8);
-				Date fin = new Date(114,2,8);
-				resultado = conexionDAO.darValoresEnVenta(start, length, columnName, tipo, search, idUsuario, inicio, fin, false);
+				Date inicio = null;
+				Date fin = null;
+				boolean marcar = false;
+				
+				if(!marcado.equals("-1")){
+					marcar = true;
+				}
+				
+				if(!fechaInicio.equals("-1") && !fechaFin.equals("-1")){
+					String[] fechs = fechaInicio.split("/");
+					String[] fechs1 = fechaFin.split("/");
+					
+					inicio = new Date(Integer.parseInt(fechs[2]), Integer.parseInt(fechs[0]), Integer.parseInt(fechs[1]));
+					fin = new Date(Integer.parseInt(fechs1[2]), Integer.parseInt(fechs1[0]), Integer.parseInt(fechs1[1]));
+				}else{
+					inicio = new Date(102,7,8);
+					fin = new Date(114,2,8);
+				}
+				
+				resultado = conexionDAO.darValoresEnVenta(start, length, columnName, tipo, search, idUsuario, inicio, fin, marcar);
 				conteo = conexionDAO.contarValoresEnVentaTotal(idUsuario);
 				conteoSearch = conexionDAO.contarValoresEnVenta(search, idUsuario, inicio, fin);
 				System.out.println("conteo Total " + conteo + " Conteo parcial " + conteoSearch);

@@ -12,6 +12,10 @@
 
     var id_actual = "";
 
+    var fechaIni = "-1";
+    var fechaFin = "-1";
+    var marcado = "-1";
+
     function cambiarId(nuevoId){
         id_actual = nuevoId;
 
@@ -19,6 +23,42 @@
     }
 
     $(document).ready(function (){
+
+        $("#fechaIni").datepicker();
+        $("#fechaFin").datepicker();
+
+        $("#req1Button").click(function(){
+            var them = $(".req1").serializeArray();
+            fechaIni = them[0].value;
+            fechaFin = them[1].value;
+            if(them.length > 2){
+                marcado = them[2].value;
+            }else{
+                marcado = "-1";
+            }
+
+            var table = $('#tabla_comprar').DataTable().destroy();
+            $('#tabla_comprar').dataTable({
+                "processing" : true,
+                "serverSide" : true,
+                "ajax": {
+                    "url": "/ValorAndes/operaciones.html",
+                    "type": "GET",
+                    "data" : { "tipo" : "comprar", "fechaIni" : fechaIni, "fechaFin" : fechaFin, "marcado" : marcado } 
+                },
+                "columns": [
+                    { data : 'FECHA_PUT' },
+                    { data : 'CANTIDAD' },
+                    { data : 'TIPO_MERCADO' },
+                    { data : 'NOMBRE_VALOR' },
+                    { data : 'TIPO_VALOR' },
+                    { data : 'NOMBRE_USUARIO' },
+                    { data : 'NOMBRE_CORREDOR' }
+                ]
+            });
+
+        });
+
         $("#tabla_comprar").hide();
         $("#tabla_vender").hide();
         
@@ -28,7 +68,7 @@
             "ajax": {
                 "url": "/ValorAndes/operaciones.html",
                 "type": "GET",
-                "data" : { "tipo" : "comprar" } 
+                "data" : { "tipo" : "comprar", "fechaIni" : fechaIni, "fechaFin" : fechaFin, "marcado" : marcado } 
             },
             "columns": [
                 { data : 'FECHA_PUT' },
@@ -127,6 +167,30 @@
                     	</div>
                     </div>
 
+                    <div class="panel panel-yellow" id="panelAcciones" style="margin-top:20px;">
+                        <div class="panel-heading">
+                            Estas son las acciones disponibles
+                        </div>
+                        <div class="panel-body">
+                            <div>
+                                <div class="form-group">
+                                    <label for="fechaIni">Fecha Inicio</label>
+                                    <input type="text" class="form-control req1" id="fechaIni" placeholder="Fecha inicio" name="fechaIni">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fechaFin">Fecha Fin</label>
+                                    <input type="text" class="form-control req1" id="fechaFin" placeholder="Fecha fin" name="fechaFin">
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                      <input type="checkbox" class="req1" name="checked"> Inverso
+                                    </label>
+                                </div>
+                                <button class="btn btn-info" id="req1Button"> Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <c:if test="${param.error == 'NO'}">
                         <div class="alert alert-success" style="margin-top:10px;">
                             <a href="#" class="close" data-dismiss="alert">&times;</a>
@@ -150,6 +214,7 @@
                             select * from dueno_valor INNER JOIN VALORES on VALORES.ID = dueno_valor.ID_VALOR where dueno_valor.ID_DUENO = '${sessionScope.id}'
                         </sql:query>
             
+
                     <div class="panel panel-info">
                     <div class="panel-heading">
                         Valores a vender
