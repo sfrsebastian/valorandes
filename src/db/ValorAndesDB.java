@@ -1839,7 +1839,8 @@ public class ValorAndesDB {
 	
 	public int contarValoresEnVenta(String search,int idUsuario,Date fechaInicio, Date fechaFin) throws SQLException {
 		startConnection();
-		String query = "select count(*) as count from(select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id))where id_usuario != ? AND ((fecha_put between ? and ?) AND nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?)";
+		//String query = "select count(*) as count from(select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id))where id_usuario != ? AND ((fecha_put between ? and ?) AND nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?)";
+		String query = "select count(*) as count from (select * from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select * from usuarios)us on val.id_usuario = us.id) fn inner join (select * from usuarios)us on fn.id_corredor = us.id)where id_usuario != ?)a where ((fecha_put between ? and ?) AND (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))))";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, idUsuario);
 		st.setDate(2, fechaInicio);
