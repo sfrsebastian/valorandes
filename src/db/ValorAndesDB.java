@@ -1801,7 +1801,7 @@ public class ValorAndesDB {
 		String query="";
 		PreparedStatement st = null;
 		if(negacion){
-			query = "select id_valor,id_corredor,id_usuario,fecha_put,cantidad,tipo_mercado,nombre_valor,tipo_valor,nombre_usuario,nombre_corredor from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id)where id_usuario != ? order by "+order+" "+ tipo+")a where ROWNUM <= ? AND NOT ((fecha_put between ? and ?) AND (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))) where rnum >= ?";
+			query = "select id_valor,id_corredor,id_usuario,fecha_put,cantidad,tipo_mercado,nombre_valor,tipo_valor,nombre_usuario,nombre_corredor from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id)where id_usuario != ? order by "+order+" "+ tipo+")a where ROWNUM <= ? AND NOT ((fecha_put between ? and ?) OR (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))) where rnum >= ?";
 			st = conexion.prepareStatement(query);
 			st.setInt(1, idUsuario);
 			st.setInt(2, start + rows-1);
@@ -1839,7 +1839,7 @@ public class ValorAndesDB {
 		startConnection();
 
 		if(inverso){
-			String query = "select count(*) as count from (select * from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select * from usuarios)us on val.id_usuario = us.id) fn inner join (select * from usuarios)us on fn.id_corredor = us.id)where id_usuario != ?)a where not((fecha_put between ? and ?) AND (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))))";
+			String query = "select count(*) as count from (select * from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select * from usuarios)us on val.id_usuario = us.id) fn inner join (select * from usuarios)us on fn.id_corredor = us.id)where id_usuario != ?)a where not((fecha_put between ? and ?) OR (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))))";
 			PreparedStatement st = conexion.prepareStatement(query);
 			st.setInt(1, idUsuario);
 			st.setDate(2, fechaInicio);
