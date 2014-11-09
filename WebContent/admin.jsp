@@ -10,6 +10,11 @@
 
 <script type="text/javascript">
 	$(document).ready(function (){
+
+        var cantidad = 0;
+        var idValor = 1;
+        var tipoValor = 1;
+
 		$( "#tabla-rec1" ).dataTable({
             "processing" : true,
             "serverSide" : true,
@@ -60,7 +65,7 @@
             var idValor = $(".req4").serializeArray()[0].value;
 
             try{
-                $("#tabla-rec4-2").DataTable.destroy();
+                var table = $("#tabla-rec4-2").DataTable.destroy();
             }catch(err){
                 console.log(err);
             }
@@ -74,17 +79,19 @@
                     "data" : {"tipo" : "req4", "idValor" : idValor}
                 },
                 columns: [
-                    { data : 'NOMBRE' },
-                    { data: 'CANTIDAD_DUENO' },
-                    { data: 'NOMBRE_TIPO'},
+                    { data : 'FECHA' },
+                    { data : 'NOMBRE_TIPO' },
+                    { data : 'NOMBRE_USUARIO'},
+                    { data : 'DESCRIPCION' },
+                    { data : 'NOMBRE_PORTAFOLIO'} 
                 ]
             });
         });
 
         $("#consultarValores").click(function (){
             var vals = $(".rec3").serializeArray();
-            cantidad = vals[0].value;
-            tipoValor = vals[1].value;
+            tipoValor = vals[0].value;
+            cantidad = vals[1].value;
 
             try{
                 $("#tabla-rec3-2").DataTable.destroy();
@@ -102,8 +109,9 @@
                 },
                 columns: [
                     { data : 'NOMBRE' },
-                    { data: 'CANTIDAD_DUENO' },
-                    { data: 'NOMBRE_TIPO'},
+                    { data : 'DESCRIPCION' },
+                    { data : 'CANTIDAD'},
+                    { data : 'TIPO'}
                 ]
             });
         });
@@ -189,18 +197,19 @@
                         <div>
                             <div class="form-group">
                                     <label for="fechaIni">Tipo del Valor</label>
-                                    <input type="text" class="form-control rec3" placeholder="Tipo">
+                                    <input type="text" class="form-control rec3" placeholder="Tipo" name="tipo">
                             </div>
                             <div class="form-group">
                                     <label for="fechaIni">Valor operacion</label>
-                                    <input type="text" class="form-control rec3" placeholder="Valor operacion">
+                                    <input type="text" class="form-control rec3" placeholder="Valor operacion" name="valor">
                             </div>
                             <table class="table table-striped" id="tabla-rec3-2">
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Cantidad Duenio</th>
-                                        <th>Nombre tipo</th>
+                                        <th>Descripcion</th>
+                                        <th>Cantidad</th>
+                                        <th>Tipo</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -217,9 +226,11 @@
                             <table class="table table-striped" id="tabla-rec4-2">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Cantidad Duenio</th>
-                                        <th>Nombre tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Nombre </th>
+                                        <th>Descripcion</th>
+                                        <th>Nombre Portafolio </th>
                                     </tr>
                                 </thead>
                             </table>
