@@ -95,8 +95,6 @@ public class ServletOperaciones extends HttpServlet {
 					inicio = new Date(dateInicio.getTime());
 					fin = new Date(dateFin.getTime());
 					
-					//inicio = new Date(Integer.parseInt(fechs[2]), Integer.parseInt(fechs[0]), Integer.parseInt(fechs[1]));
-					//fin = new Date(Integer.parseInt(fechs1[2]), Integer.parseInt(fechs1[0]), Integer.parseInt(fechs1[1]));
 				}else{
 					inicio = new Date(102,7,8);
 					fin = new Date(114,2,8);
@@ -104,7 +102,7 @@ public class ServletOperaciones extends HttpServlet {
 				
 				resultado = conexionDAO.darValoresEnVenta(start, length, columnName, tipo, search, idUsuario, inicio, fin, marcar);
 				conteo = conexionDAO.contarValoresEnVentaTotal(idUsuario);
-				conteoSearch = conexionDAO.contarValoresEnVenta(search, idUsuario, inicio, fin);
+				conteoSearch = conexionDAO.contarValoresEnVenta(search, idUsuario, inicio, fin, marcar);
 				System.out.println("conteo Total " + conteo + " Conteo parcial " + conteoSearch);
 			} catch (Exception e) {
 				e.printStackTrace();
