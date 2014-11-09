@@ -3,6 +3,8 @@ DROP VIEW CALLS_INACTIVOS;
 DROP VIEW PUTS_INACTIVOS;
 DROP VIEW VALORES_INFO;
 DROP VIEW AUTORIZADOS_INACTIVOS;
+drop view valor_rel;
+drop view info_put;
 DROP TABLE EMPRESAS;
 DROP TABLE TIPOS_EMPRESA;
 DROP TABLE INVERSIONISTAS;
@@ -435,7 +437,9 @@ CREATE TABLE VALORPORTAFOLIO(
 	id_portafolio	NUMBER(8) CONSTRAINT NN_PORTAFOLIO_VALORPORTAFOLIO NOT NULL,
 		CONSTRAINT FK_PORTAFOLIO_VALORPORTAFOLIO FOREIGN KEY(id_portafolio) REFERENCES PORTAFOLIOS(id),
 
-	CONSTRAINT PK_VALORPORTAFOLIO PRIMARY KEY (id_valor,id_portafolio)
+	fecha 			DATE	CONSTRAINT NN_FECHA_VALORPORTAFOLIO NOT NULL,
+
+	CONSTRAINT PK_VALORPORTAFOLIO PRIMARY KEY (id_valor,id_portafolio,fecha)
 );
 
 CREATE VIEW VALORES_INFO AS select * from (select valores.*, ti.nombre as nombre_tipo from valores inner join tipos_valor ti on valores.tipo = ti.id) vals inner join dueno_valor due on vals.id = due.ID_VALOR;
@@ -445,3 +449,7 @@ CREATE VIEW CALLS_INACTIVOS AS select calls.*, asociaciones.id as id_de_asociaci
 CREATE VIEW PUTS_INACTIVOS AS select puts.*, asociaciones.id as id_de_asociacion, asociaciones.id_corredor, asociaciones.id_usuario,asociaciones.activo from puts INNER JOIN ASOCIACIONES ON puts.ID_ASOCIACION = ASOCIACIONES.ID where ASOCIACIONES.ACTIVO = 0;
 
 CREATE VIEW AUTORIZADOS_INACTIVOS AS select * from autorizados inner join asociaciones on autorizados.ID_ASOCIACION = asociaciones.id;
+
+create view info_put as select pu.id_valor,aso.id_corredor,aso.id_usuario,pu.fecha as fecha_put,pu.tipo_mercado from puts pu inner join asociaciones aso on pu.id_asociacion=aso.id where aso.activo=1;
+
+create view valor_rel as select vl.id as id_valor,vl.nombre as nombre_valor,ti.nombre as tipo_valor from valores vl inner join tipos_valor ti on vl.tipo=ti.id;

@@ -52,7 +52,51 @@ public class ServletAdmin extends HttpServlet {
 
 	protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		String tipo = request.getParameter("tipo");
+		if(tipo.equals("req3")){
+			int tipoValor= Integer.parseInt(request.getParameter("tipoValor"));
+			int cantidad = Integer.parseInt(request.getParameter("cantidad"));
+			ObjectMapper mapper = new ObjectMapper();
+			response.setContentType("application/json");
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.consultarValoresPortafolios(tipoValor, cantidad);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(resultado.size());
+			dataTableObject.setRecordsTotal(resultado.size()*10);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}
+		else if(tipo.equals("req4")){
+			int idValor= Integer.parseInt(request.getParameter("idValor"));
+			ObjectMapper mapper = new ObjectMapper();
+			response.setContentType("application/json");
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.mostrarPortafoliosValorHistorico(idValor);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(resultado.size());
+			dataTableObject.setRecordsTotal(resultado.size()*10);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}
+		
 	}
 
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
@@ -145,3 +189,4 @@ public class ServletAdmin extends HttpServlet {
 		}
 	}
 }
+

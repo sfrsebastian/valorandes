@@ -21,7 +21,30 @@
     $(document).ready(function (){
         $("#tabla_comprar").hide();
         $("#tabla_vender").hide();
-
+        
+        $( "#tabla_comprar" ).dataTable({
+            "processing" : true,
+            "serverSide" : true,
+            "ajax": {
+                "url": "/ValorAndes/operaciones.html",
+                "type": "GET",
+                "data" : { "tipo" : "comprar" } 
+            },
+            "columns": [
+                { data : 'FECHA_PUT' },
+                { data : 'CANTIDAD' },
+                { data : 'TIPO_MERCADO' },
+                { data : 'NOMBRE_VALOR' },
+                { data : 'TIPO_VALOR' },
+                { data : 'NOMBRE_USUARIO' },
+                { data : 'NOMBRE_CORREDOR' }
+            ]
+        });
+        
+        $('#example tbody').on( 'click', 'button', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+            alert( data[0] +"'s salary is: "+ data[ 5 ] );
+        } );
         $("#comprar").click(function(){
             $("#tabla_vender").hide();
             $("#tabla_comprar").show("slow");
@@ -60,32 +83,6 @@
     });
 
     $(window).load(function (){
-        $('#tabla-comprar').DataTable({
-             "language": {
-                 "sProcessing":     "Procesando...",
-                  "sLengthMenu":     "Mostrar _MENU_ registros",
-                  "sZeroRecords":    "No se encontraron resultados",
-                  "sEmptyTable":     "Ningun dato disponible en esta tabla",
-                  "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                  "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                  "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                  "sInfoPostFix":    "",
-                  "sSearch":         "Buscar:",
-                  "sUrl":            "",
-                  "sInfoThousands":  ",",
-                  "sLoadingRecords": "Cargando...",
-                  "oPaginate": {
-                      "sFirst":    "Primero",
-                      "sLast":     "Último",
-                      "sNext":     "Siguiente",
-                      "sPrevious": "Anterior"
-                  },
-               "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"                        }
-             }
-        });
-
         $('#tabla-vender').DataTable({
              "language": {
                  "sProcessing":     "Procesando...",
@@ -180,7 +177,24 @@
                     </div>
 
                     </div>
-                    <div id="tabla_comprar" class="col-lg-12" style="margin-top:30px;">
+                    <br>
+                    <div>
+                        <table class="table table-striped" id="tabla_comprar">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cantidad</th>
+	                               	<th>Mercado</th>
+	                               	<th>Valor</th>
+	                               	<th>Tipo Valor</th>
+	                               	<th>Usuario</th>
+	                               	<th>Corredor</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    
+                    <%-- <div id="tabla_comprar" class="col-lg-12" style="margin-top:30px;">
 
                         <sql:setDataSource var="snapshot" driver="oracle.jdbc.OracleDriver"
                             url="jdbc:oracle:thin:@prod.oracle.virtual.uniandes.edu.co:1531:prod"
@@ -224,7 +238,7 @@
                         </div>
                     </div>
 
-                    </div>
+                    </div> --%>
 
                 </div>
                 <!-- /.col-lg-12 -->

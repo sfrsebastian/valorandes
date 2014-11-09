@@ -1,6 +1,10 @@
 package servlets;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -9,6 +13,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import test.DataTableObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import db.ValorAndesDB;
 
@@ -38,6 +48,42 @@ public class ServletOperaciones extends HttpServlet {
 
 	protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		String tableName = request.getParameter("table_name");
+		int start = Integer.parseInt(request.getParameter("start")) + 1;
+		int length = Integer.parseInt(request.getParameter("length"));
+		int columnOrder = Integer.parseInt(request.getParameter("order[0][column]"));
+		String columnName = request.getParameter("columns[" + columnOrder + "][data]");
+		String tipo = request.getParameter("order[0][dir]");
+		String search = request.getParameter("search[value]");
+		String pedido = request.getParameter("tipo");
+		HttpSession session = request.getSession();
+		int idUsuario = (Integer) session.getAttribute("id");
+		if(pedido.equals("comprar")){
+			ObjectMapper mapper = new ObjectMapper();
+			response.setContentType("application/json");
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				Date inicio = new Date(102,7,8);
+				Date fin = new Date(114,2,8);
+				resultado = conexionDAO.darValoresEnVenta(start, length, columnName, tipo, search, idUsuario, inicio, fin, false);
+				conteo = conexionDAO.contarValoresEnVentaTotal(idUsuario);
+				conteoSearch = conexionDAO.contarValoresEnVenta(search, idUsuario, inicio, fin);
+				System.out.println("conteo Total " + conteo + " Conteo parcial " + conteoSearch);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}
 		
 	}
 	

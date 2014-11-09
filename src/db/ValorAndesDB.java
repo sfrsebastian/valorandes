@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class ValorAndesDB {
 	/**
 	 * La URL de la conexion de la base de datos
 	 */
-	private String urlConexion;
+	private  String urlConexion;
 
 	//---------------------------------------------
 	// Constructor
@@ -1254,6 +1255,7 @@ public class ValorAndesDB {
 
 	public void agregarValorAPortafolio(int idValor, int cantidad, int idPortafolio){
 		boolean creada = false;
+		Date fecha = new Date(Calendar.getInstance().getTimeInMillis());
 		try{
 			if(conexion == null){
 				startConnection();
@@ -1265,11 +1267,12 @@ public class ValorAndesDB {
 			stat1.executeQuery();
 			stat1.close();
 
-			String create = "INSERT INTO VALORPORTAFOLIO (ID_VALOR, CANTIDAD, ID_PORTAFOLIO) VALUES (?, ?, ?)";
+			String create = "INSERT INTO VALORPORTAFOLIO (ID_VALOR, CANTIDAD, ID_PORTAFOLIO, FECHA) VALUES (?, ?, ?, ?)";
 			PreparedStatement state = conexion.prepareStatement(create);
 			state.setInt(1, idValor);
 			state.setInt(2,cantidad);
 			state.setInt(3, idPortafolio);
+			state.setDate(4, fecha);
 			state.executeUpdate();
 			state.close();
 			conexion.commit();
@@ -1376,7 +1379,7 @@ public class ValorAndesDB {
 		return -1;
 	}
 
-	public ArrayList<HashMap<String, String>> darHola(ResultSet resSet) throws SQLException{
+	public static ArrayList<HashMap<String, String>> darHola(ResultSet resSet) throws SQLException{
 		ArrayList<HashMap<String, String>> finale = new ArrayList<HashMap<String,String>>();
 		int j = 0;
 		while(resSet.next()){
@@ -1786,5 +1789,114 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
-
+	
+	public ArrayList<HashMap<String, String>> darValoresEnVenta(int start,int rows, String order, String tipo, String search,int idUsuario,Date fechaInicio, Date fechaFin,boolean negacion) throws SQLException {
+		if(order == null){
+			order = "NOMBRE_USUARIO";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query="";
+		PreparedStatement st = null;
+		if(negacion){
+			query = "select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id)where id_usuario != ? MINUS ";
+			query += "select id_valor,id_corredor,id_usuario,fecha_put,cantidad,tipo_mercado,nombre_valor,tipo_valor,nombre_usuario,nombre_corredor from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id)where id_usuario != ? order by "+order+" "+ tipo+")a where ROWNUM <= ? AND ((fecha_put between ? and ?) AND (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))) where rnum >= ?";
+			st = conexion.prepareStatement(query);
+			st.setInt(1, idUsuario);
+			st.setInt(2, idUsuario);
+			st.setInt(3, start + rows-1);
+			st.setDate(4, fechaInicio);
+			st.setDate(5, fechaFin);
+			st.setString(6, search+"%");
+			st.setString(7, search+"%");
+			st.setString(8, search+"%");
+			st.setString(9, search+"%");
+			st.setInt(10,start);
+		}
+		else{
+			query += "select id_valor,id_corredor,id_usuario,fecha_put,cantidad,tipo_mercado,nombre_valor,tipo_valor,nombre_usuario,nombre_corredor from ( select a.*, ROWNUM rnum from (select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id)where id_usuario != ? order by "+order+" "+ tipo+")a where ROWNUM <= ? AND ((fecha_put between ? and ?) AND (nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?))) where rnum >= ?";
+			st = conexion.prepareStatement(query);
+			st.setInt(1, idUsuario);
+			st.setInt(2, start + rows-1);
+			st.setDate(3, fechaInicio);
+			st.setDate(4, fechaFin);
+			st.setString(5, search+"%");
+			st.setString(6, search+"%");
+			st.setString(7, search+"%");
+			st.setString(8, search+"%");
+			st.setInt(9,start);
+		}
+		
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public int contarValoresEnVenta(String search,int idUsuario,Date fechaInicio, Date fechaFin) throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from(select fn.*,us.nombre as nombre_corredor from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id))where id_usuario != ? AND ((fecha_put between ? and ?) AND nombre_valor like ? OR tipo_valor like ? or nombre_usuario like ? or nombre_corredor like ?)";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, idUsuario);
+		st.setDate(2, fechaInicio);
+		st.setDate(3, fechaFin);
+		st.setString(4, search+"%");
+		st.setString(5, search+"%");
+		st.setString(6, search+"%");
+		st.setString(7, search+"%");;
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public int contarValoresEnVentaTotal(int idUsuario) throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from((select val.*,us.nombre as nombre_usuario from (select * from info_put natural join valor_rel) val inner join (select id,nombre from usuarios)us on val.id_usuario = us.id) fn inner join (select id,nombre from usuarios)us on fn.id_corredor = us.id)where id_usuario != ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, idUsuario);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public ArrayList<HashMap<String, String>>consultarValoresPortafolios(int tipoValor, int cantidad) throws SQLException{
+		startConnection();
+		String query = "select * from portafolios por inner join valorportafolio valpor on por.id = valpor.ID_PORTAFOLIO where valpor.id_valor in (select vals.id from (select id_valor,sum(cantidad)as cantidad from transacciones group by id_valor order by id_valor)trans inner join valores vals on trans.id_valor=vals.id where tipo= ? and cantidad > ?)";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, tipoValor);
+		st.setInt(2,cantidad);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+	
+	public ArrayList<HashMap<String, String>> mostrarPortafoliosValorHistorico(int idValor) throws SQLException{
+		startConnection();
+		String query = "select distinct(id_portafolio) from valorPortafolio where id_valor = ? order by id_valor asc,fecha asc";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, idValor);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;
+	}
 }
+
+
