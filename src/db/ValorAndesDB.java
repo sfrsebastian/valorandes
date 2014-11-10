@@ -1906,7 +1906,7 @@ public class ValorAndesDB {
 	
 	public ArrayList<HashMap<String, String>> mostrarPortafoliosValorHistorico(int idValor) throws SQLException{
 		startConnection();
-		String query = "select distinct(id_portafolio) from valorPortafolio where id_valor = ? order by id_valor asc,fecha asc";
+		String query = "select por.nombre_portafolio,por.descripcion,por.nombre_tipo,us.nombre as nombre_usuario,por.fecha from (select * from ((select por.id as id_portafolio, por.nombre as nombre_portafolio,por.descripcion,ti.nombre as nombre_tipo,id_usuario from portafolios por inner join tipos_portafolio ti on por.tipo=ti.id) natural join (select distinct(id_portafolio),fecha from valorPortafolio where id_valor = ?)))por inner join usuarios us on por.id_usuario = us.id order by fecha";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, idValor);
 		ResultSet set = st.executeQuery();
