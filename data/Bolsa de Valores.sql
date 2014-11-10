@@ -1,10 +1,12 @@
 --ELIMINAR TABLAS--
+DROP INDEX I_PORTAFOLIO;
+DROP INDEX I_PUT;
 DROP VIEW CALLS_INACTIVOS;
 DROP VIEW PUTS_INACTIVOS;
 DROP VIEW VALORES_INFO;
 DROP VIEW AUTORIZADOS_INACTIVOS;
-drop view valor_rel;
-drop view info_put;
+DROP VIEW VALOR_REL;
+DROP VIEW INFO_PUT;
 DROP TABLE EMPRESAS;
 DROP TABLE TIPOS_EMPRESA;
 DROP TABLE INVERSIONISTAS;
@@ -453,3 +455,9 @@ CREATE VIEW AUTORIZADOS_INACTIVOS AS select * from autorizados inner join asocia
 create view info_put as select pu.id_valor,aso.id_corredor,aso.id_usuario,pu.fecha as fecha_put,pu.tipo_mercado from puts pu inner join asociaciones aso on pu.id_asociacion=aso.id where aso.activo=1;
 
 create view valor_rel as select vl.id as id_valor,vl.nombre as nombre_valor,ti.nombre as tipo_valor from valores vl inner join tipos_valor ti on vl.tipo=ti.id;
+
+	--Indices--
+CREATE INDEX I_PUT ON PUTS(id_valor,id_asociacion);
+CREATE INDEX I_PORTAFOLIO ON PORTAFOLIOS(id);
+
+
