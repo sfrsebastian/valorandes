@@ -1131,7 +1131,7 @@ public class ValorAndesDB {
 		catch(SQLException e){
 			try {
 				conexion.rollback();
-				System.out.println("Error deshabilitando asociacion id: " + idAsociacion);
+				System.out.println("Error deshabilitando asociacion id_corredor: " + idAsociacion);
 			}
 			catch(SQLException e1){
 
@@ -1411,7 +1411,7 @@ public class ValorAndesDB {
 			tipo = "asc";
 		}
 		startConnection();
-		String query = "select * from ( select a.*, ROWNUM rnum from (select * from usuarios NATURAL JOIN corredores ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
+		String query = "select * from ( select a.*, ROWNUM rnum from (select * from usuarios NATURAL JOIN corredores where activo = '1' ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, start + rows-1);
 		st.setInt(2, start);
@@ -1445,7 +1445,7 @@ public class ValorAndesDB {
 
 	public int contarIntermediarios(String search) throws Exception{
 		startConnection();
-		String query = "select count(*) as count from usuarios NATURAL JOIN corredores where NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%'";
+		String query = "select count(*) as count from usuarios NATURAL JOIN corredores where activo=1 and(NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')";
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
@@ -1471,7 +1471,7 @@ public class ValorAndesDB {
 
 	public int contarIntermediariosTotal()throws Exception{
 		startConnection();
-		String query = "select count(*) as count from usuarios NATURAL JOIN corredores";
+		String query = "select count(*) as count from usuarios NATURAL JOIN corredores where activo=1";
 		PreparedStatement st = conexion.prepareStatement(query);
 		ResultSet set = st.executeQuery();
 		set.next();
@@ -1494,7 +1494,42 @@ public class ValorAndesDB {
 		closeConnection();
 		return resultado;	
 	}
+	public void retirarCorredor(int idCorredor){
+		boolean creada = false;
+		try{
+			if(conexion == null){
+				startConnection();
+				creada = true;
+			}
+			//Asegura lock asociacion
+			String lock = "SELECT * FROM CORREDORES WHERE id=? FOR UPDATE";
+			PreparedStatement stat1 = conexion.prepareStatement(lock);
+			stat1.setInt(1, idCorredor);
+			stat1.executeQuery();
+			stat1.close();
 
+			String create = "UPDATE CORREDORES SET ACTIVO='0' WHERE id=?";
+			PreparedStatement state = conexion.prepareStatement(create);
+			state.setInt(1, idCorredor);
+			state.executeUpdate();
+			state.close();
+			conexion.commit();
+		}
+		catch(SQLException e){
+			try {
+				conexion.rollback();
+				System.out.println("Error deshabilitando asociacion id_corredor: " + idCorredor);
+			}
+			catch(SQLException e1){
+
+			}
+			
+		}
+		finally{
+			if(creada)
+				closeConnection();
+		}
+	}
 	public ArrayList<HashMap<String, String>> darInversionistas(int start,int rows, String order, String tipo, String search) throws SQLException {
 		if(order == null){
 			order = "NOMBRE";
@@ -1909,6 +1944,20 @@ public class ValorAndesDB {
 		String query = "select por.nombre_portafolio,por.descripcion,por.nombre_tipo,us.nombre as nombre_usuario,por.fecha from (select * from ((select por.id as id_portafolio, por.nombre as nombre_portafolio,por.descripcion,ti.nombre as nombre_tipo,id_usuario from portafolios por inner join tipos_portafolio ti on por.tipo=ti.id) natural join (select distinct(id_portafolio),fecha from valorPortafolio where id_valor = ?)))por inner join usuarios us on por.id_usuario = us.id order by fecha";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, idValor);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;
+	}
+	
+	public ArrayList<HashMap<String,String>> darTop20Valores(Date inic, Date fin) throws SQLException{
+		startConnection();
+		String query = "select nombre,conteo as cantidad, promedio from ((select id_valor,nombre,conteo from (select a.*, ROWNUM rnum from (select id_valor,nombre,count(nombre) as conteo from (select * from puts where fecha between ? and ?)pu inner join valores vals on vals.id=pu.id_valor group by id_valor,nombre order by conteo desc) a where ROWNUM <= 20) where rnum >= 1)val inner join(select id_valor,avg(precio_unitario)as promedio from precios_valor group by id_valor)pre on val.id_valor = pre.id_valor)";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setDate(1, inic);
+		st.setDate(2, fin);
 		ResultSet set = st.executeQuery();
 		ArrayList<HashMap<String, String>> resultado = darHola(set);
 		set.close();
