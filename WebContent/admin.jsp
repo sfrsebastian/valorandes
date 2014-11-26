@@ -10,56 +10,12 @@
 
 <script type="text/javascript">
 	$(document).ready(function (){
+		 $("#fechaInicial").datepicker();
+	     $("#fechaFinal").datepicker();
 
         var cantidad = 0;
         var idValor = 1;
         var tipoValor = 1;
-
-		$( "#tabla-rec1" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/admin.html",
-                "type": "POST",
-                "data" : { "table_name" : "intermediarios" } 
-            },
-            "columns": [
-                { data : 'NOMBRE' },
-                { data : 'APELLIDO' },
-                { data : 'CORREO' },
-            ]
-        });
-
-        $( "#tabla-rec2" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/admin.html",
-                "type": "POST",
-                "data" : { "table_name" : "inversionistas" } 
-            },
-            columns: [
-                { data : 'NOMBRE' },
-                { data : 'APELLIDO' },
-                { data : 'CORREO'}
-            ]
-        });
-
-        $( "#tabla-rec3" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/admin.html",
-                "type": "POST",
-                "data" : { "table_name" : "empresas" } 
-            },
-            columns: [
-                { data : 'NOMBRE' },
-                { data : 'CORREO' },
-                { data : 'NOMBRE_TIPO'}
-            ]
-        });
-
 
         $("#buscarPortafolios").click(function (){
             var idValor = $(".req4").serializeArray()[0].value;
@@ -116,18 +72,164 @@
             });
         });
 
+        $("#top20").click(function (){
+        	var vals = $(".top20").serializeArray();
+        	var tipo = "top20";
+        	var bolsa = vals[0].value;
+        	var fechaInicial = vals[1].value;
+        	var fechaFinal = vals[2].value;
+        	
+        	$.ajax({
+        		  type: "GET",
+        		  url: "/ValorAndes/admin.html",
+        		  data: { "tipo": tipo, "bolsa": bolsa, "fechaInicial":fechaInicial, "fechaFinal" : fechaFinal}
+        		})
+        		.done(function( data ) {
+            		data = JSON.parse(data);
+        		    renderTop20(data["data"]);
+        	});
+        	
+        });
+
         $("#reqs").hide();
         $("#todos").hide();
 
         $("#btn-todos").click(function (){
             $("#reqs").hide();
             $("#todos").show("slow");
+            $( "#tabla-rec1" ).dataTable({
+                "processing" : true,
+                "serverSide" : true,
+                "ajax": {
+                    "url": "/ValorAndes/admin.html",
+                    "type": "POST",
+                    "data" : { "table_name" : "intermediarios" } 
+                },
+                "columns": [
+                    { data : 'NOMBRE' },
+                    { data : 'APELLIDO' },
+                    { data : 'CORREO' },
+                ]
+            });
+
+            $( "#tabla-rec2" ).dataTable({
+                "processing" : true,
+                "serverSide" : true,
+                "ajax": {
+                    "url": "/ValorAndes/admin.html",
+                    "type": "POST",
+                    "data" : { "table_name" : "inversionistas" } 
+                },
+                columns: [
+                    { data : 'NOMBRE' },
+                    { data : 'APELLIDO' },
+                    { data : 'CORREO'}
+                ]
+            });
+
+            $( "#tabla-rec3" ).dataTable({
+                "processing" : true,
+                "serverSide" : true,
+                "ajax": {
+                    "url": "/ValorAndes/admin.html",
+                    "type": "POST",
+                    "data" : { "table_name" : "empresas" } 
+                },
+                columns: [
+                    { data : 'NOMBRE' },
+                    { data : 'CORREO' },
+                    { data : 'NOMBRE_TIPO'}
+                ]
+            });
         });
         $("#btn-reqs").click(function (){
             $("#reqs").show("slow");
             $("#todos").hide();
         });
+
+        $("#intermediarios").click(function (){
+        	$('#tabla-intermediarios').dataTable().fnClearTable();
+  			$('#tabla-intermediarios').dataTable().fnDestroy();
+        	var vals = $(".intermediario").serializeArray();
+        	var bolsa = vals[0].value;
+        	$( "#tabla-intermediarios" ).dataTable({
+                "processing" : true,
+                "serverSide" : true,
+                "ajax": {
+                    "url": "/ValorAndes/admin.html",
+                    "type": "GET",
+                    "data" : { "tipo":"darIntermediarios","bolsa":bolsa } 
+                },
+                "aoColumnDefs": [
+                                 {
+                                      "aTargets": [3],
+                                      "mData": null,
+                                      "mRender": function (data, type, full) {
+                                          return "<a href=\"#\" onclick=\"eliminarIntermediario("+data["ID"]+");\">Eliminar</a>";
+                                      }
+                                  }
+                ],
+                columns: [
+                    { data : 'NOMBRE' },
+                    { data : 'CEDULA' },
+                    { data : 'NUMERO_REGISTRO'}
+                ]
+            });
+        });
 	});
+
+	function renderTop20(data){
+		var table = document.getElementById("top20-body");
+		for(var i=0;i<data.length;i++){
+			var valor = data[i];
+			var row = table.insertRow(i);
+			var cellPosicion = row.insertCell(0);
+			cellPosicion.innerHTML = i+1;
+			var cellValor = row.insertCell(1);
+			cellValor.innerHTML = valor["NOMBRE"];
+			var cellCantidad = row.insertCell(2);
+			cellCantidad.innerHTML = valor["CANTIDAD"];
+			var cellPromedio = row.insertCell(3);
+			cellPromedio.innerHTML = valor["PROMEDIO"];
+		}
+	}
+	function eliminarIntermediario(id){
+		var vals = $(".intermediario").serializeArray();
+		var bolsa = vals[0].value;
+		$.ajax({
+  		  type: "GET",
+  		  url: "/ValorAndes/admin.html",
+  		  data: { "tipo": "retirarIntermediario", "bolsa": bolsa, "idRetirar":id }
+  		})
+  		.done(function( data ) {
+  			$('#tabla-intermediarios').dataTable().fnClearTable();
+  			$('#tabla-intermediarios').dataTable().fnDestroy();
+  			$( "#tabla-intermediarios" ).dataTable({
+                "processing" : true,
+                "serverSide" : true,
+                "ajax": {
+                    "url": "/ValorAndes/admin.html",
+                    "type": "GET",
+                    "data" : { "tipo":"darIntermediarios","bolsa":bolsa} 
+                },
+                "aoColumnDefs": [
+                                 {
+                                      "aTargets": [3],
+                                      "mData": null,
+                                      "mRender": function (data, type, full) {
+                                          return "<a href=\"#\" onclick=\"eliminarIntermediario("+data["ID"]+");\">Eliminar</a>";
+                                      }
+                                  }
+                ],
+                columns: [
+                    { data : 'NOMBRE' },
+                    { data : 'CEDULA' },
+                    { data : 'NUMERO_REGISTRO'}
+                ]
+            });
+  		});
+	}
+		
 </script>
         <!-- hola -->
         <!-- Page Content -->
@@ -231,6 +333,60 @@
                                         <th>Nombre </th>
                                         <th>Descripcion</th>
                                         <th>Nombre Portafolio </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        
+                         <hr>
+                        <button style="margin: 10px 10px;" class="btn btn-success btn-lg btn-block" id="top20"><span class="glyphicon glyphicon-tag"></span> Ver Top 20 valores</button>
+
+                        <div>
+                            <div class="form-group">
+                                    <label for="bolsa">Seleccione la bolsa a consultar</label>
+                                    <select id="bolsa" class="form-control top20" name="bolsa">
+                                    	<option value = "ValorAndes">ValorAndes</option>
+                                    	<option value = "Medallo">Medallo</option>
+                                    </select>
+                                    <br>
+                                    <label for="fechaInicial">Fecha Inicio</label>
+                                    <input type="text" class="form-control top20" id="fechaInicial" placeholder="Fecha inicio" name="fechaInicial">
+                                    <br>
+                                     <label for="fechaFinal">Fecha Inicio</label>
+                                    <input type="text" class="form-control top20" id="fechaFinal" placeholder="Fecha Fin" name="fechaFinal">
+                            </div>
+                            <table class="table table-striped" id="tabla-top20">
+                                <thead>
+                                    <tr>
+                                    	<th>#</th>
+                                        <th>Valor</th>
+                                        <th>Cantidad</th>
+                                        <th>Promedio</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="top20-body">
+                                	
+                                </tbody>
+                            </table>
+                        </div>
+                          <hr>
+                        <button style="margin: 10px 10px;" class="btn btn-success btn-lg btn-block" id="intermediarios"><span class="glyphicon glyphicon-tag"></span> Eliminar intermediario</button>
+
+                        <div>
+                            <div class="form-group">
+                                    <label for="bolsa">Seleccione la bolsa a consultar</label>
+                                    <select id="bolsa" class="form-control intermediario" name="bolsa">
+                                    	<option value = "ValorAndes">ValorAndes</option>
+                                    	<option value = "Medallo">Medallo</option>
+                                    </select>
+                            </div>
+                            <table class="table table-striped" id="tabla-intermediarios">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Cedula</th>
+                                        <th>N&uacute;mero de registro</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                             </table>

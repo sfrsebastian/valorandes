@@ -23,7 +23,7 @@
             "drawCallback": function(settings, json) {
             	console.log("DONE Des-asociar");
 			   $(".sociar").click(function (){
-				   	console.log('HELLO');
+				   	console.log('HELLO desasociar');
 				   	var id_actual = this.value;
 
 				   	var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");

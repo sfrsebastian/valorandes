@@ -15,6 +15,7 @@
     var fechaIni = "-1";
     var fechaFin = "-1";
     var marcado = "-1";
+    var bolsa = "ValorAndes";
 
     function cambiarId(nuevoId){
         id_actual = nuevoId;
@@ -31,55 +32,60 @@
             var them = $(".req1").serializeArray();
             fechaIni = them[0].value;
             fechaFin = them[1].value;
-            if(them.length > 2){
-                marcado = them[2].value;
+            bolsa = them[2].value;
+            if(them.length > 3){
+                marcado = them[3].value;
             }else{
                 marcado = "-1";
             }
-
-            var table = $('#tabla_comprar').DataTable().destroy();
-            $('#tabla_comprar').dataTable({
-                "processing" : true,
-                "serverSide" : true,
-                "ajax": {
-                    "url": "/ValorAndes/operaciones.html",
-                    "type": "GET",
-                    "data" : { "tipo" : "comprar", "fechaIni" : fechaIni, "fechaFin" : fechaFin, "marcado" : marcado } 
-                },
-                "columns": [
-                    { data : 'FECHA_PUT' },
-                    { data : 'CANTIDAD' },
-                    { data : 'TIPO_MERCADO' },
-                    { data : 'NOMBRE_VALOR' },
-                    { data : 'TIPO_VALOR' },
-                    { data : 'NOMBRE_USUARIO' },
-                    { data : 'NOMBRE_CORREDOR' }
-                ]
-            });
+			if(bolsa === "ValorAndes"){
+				var table = $('#tabla_comprar').DataTable().destroy();
+	            $('#tabla_comprar').dataTable({
+	                "processing" : true,
+	                "serverSide" : true,
+	                "ajax": {
+	                    "url": "/ValorAndes/operaciones.html",
+	                    "type": "GET",
+	                    "data" : { "tipo" : "comprar", "fechaIni" : fechaIni, "fechaFin" : fechaFin, "marcado" : marcado, "bolsa":bolsa } 
+	                },
+	                "columns": [
+	                    { data : 'FECHA_PUT' },
+	                    { data : 'CANTIDAD' },
+	                    { data : 'TIPO_MERCADO' },
+	                    { data : 'NOMBRE_VALOR' },
+	                    { data : 'TIPO_VALOR' },
+	                    { data : 'NOMBRE_USUARIO' },
+	                    { data : 'NOMBRE_CORREDOR' }
+	                ]
+	            });
+			}
+			else if(bolsa === "Medallo"){
+				var table = $('#tabla_comprar').DataTable().destroy();
+	            $('#tabla_comprar').dataTable({
+	                "processing" : true,
+	                "serverSide" : true,
+	                "ajax": {
+	                    "url": "/ValorAndes/operaciones.html",
+	                    "type": "GET",
+	                    "data" : { "tipo" : "comprar", "fechaIni" : fechaIni, "fechaFin" : fechaFin, "marcado" : marcado, "bolsa":bolsa } 
+	                },
+	                "columns": [
+	                    { data : 'FECHA' },
+	                    { data : 'CANTIDAD' },
+	                    { data : 'TIPO_MERCADO' },
+	                    { data : 'NOMBRE_VALOR' },
+	                    { data : 'TIPO_VALOR' },
+	                    { data : 'NOMBRE_USUARIO' },
+	                    { data : 'NOMBRE_CORREDOR' }
+	                ]
+	            });
+			}
 
         });
 
         $("#tabla_comprar").hide();
         $("#tabla_vender").hide();
         
-        $( "#tabla_comprar" ).dataTable({
-            "processing" : true,
-            "serverSide" : true,
-            "ajax": {
-                "url": "/ValorAndes/operaciones.html",
-                "type": "GET",
-                "data" : { "tipo" : "comprar", "fechaIni" : fechaIni, "fechaFin" : fechaFin, "marcado" : marcado } 
-            },
-            "columns": [
-                { data : 'FECHA_PUT' },
-                { data : 'CANTIDAD' },
-                { data : 'TIPO_MERCADO' },
-                { data : 'NOMBRE_VALOR' },
-                { data : 'TIPO_VALOR' },
-                { data : 'NOMBRE_USUARIO' },
-                { data : 'NOMBRE_CORREDOR' }
-            ]
-        });
         
         $('#example tbody').on( 'click', 'button', function () {
             var data = table.row( $(this).parents('tr') ).data();
@@ -180,6 +186,13 @@
                                 <div class="form-group">
                                     <label for="fechaFin">Fecha Fin</label>
                                     <input type="text" class="form-control req1" id="fechaFin" placeholder="Fecha fin" name="fechaFin">
+                                </div>
+                                <div class="form-group">
+                                	<label for="bolsa">Seleccione la bolsa a consultar</label>
+                                    <select id="bolsa" class="form-control req1" name="bolsa">
+                                    	<option value = "ValorAndes">ValorAndes</option>
+                                    	<option value = "Medallo">Medallo</option>
+                                    </select>
                                 </div>
                                 <div class="checkbox">
                                     <label>

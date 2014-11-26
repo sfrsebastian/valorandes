@@ -18,10 +18,14 @@ import javax.servlet.http.HttpSession;
 
 import test.DataTableObject;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
+import db.Conector;
 import db.ValorAndesDB;
 
 public class ServletOperaciones extends HttpServlet {
@@ -31,6 +35,7 @@ public class ServletOperaciones extends HttpServlet {
 	//--------------------------------------------
 	
 	private ValorAndesDB conexionDAO;
+	private Conector conector;
 	
 	//--------------------------------------------
 	// Constructor
@@ -41,7 +46,12 @@ public class ServletOperaciones extends HttpServlet {
 	 */
 	public void init( ) throws ServletException
     {
-        conexionDAO = ValorAndesDB.getInstance();
+        try {
+        	conexionDAO = ValorAndesDB.getInstance();
+			//conector = Conector.getInstance();
+		} catch (Exception e) {
+			System.err.println("Error con conector");
+		}
     }
 	
 	//--------------------------------------------
@@ -58,6 +68,7 @@ public class ServletOperaciones extends HttpServlet {
 		String tipo = request.getParameter("order[0][dir]");
 		String search = request.getParameter("search[value]");
 		String pedido = request.getParameter("tipo");
+		String bolsa = request.getParameter("bolsa");
 		HttpSession session = request.getSession();
 		int idUsuario = (Integer) session.getAttribute("id");
 		
@@ -72,50 +83,74 @@ public class ServletOperaciones extends HttpServlet {
 		}
 		
 		if(pedido.equals("comprar")){
-			ObjectMapper mapper = new ObjectMapper();
-			response.setContentType("application/json");
-			ArrayList<HashMap<String, String>> resultado = null;
-			int conteo=0;
-			int conteoSearch=0;
-			try {
-				Date inicio = null;
-				Date fin = null;
-				boolean marcar = false;
-				
-				if(!marcado.equals("-1")){
-					marcar = true;
-				}
-				
-				if(!fechaInicio.equals("-1") && !fechaFin.equals("-1")){
-					String[] fechs = fechaInicio.split("/");
-					String[] fechs1 = fechaFin.split("/");	
-					java.util.Date dateInicio = new java.util.Date(fechaInicio);
-					java.util.Date dateFin = new java.util.Date(fechaFin);
+			if(bolsa.equals("ValorAndes")){
+				ObjectMapper mapper = new ObjectMapper();
+				response.setContentType("application/json");
+				ArrayList<HashMap<String, String>> resultado = null;
+				int conteo=0;
+				int conteoSearch=0;
+				try {
+					Date inicio = null;
+					Date fin = null;
+					boolean marcar = false;
 					
-					inicio = new Date(dateInicio.getTime());
-					fin = new Date(dateFin.getTime());
+					if(!marcado.equals("-1")){
+						marcar = true;
+					}
 					
-				}else{
-					inicio = new Date(102,7,8);
-					fin = new Date(114,2,8);
+					if(!fechaInicio.equals("-1") && !fechaFin.equals("-1")){
+						String[] fechs = fechaInicio.split("/");
+						String[] fechs1 = fechaFin.split("/");	
+						java.util.Date dateInicio = new java.util.Date(fechaInicio);
+						java.util.Date dateFin = new java.util.Date(fechaFin);
+						
+						inicio = new Date(dateInicio.getTime());
+						fin = new Date(dateFin.getTime());
+						
+					}else{
+						inicio = new Date(102,7,8);
+						fin = new Date(114,2,8);
+					}
+					
+					resultado = conexionDAO.darValoresEnVenta(start, length, columnName, tipo, search, idUsuario, inicio, fin, marcar);
+					conteo = conexionDAO.contarValoresEnVentaTotal(idUsuario);
+					conteoSearch = conexionDAO.contarValoresEnVenta(search, idUsuario, inicio, fin, marcar);
+					System.out.println("conteo Total " + conteo + " Conteo parcial " + conteoSearch);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				
-				resultado = conexionDAO.darValoresEnVenta(start, length, columnName, tipo, search, idUsuario, inicio, fin, marcar);
-				conteo = conexionDAO.contarValoresEnVentaTotal(idUsuario);
-				conteoSearch = conexionDAO.contarValoresEnVenta(search, idUsuario, inicio, fin, marcar);
-				System.out.println("conteo Total " + conteo + " Conteo parcial " + conteoSearch);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 
-			DataTableObject dataTableObject = new DataTableObject();
-			dataTableObject.setAaData(resultado);
-			dataTableObject.setRecordsFiltered(conteoSearch);
-			dataTableObject.setRecordsTotal(conteo);
-			PrintWriter out = response.getWriter();
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			String json = gson.toJson(dataTableObject);
-			out.print(json);
+				DataTableObject dataTableObject = new DataTableObject();
+				dataTableObject.setAaData(resultado);
+				dataTableObject.setRecordsFiltered(conteoSearch);
+				dataTableObject.setRecordsTotal(conteo);
+				PrintWriter out = response.getWriter();
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				String json = gson.toJson(dataTableObject);
+				System.out.println(json);
+				out.print(json);
+			}
+			else if(bolsa.equals("Medallo")){
+				response.setContentType("application/json");
+				PrintWriter out = response.getWriter();
+				JsonObject element = new JsonObject();
+				element.addProperty("method", "darValores");
+				element.addProperty("start", start);
+				element.addProperty("length", length);
+				element.addProperty("columnName", columnName);
+				element.addProperty("tipo", tipo);
+				element.addProperty("search", search);
+				element.addProperty("inicio", fechaInicio);
+				element.addProperty("fin", fechaFin);
+				
+				Gson gson = new GsonBuilder().create();
+				String pregunta = gson.toJson(element);
+				System.out.println(pregunta);
+				//conector.enviarPregunta(pregunta);
+				//Esperamos que responda
+				//Obtenemos la respuesta de alguna forma
+				//Imprime json recibido para datatable de medallo
+			}
 		}
 		
 	}
