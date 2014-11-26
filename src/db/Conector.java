@@ -19,7 +19,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 public class Conector extends Thread{
 	
 	public final static String NOMBRE = "VALORANDES";
@@ -352,6 +351,7 @@ public class Conector extends Thread{
 	      ((IEscuchadorEventos) i.next()).manejarEvento(event);
 	    }
 	  }
+	
 	private String toJson(ArrayList<HashMap<String,String>> arr){
 		DataTableObject dataTableObject = new DataTableObject();
 		dataTableObject.setAaData(arr);
