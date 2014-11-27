@@ -19,6 +19,7 @@ import test.DataTableObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -50,8 +51,8 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 	{
 		try {
 			conexionDAO = ValorAndesDB.getInstance();
-			conector = Conector.getInstance();
-			conector.addEventListener(this);
+			//conector = Conector.getInstance();
+			//conector.addEventListener(this);
 		} catch (Exception e) {
 			
 			e.printStackTrace();
@@ -313,10 +314,13 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 			e1.printStackTrace();
 		}
 		String mensaje = ((MiEvento)e).getElMensaje();
-		System.out.println("mensaje recibido : " + mensaje);
-		JsonElement jelement = new JsonParser().parse(mensaje);
-	    JsonObject  jobject = jelement.getAsJsonObject();
-		out.print(jobject.get("data").toString());
+//		System.out.println("mensaje recibido : " + mensaje);
+//		JsonElement jelement = new JsonParser().parse(mensaje);
+//	    JsonObject  jobject = jelement.getAsJsonObject();
+//	    JsonArray array = jobject.get("data").getAsJsonArray();
+//	    String json = array.toString();
+//	    System.out.println("respuesta enviada" + json);
+		out.print(mensaje);
 		Thread.currentThread().interrupt();
 	}
 }

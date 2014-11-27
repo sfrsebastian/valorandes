@@ -26,7 +26,7 @@ public class Conector extends Thread{
 	/**
 	 * La direccion del servidor
 	 */
-	public final static String HOST = "157.253.250.89";
+	public final static String HOST = "54.149.33.84";
 
 	/**
 	 * El puerto a la conexion de pregunta
@@ -166,13 +166,22 @@ public class Conector extends Thread{
 					//Atender pregunta!!
 					JsonElement jelement = new JsonParser().parse(params[0]);
 				    JsonObject  jobject = jelement.getAsJsonObject();
-					java.util.Date dateInicio = new java.util.Date(jobject.get("inicial").toString());
-					java.util.Date dateFin = new java.util.Date(jobject.get("fin").toString());
-					Date inicio = new Date(dateInicio.getTime());
-					Date fin = new Date(dateFin.getTime());
-				    if(jobject.get("method").toString().equals("Top20")){
+				    String method = jobject.get("method").getAsString();
+				    if(method.equals("Top20")){
+				    	java.util.Date dateInicio = new java.util.Date(jobject.get("inicial").getAsString());
+						java.util.Date dateFin = new java.util.Date(jobject.get("fin").getAsString());
+						Date inicio = new Date(dateInicio.getTime());
+						Date fin = new Date(dateFin.getTime());
 				    	ArrayList<HashMap<String, String>> ans = ValorAndesDB.getInstance().darTop20Valores(inicio, fin);
 				    	resp = toJson(ans);
+				    }
+				    else if(method.equals("darIntermediarios")){
+				    	ArrayList<HashMap<String, String>> ans = ValorAndesDB.getInstance().darIntermediarios(1, 20, null, null, "");
+				    	resp = toJson(ans);
+				    }
+				    else if(method.equals("retirar")){
+				    	int id = Integer.parseInt(jobject.get("id").getAsString());
+				    	ValorAndesDB.getInstance().retirarCorredor(id);
 				    }
 					enviarRespuesta(resp);
 				}
