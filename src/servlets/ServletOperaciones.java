@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+
 import test.DataTableObject;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -26,9 +28,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import db.Conector;
+import db.IEscuchadorEventos;
+import db.MiEvento;
 import db.ValorAndesDB;
 
-public class ServletOperaciones extends HttpServlet {
+public class ServletOperaciones extends HttpServlet implements IEscuchadorEventos {
 	
 	//--------------------------------------------
 	// Atributos
@@ -36,6 +40,7 @@ public class ServletOperaciones extends HttpServlet {
 	
 	private ValorAndesDB conexionDAO;
 	private Conector conector;
+	private HttpServletResponse response;
 	
 	//--------------------------------------------
 	// Constructor
@@ -48,6 +53,8 @@ public class ServletOperaciones extends HttpServlet {
     {
         try {
         	conexionDAO = ValorAndesDB.getInstance();
+        	conector = Conector.getInstance();
+			conector.addEventListener(this);
 			//conector = Conector.getInstance();
 		} catch (Exception e) {
 			System.err.println("Error con conector");
@@ -60,6 +67,7 @@ public class ServletOperaciones extends HttpServlet {
 
 	protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		this.response = response;
 		String tableName = request.getParameter("table_name");
 		int start = Integer.parseInt(request.getParameter("start")) + 1;
 		int length = Integer.parseInt(request.getParameter("length"));
@@ -145,14 +153,17 @@ public class ServletOperaciones extends HttpServlet {
 				
 				Gson gson = new GsonBuilder().create();
 				String pregunta = gson.toJson(element);
-				System.out.println(pregunta);
-				//conector.enviarPregunta(pregunta);
-				//Esperamos que responda
-				//Obtenemos la respuesta de alguna forma
-				//Imprime json recibido para datatable de medallo
+				System.out.println("mando pregunta: " + pregunta);
+				conector.enviarPregunta(pregunta);
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		
+		System.out.println("fin metodo");
 	}
 	
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
@@ -188,5 +199,20 @@ public class ServletOperaciones extends HttpServlet {
 		
 		//TODO realizar autorizacion ya sea compra/venta
 	}
-
+	
+	@Override
+	public void manejarEvento(EventObject e) {
+		System.out.println("empezo evento");
+		PrintWriter out=null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String mensaje = ((MiEvento)e).getElMensaje();
+		System.out.println("mensaje recibido: " + mensaje);
+		out.print(mensaje);
+		Thread.currentThread().interrupt();
+	}
 }

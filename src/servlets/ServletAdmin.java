@@ -51,8 +51,8 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 	{
 		try {
 			conexionDAO = ValorAndesDB.getInstance();
-			//conector = Conector.getInstance();
-			//conector.addEventListener(this);
+			conector = Conector.getInstance();
+			conector.addEventListener(this);
 		} catch (Exception e) {
 			
 			e.printStackTrace();
@@ -154,11 +154,18 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 		}
 		
 		else if(tipo.equals("darIntermediarios")){
-			if(bolsa.equals("medallo")){
+			if(bolsa.equals("Medallo")){
 				JsonObject element = new JsonObject();
 				element.addProperty("method", "darIntermediarios");
 				Gson gson = new GsonBuilder().create();
 				String pregunta = gson.toJson(element);
+				conector.enviarPregunta(pregunta);
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else if(bolsa.equals("ValorAndes")){
 				int start = Integer.parseInt(request.getParameter("start")) + 1;
@@ -193,14 +200,20 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 		}
 		
 		else if(tipo.equals("retirarIntermediario")){
-			if(bolsa.equals("medallo")){
+			if(bolsa.equals("Medallo")){
 				String id = request.getParameter("idRetirar");
 				JsonObject element = new JsonObject();
 				element.addProperty("method", "retirar");
 				element.addProperty("id", id);
 				Gson gson = new GsonBuilder().create();
 				String pregunta = gson.toJson(element);
-				//TODO
+				conector.enviarPregunta(pregunta);
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else if(bolsa.equals("ValorAndes")){
 				String id = request.getParameter("idRetirar");
@@ -302,7 +315,7 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 		}
 		
 	}
-
+	
 	@Override
 	public void manejarEvento(EventObject e) {
 		System.out.println("empezo evento");
@@ -314,6 +327,7 @@ public class ServletAdmin extends HttpServlet implements IEscuchadorEventos {
 			e1.printStackTrace();
 		}
 		String mensaje = ((MiEvento)e).getElMensaje();
+		System.out.println("mensaje recibido: " + mensaje);
 //		System.out.println("mensaje recibido : " + mensaje);
 //		JsonElement jelement = new JsonParser().parse(mensaje);
 //	    JsonObject  jobject = jelement.getAsJsonObject();

@@ -152,29 +152,43 @@
   			$('#tabla-intermediarios').dataTable().fnDestroy();
         	var vals = $(".intermediario").serializeArray();
         	var bolsa = vals[0].value;
-        	$( "#tabla-intermediarios" ).dataTable({
-                "processing" : true,
-                "serverSide" : true,
-                "ajax": {
-                    "url": "/ValorAndes/admin.html",
-                    "type": "GET",
-                    "data" : { "tipo":"darIntermediarios","bolsa":bolsa } 
-                },
-                "aoColumnDefs": [
-                                 {
-                                      "aTargets": [3],
-                                      "mData": null,
-                                      "mRender": function (data, type, full) {
-                                          return "<a href=\"#\" onclick=\"eliminarIntermediario("+data["ID"]+");\">Eliminar</a>";
+        	if(bolsa === "ValorAndes"){
+        		$( "#tabla-intermediarios" ).dataTable({
+                    "processing" : true,
+                    "serverSide" : true,
+                    "ajax": {
+                        "url": "/ValorAndes/admin.html",
+                        "type": "GET",
+                        "data" : { "tipo":"darIntermediarios","bolsa":bolsa } 
+                    },
+                    "aoColumnDefs": [
+                                     {
+                                          "aTargets": [2],
+                                          "mData": null,
+                                          "mRender": function (data, type, full) {
+                                              return "<a href=\"#\" onclick=\"eliminarIntermediario("+data["ID"]+");\">Eliminar</a>";
+                                          }
                                       }
-                                  }
-                ],
-                columns: [
-                    { data : 'NOMBRE' },
-                    { data : 'CEDULA' },
-                    { data : 'NUMERO_REGISTRO'}
-                ]
-            });
+                    ],
+                    columns: [
+                        { data : 'NOMBRE' },
+                        { data : 'NUMERO_REGISTRO'}
+                    ]
+                });
+            }
+        	else if(bolsa === "Medallo"){
+        		$.ajax({
+          		  type: "GET",
+          		  url: "/ValorAndes/admin.html",
+          		  data: { "tipo":"darIntermediarios","bolsa":bolsa } 
+          		})
+          		.done(function( data ) {
+          			$('#tabla-intermediarios').dataTable().fnClearTable();
+          			$('#tabla-intermediarios').dataTable().fnDestroy();
+              		data = JSON.parse(data);
+          		    renderIntermediarios(data["data"]);
+          	});
+            }
         });
 	});
 
@@ -193,6 +207,25 @@
 			cellPromedio.innerHTML = valor["PROMEDIO"];
 		}
 	}
+
+	function renderIntermediarios(data){
+		var table = document.getElementById("intermediarios-body");
+		for(var i=0;i<data.length;i++){
+			var valor = data[i];
+			var row = table.insertRow(i);
+			var cellValor = row.insertCell(0);
+			cellValor.innerHTML = valor["NOMBRE"];
+			var cellCantidad = row.insertCell(1);
+			cellCantidad.innerHTML = valor["NUMERO_REGISTRO"];
+			var cellEliminar = row.insertCell(2);
+			var newlink = document.createElement('a');
+			var tn = document.createTextNode('Eliminar');
+			newlink.appendChild(tn);
+			newlink.setAttribute('onclick', "eliminarIntermediario("+valor["ID"]+")");
+			cellEliminar.appendChild(newlink);
+		}
+	
+	}
 	function eliminarIntermediario(id){
 		var vals = $(".intermediario").serializeArray();
 		var bolsa = vals[0].value;
@@ -202,31 +235,7 @@
   		  data: { "tipo": "retirarIntermediario", "bolsa": bolsa, "idRetirar":id }
   		})
   		.done(function( data ) {
-  			$('#tabla-intermediarios').dataTable().fnClearTable();
-  			$('#tabla-intermediarios').dataTable().fnDestroy();
-  			$( "#tabla-intermediarios" ).dataTable({
-                "processing" : true,
-                "serverSide" : true,
-                "ajax": {
-                    "url": "/ValorAndes/admin.html",
-                    "type": "GET",
-                    "data" : { "tipo":"darIntermediarios","bolsa":bolsa} 
-                },
-                "aoColumnDefs": [
-                                 {
-                                      "aTargets": [3],
-                                      "mData": null,
-                                      "mRender": function (data, type, full) {
-                                          return "<a href=\"#\" onclick=\"eliminarIntermediario("+data["ID"]+");\">Eliminar</a>";
-                                      }
-                                  }
-                ],
-                columns: [
-                    { data : 'NOMBRE' },
-                    { data : 'CEDULA' },
-                    { data : 'NUMERO_REGISTRO'}
-                ]
-            });
+  			 $("#intermediarios").click();
   		});
 	}
 		
@@ -384,11 +393,12 @@
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Cedula</th>
                                         <th>N&uacute;mero de registro</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
+                                <tbody id="intermediarios-body">	
+                                </tbody>
                             </table>
                         </div>
                     </div>

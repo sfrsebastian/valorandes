@@ -1411,7 +1411,7 @@ public class ValorAndesDB {
 			tipo = "asc";
 		}
 		startConnection();
-		String query = "select * from ( select a.*, ROWNUM rnum from (select * from usuarios NATURAL JOIN corredores where activo = '1' ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
+		String query = "select id,nombre,numero_registro from ( select a.*, ROWNUM rnum from (select * from usuarios NATURAL JOIN corredores where activo = '1' ORDER BY " +  order +" " +  tipo + ") a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR APELLIDO like '" + search +"%' OR CORREO like '" + search +"%')) where rnum  >= ?";
 		PreparedStatement st = conexion.prepareStatement(query);
 		st.setInt(1, start + rows-1);
 		st.setInt(2, start);

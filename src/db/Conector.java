@@ -26,7 +26,7 @@ public class Conector extends Thread{
 	/**
 	 * La direccion del servidor
 	 */
-	public final static String HOST = "54.149.33.84";
+	public final static String HOST = "54.69.121.127";
 
 	/**
 	 * El puerto a la conexion de pregunta
@@ -168,7 +168,7 @@ public class Conector extends Thread{
 				    JsonObject  jobject = jelement.getAsJsonObject();
 				    String method = jobject.get("method").getAsString();
 				    if(method.equals("Top20")){
-				    	java.util.Date dateInicio = new java.util.Date(jobject.get("inicial").getAsString());
+				    	java.util.Date dateInicio = new java.util.Date(jobject.get("inicio").getAsString());
 						java.util.Date dateFin = new java.util.Date(jobject.get("fin").getAsString());
 						Date inicio = new Date(dateInicio.getTime());
 						Date fin = new Date(dateFin.getTime());
@@ -176,18 +176,33 @@ public class Conector extends Thread{
 				    	resp = toJson(ans);
 				    }
 				    else if(method.equals("darIntermediarios")){
-				    	ArrayList<HashMap<String, String>> ans = ValorAndesDB.getInstance().darIntermediarios(1, 20, null, null, "");
+				    	ArrayList<HashMap<String, String>> ans = ValorAndesDB.getInstance().darIntermediarios(1, 5, null, null, "");
 				    	resp = toJson(ans);
 				    }
 				    else if(method.equals("retirar")){
 				    	int id = Integer.parseInt(jobject.get("id").getAsString());
 				    	ValorAndesDB.getInstance().retirarCorredor(id);
 				    }
+				    else if(method.equals("darValores")){
+				    	int start= jobject.get("start").getAsInt();
+				    	int rows= jobject.get("length").getAsInt();
+				    	String order=jobject.get("columnName").getAsString();
+				    	String tipo=jobject.get("tipo").getAsString();
+				    	String search=jobject.get("search").getAsString();
+				    	java.util.Date dateInicio = new java.util.Date(jobject.get("inicio").getAsString());
+						java.util.Date dateFin = new java.util.Date(jobject.get("fin").getAsString());
+						Date inicio = new Date(dateInicio.getTime());
+						Date fin = new Date(dateFin.getTime());
+				    	ArrayList<HashMap<String, String>> ans = ValorAndesDB.getInstance().darValoresEnVenta(start, rows, order, tipo, search, 1, inicio, fin, false);
+				    	resp=toJson(ans);
+				    }
+				    System.out.println("envio respuesta " + resp);
 					enviarRespuesta(resp);
 				}
 				closeConnectionPregunta();
 				
 			} catch (Exception e) {
+				e.printStackTrace();
 				try {
 					closeConnectionPregunta();
 				} catch (IOException e1) {
@@ -366,7 +381,7 @@ public class Conector extends Thread{
 		dataTableObject.setAaData(arr);
 		dataTableObject.setRecordsFiltered(0);
 		dataTableObject.setRecordsTotal(0);
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Gson gson = new GsonBuilder().create();
 		String json = gson.toJson(dataTableObject);
 		return json;
 	}
@@ -378,9 +393,6 @@ public class Conector extends Thread{
 	public static void main(String[] args) {
 		try{
 			Conector nicky = new Conector();
-			nicky.start();
-			nicky.sleep(10000);
-			nicky.enviarPregunta("Am I Wrong?");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
