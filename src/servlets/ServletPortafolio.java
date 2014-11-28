@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -22,15 +23,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import db.Conector;
+import db.IEscuchadorEventos;
+import db.MiEvento;
 import db.ValorAndesDB;
 
-public class ServletPortafolio extends HttpServlet {
+public class ServletPortafolio extends HttpServlet implements IEscuchadorEventos {
 
 	//--------------------------------------------
 	// Atributos
 	//--------------------------------------------
 
 	private ValorAndesDB conexionDAO;
+	private HttpServletResponse response;
+	private Conector conector;
 
 	//--------------------------------------------
 	// Constructor
@@ -42,6 +48,13 @@ public class ServletPortafolio extends HttpServlet {
 	public void init( ) throws ServletException
 	{
 		conexionDAO = ValorAndesDB.getInstance();
+		try {
+			conector = Conector.getInstance();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		conector.addEventListener(this);
 	}
 
 	//--------------------------------------------
@@ -55,6 +68,7 @@ public class ServletPortafolio extends HttpServlet {
 
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		this.response = response;
 		String global = request.getParameter("global");
 		if(global.equals("mostrarPortafolios")){
 			HttpSession session = request.getSession();
@@ -216,6 +230,37 @@ public class ServletPortafolio extends HttpServlet {
 			String json = gson.toJson(dataTableObject);
 			out.print(json);
 		}
+	}
+
+	@Override
+	public void manejarEvento(EventObject e) {
+		System.out.println("empezo evento");
+		PrintWriter out=null;
+		try {
+			out = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String mensaje = ((MiEvento)e).getElMensaje();
+		System.out.println("mensaje recibido: " + mensaje);
+		JsonElement jelement = new JsonParser().parse(mensaje);
+	    JsonObject  jobject = jelement.getAsJsonObject();
+	    boolean sirvio = jobject.get("resultado").getAsBoolean();
+	    try{
+			if(sirvio){
+				conexionDAO.conexion.commit();
+			}
+			else{
+				conexionDAO.conexion.rollback();
+			}
+	    }
+	    catch(Exception e1){
+	    	e1.printStackTrace();
+	    }
+		conexionDAO.closeConnection();
+		Thread.currentThread().interrupt();
+		
 	}
 	
 }

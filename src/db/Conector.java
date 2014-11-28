@@ -26,7 +26,7 @@ public class Conector extends Thread{
 	/**
 	 * La direccion del servidor
 	 */
-	public final static String HOST = "54.69.121.127";
+	public final static String HOST = "54.149.4.107";
 
 	/**
 	 * El puerto a la conexion de pregunta
@@ -151,6 +151,12 @@ public class Conector extends Thread{
 		System.out.println("======================================================================");
 		System.out.println("Monitoreando preguntas y respuestas");
 		System.out.println("======================================================================");
+		try {
+			enviarPregunta("{\"method\":\"compraVenta\", \"id\":5 ,\"cantidad\": 5}");
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		while(true){
 			try {
 				openConnectionPregunta();
@@ -195,6 +201,22 @@ public class Conector extends Thread{
 						Date fin = new Date(dateFin.getTime());
 				    	ArrayList<HashMap<String, String>> ans = ValorAndesDB.getInstance().darValoresEnVenta(start, rows, order, tipo, search, 1, inicio, fin, false);
 				    	resp=toJson(ans);
+				    }
+				    else if(method.equals("compraVenta")){
+				    	int id= jobject.get("id").getAsInt();
+				    	int cantidad= jobject.get("cantidad").getAsInt();
+				    	boolean resultado=false;
+				    	try{
+				    		ValorAndesDB.getInstance().actualizarValorPortafolioExterno(id, cantidad);
+				    		resultado = true;
+				    	}catch(Exception e){
+				    		e.printStackTrace();
+				    		resultado=false;
+				    	}
+				    	JsonObject element = new JsonObject();
+						element.addProperty("resultado", resultado);
+						Gson gson = new GsonBuilder().create();
+						resp = gson.toJson(element);
 				    }
 				    System.out.println("envio respuesta " + resp);
 					enviarRespuesta(resp);
