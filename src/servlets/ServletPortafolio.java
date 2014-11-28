@@ -48,13 +48,13 @@ public class ServletPortafolio extends HttpServlet implements IEscuchadorEventos
 	public void init( ) throws ServletException
 	{
 		conexionDAO = ValorAndesDB.getInstance();
-		try {
-			conector = Conector.getInstance();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		conector.addEventListener(this);
+//		try {
+//			conector = Conector.getInstance();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		conector.addEventListener(this);
 	}
 
 	//--------------------------------------------
@@ -63,7 +63,37 @@ public class ServletPortafolio extends HttpServlet implements IEscuchadorEventos
 
 	protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
 	{
+		this.response = response;
+		int start = Integer.parseInt(request.getParameter("start")) + 1;
+		int length = Integer.parseInt(request.getParameter("length"));
+		int columnOrder = Integer.parseInt(request.getParameter("order[0][column]"));
+		String columnName = request.getParameter("columns[" + columnOrder + "][data]");
+		String tipoFiltro = request.getParameter("order[0][dir]");
+		String search = request.getParameter("search[value]");
+		String global = request.getParameter("global");
+		if(global.equals("mostrarValoresPortafolioExternos")){
+			response.setContentType("application/json");   
+			ArrayList<HashMap<String, String>> resultado = null;
+			int conteo=0;
+			int conteoSearch=0;
+			try {
+				resultado = conexionDAO.darValoresPortafoliosUsuarioExterno(start, length, columnName, tipoFiltro, search);
+				conteo = conexionDAO.contarValoresPortafoliosUsuarioExternoTotal();
+				conteoSearch = conexionDAO.contarValoresPortafoliosUsuarioExterno(search);
+				System.out.println("conteo " + conteo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
+			DataTableObject dataTableObject = new DataTableObject();
+			dataTableObject.setAaData(resultado);
+			dataTableObject.setRecordsFiltered(conteoSearch);
+			dataTableObject.setRecordsTotal(conteo);
+			PrintWriter out = response.getWriter();
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			String json = gson.toJson(dataTableObject);
+			out.print(json);
+		}
 	}
 
 	protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
@@ -213,9 +243,9 @@ public class ServletPortafolio extends HttpServlet implements IEscuchadorEventos
 			int conteo=0;
 			int conteoSearch=0;
 			try {
-				resultado = conexionDAO.darIntermediariosUsuario(1, 100, "NOMBRE", "asc", "", idUsuario);
-//				conteo = conexionDAO.contarValoresUsuario(search, idUsuario);
-//				conteoSearch = conexionDAO.contarValoresUsuarioTotal(idUsuario);
+				//resultado = conexionDAO.darIntermediariosUsuario(1, 100, "NOMBRE", "asc", "", idUsuario);
+				//conteo = conexionDAO.contarValoresUsuario(search, idUsuario);
+				//conteoSearch = conexionDAO.contarValoresUsuarioTotal(idUsuario);
 				System.out.println("conteo " + conteo);
 			} catch (Exception e) {
 				e.printStackTrace();

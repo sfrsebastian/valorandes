@@ -155,7 +155,7 @@
                         "serverSide" : true,
                         "ajax": {
                             "url": "/ValorAndes/portafolio.html",
-                            "type": "POST",
+                            "type": "GET",
                             "data" : {"global" : "mostrarValoresPortafolioExternos", "otra" : idPortafolio}
                         },
                         "drawCallback": function(settings, json) {
