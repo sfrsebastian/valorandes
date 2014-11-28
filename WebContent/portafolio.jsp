@@ -128,6 +128,100 @@
 			            ]
 			        });
 
+
+                    // TABLA VALORES EXTERNOS
+
+
+                    var gTable1 = $("<table>").attr("class","table table-striped").attr("id","portafolio-tabla");
+                    var gTableHead1 = $("<thead>");
+                    var gTr1 = $("<tr>");
+
+                    //THEADS
+                    var gth11 = $("<th>").text("Nombre Valor");
+                    var gth21 = $("<th>").text("Cantidad Total");
+                    var gth31 = $("<th>").text("% Invertido");
+                    var gth41 = $("<th>").text("Acciones");
+
+                    gTr1.append($(gth11));
+                    gTr1.append($(gth21));
+                    gTr1.append($(gth31));
+                    gTr1.append($(gth41));
+
+                    gTableHead1.append($(gTr1));
+                    gTable1.append($(gTableHead1));
+                    $("#portafolio-actual-body").append($(gTable1));
+                    $(gTable1).dataTable({
+                        "processing" : true,
+                        "serverSide" : true,
+                        "ajax": {
+                            "url": "/ValorAndes/portafolio.html",
+                            "type": "POST",
+                            "data" : {"global" : "mostrarValoresPortafolioExternos", "otra" : idPortafolio}
+                        },
+                        "drawCallback": function(settings, json) {
+                            console.log("DONE MODIFICAR PORTAFOLIO");
+                           $(".modificar-valores-portafolio").click(function (){
+                                console.log('HELLO');
+
+                                $("#modal-modificar-valor").modal();
+                                // var id_actual = this.value;
+                                var stringger = this.value;
+                                var res = stringger.split("-");
+                                modificarValor_id = res[0];
+                                cantidad_vieja_val = res[1];
+
+                                $.post( "/ValorAndes/portafolio.html", { global: "cargarCorredores", value: "cargarCorredores" }).done(function( data ) {
+
+                                    $("#select_corredor_valor").empty();
+                                    jQuery.each(data.data, function ( i , val){
+                                        //<option value="${row.asoci}"><c:out value="${row.nombre} ${row.apellido}"/></option>
+                                        // var option  = $("<option>").attr("value", val.ID_CORREDOR).attr("nombre","id_corredor_valor_opt").text(val.NOMBRE + " " + val.APELLIDO);
+                                        var nombreApellido = val.NOMBRE + " " + val.APELLIDO; 
+                                        $("#select_corredor_valor").append($('<option>', { 
+                                            value: val.ID_CORREDOR,
+                                            text : nombreApellido
+                                        }));
+                                    })
+                                });
+                                // var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/corredores.html");
+                                // var input = $("<input>").attr("type", "hidden").attr("name", "id_valor").val(id_actual);
+                                // var tipo = $("<input>").attr("type", "hidden").attr("name", "tipo-post").val("des-asociar");
+                                // var myID = $("<input>").attr("type", "hidden").attr("name", "id").val("${sessionScope.id}");
+                          //       $((form)).append($(input));
+                          //       $((form)).append($(tipo));
+                          //       $((form)).append($(myID));
+                          //       $((form)).submit();
+                           });
+                        },
+                        "columnDefs": [ {
+                            "render": function ( data, type, row ) {
+                                return "<button class=\"modificar-valores-portafolio btn btn-warning\" value=\"" + row.ID_VALOR + "-" + row.CANTIDAD_DUENO + "\">Modificar</button>";
+                            },
+                            "targets": -1
+                        },
+                        {
+                            "render": function ( data, type, row ) {
+                                var cantidad_total_valor = parseInt(row.CANTIDAD_DUENO);
+                                var cantidad_invertida_valor = parseInt(row.CANTIDAD_PORTAFOLIO);
+                                var porcentaje = (cantidad_invertida_valor/cantidad_total_valor) * 100;
+
+                                return " <div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-info\" role=\"progressbar\" aria-valuenow=\"20\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width: " + porcentaje + "%\"><span class=\"sr-only\">" + porcentaje + "% Complete</span></div></div>";
+                            },
+                            "targets": -2
+                        }
+                         ],
+                        columns: [
+                            { data : 'NOMBRE' },
+                            { data: 'CANTIDAD_DUENO' },
+                            { data: 'NOMBRE_TIPO'},
+                            { data : 'ID' }
+                        ]
+                    });
+
+
+                    // TERMINA TABLA VALORES EXTERNOS
+
+
 					//Segundo se muestra la tabla
 					$("#portafolio-actual").show();
 				});
@@ -191,9 +285,9 @@
 	        ],
             columns: [
                 { data : 'NOMBRE' },
-                { data: 'CANTIDAD' },
-                { data: 'NOMBRE_TIPO' },
-                { data: 'TIPO' },
+                { data : 'CANTIDAD' },
+                { data : 'NOMBRE_TIPO' },
+                { data : 'TIPO' },
                 { data : 'ID' }
             ]
         });
