@@ -314,6 +314,16 @@
             $("#form-modificar-valor").submit();
         });
 
+        $("#btn-modificar-valor-ext").click(function (){
+            var input = $("<input>").attr("type", "hidden").attr("value", modificarValor_id).attr("name","modificarValor_id_final_ext");
+            var idPortafolioInput = $("<input>").attr("type", "hidden").attr("value", idPortafolio).attr("name","id_portafolio");
+            var cantidadViejaInput = $("<input>").attr("type", "hidden").attr("value", cantidad_vieja_val).attr("name","cantidadVieja");
+            $("#form-modificar-valor").append($(cantidadViejaInput));
+            $("#form-modificar-valor").append($(input));
+            $("#form-modificar-valor").append($(idPortafolioInput));
+            $("#form-modificar-valor").submit();
+        });
+
         function crearCorredores(){
 
         }
@@ -516,6 +526,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="btn-modificar-valor">Modificar Valor</button>
+                <button type="button" class="btn btn-primary" id="btn-modificar-valor-ext">Modificar Valor Exter</button>
             </div>
         </div>
         <!-- /.modal-content -->
