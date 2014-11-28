@@ -2027,6 +2027,52 @@ public class ValorAndesDB {
 				closeConnection();
 		}
 	}
+	
+	public ArrayList<HashMap<String, String>> darValoresPortafoliosUsuarioExterno(int start,int rows, String order, String tipo, String search) throws SQLException {
+		if(order == null){
+			order = "NOMBRE";
+		}
+		if(tipo == null){
+			tipo = "asc";
+		}
+		startConnection();
+		String query = "select * from ( select a.*, ROWNUM rnum from (select nombre, cantidad as cantidad_dueno, id_valor as id from valorportafolioexterno where id_portafolio=1) a where ROWNUM <= ? AND (NOMBRE like '" + search +"%' OR cantidad_dueno like '" + search +"%')) where rnum >= ?";
+		PreparedStatement st = conexion.prepareStatement(query);
+		st.setInt(1, start + rows-1);
+		st.setInt(2, start);
+		ResultSet set = st.executeQuery();
+		ArrayList<HashMap<String, String>> resultado = darHola(set);
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarValoresPortafoliosUsuarioExternoTotal() throws SQLException {
+		startConnection();
+		String query = "select count(*) as count from valorportafolioexterno";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
+
+	public int contarValoresPortafoliosUsuarioExterno(String search) throws SQLException{
+		startConnection();
+		String query = "select count(*) as count from valorportafolioexterno where (NOMBRE like '" + search +"%' OR CANTIDAD like '" + search +"%') AND ID_PORTAFOLIO = 1";
+		PreparedStatement st = conexion.prepareStatement(query);
+		ResultSet set = st.executeQuery();
+		set.next();
+		int resultado = set.getInt("COUNT");
+		set.close();
+		st.close();
+		closeConnection();
+		return resultado;	
+	}
 }
 
 
