@@ -315,18 +315,17 @@
         });
 
         $("#btn-modificar-valor-ext").click(function (){
-            var input = $("<input>").attr("type", "hidden").attr("value", modificarValor_id).attr("name","modificarValor_id_final_ext");
-            var idPortafolioInput = $("<input>").attr("type", "hidden").attr("value", idPortafolio).attr("name","id_portafolio");
-            var cantidadViejaInput = $("<input>").attr("type", "hidden").attr("value", cantidad_vieja_val).attr("name","cantidadVieja");
-            $("#form-modificar-valor").append($(cantidadViejaInput));
-            $("#form-modificar-valor").append($(input));
-            $("#form-modificar-valor").append($(idPortafolioInput));
-            $("#form-modificar-valor").submit();
+        	var form = $("<form>").attr("method", "POST").attr("action", "/ValorAndes/portafolio.html");
+        	var input = $("<input>").attr("type", "hidden").attr("value", modificarValor_id).attr("name","modificarValor_id_final_ext");
+        	var input2 = $("<input>").attr("type", "hidden").attr("value", "modificarCantidadValorExterno").attr("name","global");
+        	var idPortafolioInput = $("<input>").attr("type", "hidden").attr("value", idPortafolio).attr("name","id_portafolio");
+			var cantidadViejaInput = $("<input>").attr("type", "hidden").attr("value", cantidad_vieja_val).attr("name","cantidadVieja");
+			$(form).append($(cantidadViejaInput));
+			$(form).append($(input));
+			$(form).append($(input2));
+			$(form).append($(idPortafolioInput));
+			$((form)).submit();
         });
-
-        function crearCorredores(){
-
-        }
 	});
 </script>
 

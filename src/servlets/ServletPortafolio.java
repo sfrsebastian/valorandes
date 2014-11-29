@@ -48,13 +48,13 @@ public class ServletPortafolio extends HttpServlet implements IEscuchadorEventos
 	public void init( ) throws ServletException
 	{
 		conexionDAO = ValorAndesDB.getInstance();
-//		try {
-//			conector = Conector.getInstance();
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		conector.addEventListener(this);
+		try {
+			conector = Conector.getInstance();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		conector.addEventListener(this);
 	}
 
 	//--------------------------------------------
@@ -259,6 +259,26 @@ public class ServletPortafolio extends HttpServlet implements IEscuchadorEventos
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			String json = gson.toJson(dataTableObject);
 			out.print(json);
+		}
+		else if(global.equals("modificarCantidadValorExterno")){
+			int idValor = Integer.parseInt(request.getParameter("modificarValor_id_final"));
+			int cantidad = Integer.parseInt(request.getParameter("cantidad_nueva"));
+			int cantidadVieja = Integer.parseInt(request.getParameter("cantidadVieja"));
+			int delta = cantidad - cantidadVieja;
+			JsonObject element = new JsonObject();
+			element.addProperty("method", "compraVenta");
+			element.addProperty("id", idValor);
+			element.addProperty("cantidad", delta);
+			Gson gson = new GsonBuilder().create();
+			String pregunta = gson.toJson(element);
+			System.out.println("envio pregunta" + pregunta);
+			conector.enviarPregunta(pregunta);
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
