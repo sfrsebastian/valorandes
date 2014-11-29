@@ -325,6 +325,7 @@
 			$(form).append($(input2));
 			$(form).append($(idPortafolioInput));
 			$((form)).submit();
+
         });
 	});
 </script>
